@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<JAMMER_property>
+  <Radar>
+    <PRF>20e3</PRF>
+    <Tpulse>6.4e-6</Tpulse>
+    <Tgate>6.4e-6</Tgate>
+    <NFilters>128</NFilters>
+    <Frequency>3.1e9</Frequency>
+	<Pt>10000</Pt>
+	<fre_center>3.1e9</fre_center>
+	<fre_band>0.2e6</fre_band>
+  </Radar>
+  
+  <Antenna>
+    <ScanAzRange>360</ScanAzRange>
+	<ScanElRangeLl>0.0</ScanElRangeLl>
+	<ScanElRangeUl>90.0</ScanElRangeUl>
+	<ThetaAZ05>1.3</ThetaAZ05>
+  	<ThetaEL05>1.3</ThetaEL05>
+  	<ScanPeriod>10</ScanPeriod>
+  </Antenna>
+  
+  <Jammer>
+    <BeamAzCenter>90.0</BeamAzCenter>
+	<BeamAzSweep>360.0</BeamAzSweep>
+	<BeamElCenter>-45.0</BeamElCenter>
+	<BeamElSweep>180.0</BeamElSweep>
+  	<Frequency>3.1e9</Frequency>
+	<FreqRange>0.5e6</FreqRange>
+  	<P_j>1000</P_j>
+  </Jammer>
+  
+  
+  
+  
+  
+  
+
+</JAMMER_property>

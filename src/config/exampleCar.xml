@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<car>
+    <name>testCar</name>
+
+    <hull>
+        <type>wheeled</type>
+
+        <mass>5000</mass>
+
+        <inertia>
+            <x>1500</x>
+            <y>2000</y>
+            <z>3000</z>
+        </inertia>
+
+        <length>5</length>
+
+        <maxAngle>0.523</maxAngle>
+
+        <rotateSpeed>0.349</rotateSpeed>
+
+        <maxLinearSpeed>30</maxLinearSpeed>
+
+        <maxFrontAcceleration>3</maxFrontAcceleration>
+
+        <maxBrakeAcceleration>2.5</maxBrakeAcceleration>
+
+        <maxLateralAcceleration>0.49</maxLateralAcceleration>
+    </hull>
+
+    <damagePartList>
+        <damagePart>
+            <type>normal</type>
+
+            <name>body</name>
+
+            <position>
+                <x>0</x>
+                <y>0</y>
+                <z>-1.5</z>
+            </position>
+
+            <!--x,y,z:Vector3;yaw,pitch,roll:Quaternion-->
+            <altitude>
+                <x>0</x>
+                <y>0</y>
+                <z>0</z>
+            </altitude>
+
+            <size>
+                <x>0.5</x>
+                <y>0.5</y>
+                <z>0.5</z>
+            </size>
+        </damagePart>
+    </damagePartList>
+
+    <protectionList>
+        <protection>
+            <type>normal</type>
+
+            <position>
+                <x>0</x>
+                <y>0</y>
+                <z>-1.5</z>
+            </position>
+
+            <altitude>
+                <x>0</x>
+                <y>0</y>
+                <z>0</z>
+            </altitude>
+
+            <armor>600</armor>
+
+            <activeProtectionAmmo>5</activeProtectionAmmo>
+
+            <reactiveArmor>20</reactiveArmor>
+
+            <protectZone>
+                <x>5.0</x>
+                <y>3.0</y>
+                <z>2.5</z>
+            </protectZone>
+        </protection>
+    </protectionList>
+
+    <fireUnitList>
+        <fireUnit>
+            <type>normal</type>
+
+            <damageModelName>body</damageModelName>
+
+            <fireZone>
+                <yawLeft>0.01</yawLeft>
+                <yawRight>0.01</yawRight>
+                <pitchUp>0.01</pitchUp>
+                <pitchDown>0.01</pitchDown>
+            </fireZone>
+            
+            <rotateZone>
+                <yawLeft>-180</yawLeft>
+                <yawRight>180</yawRight>
+                <pitchUp>30</pitchUp>
+                <pitchDown>-15</pitchDown>
+            </rotateZone>
+
+            <rotateSpeed>
+                <yaw>10</yaw>
+                <pitch>5</pitch>
+            </rotateSpeed>
+
+            <weapon>
+                <ammoType>125mmGun</ammoType>
+
+                <ammoRemain>50</ammoRemain>
+
+                <reloadingTime>12</reloadingTime>
+            </weapon>
+        </fireUnit>
+    </fireUnitList>
+
+    <sensorList>
+        <sensor>
+            <type>radar</type>
+
+            <damageModelName>body</damageModelName>
+        </sensor>
+    </sensorList>
+</car>

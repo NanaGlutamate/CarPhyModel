@@ -1,0 +1,6 @@
+#ifndef __SRC_MODEL_FIRECONTROLSYSTEM_FCS_H__
+#define __SRC_MODEL_FIRECONTROLSYSTEM_FCS_H__
+
+
+
+#endif
