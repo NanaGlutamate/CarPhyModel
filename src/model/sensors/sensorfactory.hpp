@@ -4,8 +4,12 @@
 #include "radar/myradar.h"
 #include "../framework/pattern.hpp"
 
-using SensorFactory = Factory<Sensor>;
+namespace carPhyModel{
+
+class SensorFactory : public Factory<Sensor>{};
 
 inline SensorFactory::LUT SensorFactory::look_up_table{
-    {"radar", std::shared_ptr<Sensor>(new MyRadar())},
+    {"radar", std::make_shared<MyRadar>()},
+};
+
 };

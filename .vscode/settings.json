@@ -64,6 +64,10 @@
         "xloctime": "cpp",
         "set": "cpp",
         "queue": "cpp",
-        "deque": "cpp"
+        "deque": "cpp",
+        "functional": "cpp",
+        "ranges": "cpp",
+        "span": "cpp",
+        "optional": "cpp"
     },
 }

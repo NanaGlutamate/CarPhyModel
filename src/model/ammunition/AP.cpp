@@ -12,12 +12,17 @@ constexpr const double INF_SMALL = 1e-10;
 constexpr const double INF_BIG = 1e+10;
 
 // array collision with AABB
-std::tuple<double, bool> collision(const Vector3& dir, const Vector3& pos, const PartDamageModel& pdm, const Coordinate& coordinate){
+std::tuple<double, bool> collision(
+    const carPhyModel::Vector3& dir,
+    const carPhyModel::Vector3& pos,
+    const carPhyModel::PartDamageModel& pdm,
+    const carPhyModel::Coordinate& coordinate)
+    {
     using std::fabs;
     using std::fmax;
     using std::fmin;
-    const Vector3 dir_local = coordinate.directionWorldToBody(dir);
-    const Vector3 pos_local = coordinate.positionWorldToBody(pos);
+    const carPhyModel::Vector3 dir_local = coordinate.directionWorldToBody(dir);
+    const carPhyModel::Vector3 pos_local = coordinate.positionWorldToBody(pos);
     double depth_min = -INF_BIG, depth_max = INF_BIG;
     // array collision with AABB
     for(size_t i=0; i<3; ++i){
@@ -35,6 +40,8 @@ std::tuple<double, bool> collision(const Vector3& dir, const Vector3& pos, const
 
 };
 
+namespace carPhyModel{
+
 void APDamage::updateDamage(PartDamageModel& pdm, const Coordinate& coordinate, const Vector3& pos, const Vector3& dir, const Vector3& vel, double range) const{
     auto [depth, is_hit] = collision(vel, pos, pdm, coordinate);
     if(is_hit){
@@ -44,11 +51,12 @@ void APDamage::updateDamage(PartDamageModel& pdm, const Coordinate& coordinate, 
         if(speed >= damageTable[0]){
             pdm.damageLevel = DAMAGE_LEVEL::KK;
         }else if(speed >= damageTable[1]){
-            if(pdm.damageLevel > DAMAGE_LEVEL::K)pdm.damageLevel = DAMAGE_LEVEL::K;
+            if(pdm.damageLevel < DAMAGE_LEVEL::K)pdm.damageLevel = DAMAGE_LEVEL::K;
         }else if(speed >= damageTable[2]){
-            if(pdm.damageLevel > DAMAGE_LEVEL::M)pdm.damageLevel = DAMAGE_LEVEL::M;
+            if(pdm.damageLevel < DAMAGE_LEVEL::M)pdm.damageLevel = DAMAGE_LEVEL::M;
         }
     }
     return;
 };
 
+};

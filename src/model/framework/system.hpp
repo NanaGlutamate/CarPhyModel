@@ -3,9 +3,19 @@
 #include <string>
 #include "../tools/datastructure.hpp"
 
+namespace carPhyModel{
+
+struct SystemRestriction{
+    std::vector<std::string> thisBefore;
+    std::vector<std::string> thisAfter;
+};
+
 class System{
 public:
-    virtual std::string getTag()=0;
-    virtual std::string getConstrain()=0;
-    virtual void Tick(double dt, Components& c)=0;
+    // virtual std::string_view getTag(){return std::string_view();};
+    // virtual SystemConstraint& getConstraint(){static SystemConstraint sc; return sc;};
+    virtual void tick(double dt, Components& c)=0;
+    virtual ~System()=default;
+};
+
 };

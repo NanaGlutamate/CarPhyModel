@@ -6,7 +6,11 @@
 #include <memory>
 //include <iostream>
 
+namespace carPhyModel{
+
 class MyRadar : public Sensor {
 public:
     virtual bool isDetectable(const Coordinate& self, const EntityInfo& e, const SensorData& sensor, const Hull& hull) const override;
+};
+
 };

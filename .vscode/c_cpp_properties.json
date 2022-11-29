@@ -3,7 +3,8 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/"
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/src/extern/"
             ],
             "defines": [
                 "_DEBUG",
@@ -12,8 +13,8 @@
             ],
             "windowsSdkVersion": "10.0.19041.0",
             "compilerPath": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30133\\bin\\Hostx64\\x64\\cl.exe",
-            "cStandard": "c17",
-            "cppStandard": "c++17",
+            "cStandard": "c20",
+            "cppStandard": "c++20",
             "configurationProvider": "ms-vscode.cmake-tools",
             "intelliSenseMode": "windows-msvc-x64"
         }

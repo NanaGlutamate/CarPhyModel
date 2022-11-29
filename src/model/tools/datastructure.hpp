@@ -1,5 +1,4 @@
-﻿#ifndef __SRC_MODEL_PCH_H__
-#define __SRC_MODEL_PCH_H__
+﻿#pragma once
 
 #include <vector>
 #include <string>
@@ -9,9 +8,13 @@
 #include "vector3.hpp"
 #include "coordinate.hpp"
 #include "../framework/componentmanager.hpp"
+#include "../framework/component.hpp"
+
+namespace carPhyModel{
 
 // carprotection
 struct ProtectionModel{
+    constexpr static const char* token_list[] = {"armor", "activeProtectionAmmo", "reactiveArmor", "protectZone"};
     double armor;
     int activeProtectionAmmo;
     int reactiveArmor;
@@ -26,15 +29,16 @@ struct Hull{
     // Vector3 I;
 };
 
-// cardamage，越大越正常
+// cardamage，越小越正常
 enum class DAMAGE_LEVEL{
-    KK, //失去结构
-    K, //失去功能
-    M, //中度毁伤
     N, //正常
+    M, //中度毁伤
+    K, //失去功能
+    KK, //失去结构
 };
 
 struct PartDamageModel{
+    constexpr static const char* token_list[] = {"damageLevel", "size"};
     DAMAGE_LEVEL damageLevel;
     Vector3 size;
 };
@@ -62,29 +66,41 @@ enum class FIRE_UNIT_STATE{
 };
 
 struct Weapon{
+    constexpr static const char* token_list[] = {"ammoType", "ammoRemain", "reloadingTime", "reloadingState"};
     std::string ammoType;
     int ammoRemain;
     double reloadingTime;
     double reloadingState;
 };
 
+struct AngleZone{
+    constexpr static const char* token_list[] = {"yawLeft", "yawRight", "pitchUp", "pitchDown"};
+    double yawLeft, yawRight, pitchUp, pitchDown;
+    double& operator[](size_t index){return (&yawLeft)[index];};
+    const double& operator[](size_t index) const {return (&yawLeft)[index];};
+};
+
+struct Direction{
+    constexpr static const char* token_list[] = {"yaw", "pitch"};
+    double yaw, pitch;
+    double& operator[](size_t index){return (&yaw)[index];};
+    const double& operator[](size_t index) const {return (&yaw)[index];};
+};
+            
 struct FireUnit{
+    constexpr static const char* token_list[] = {"state", "fireZone", "rotateZone", "presentDirection", "rotateSpeed"};
     FIRE_UNIT_STATE state;
-    std::array<double, 4> fireZone; //[yawLeft, yawRight, pitchUp, pitchDown]
-    std::array<double, 4> rotateZone; //[yawLeft, yawRight, pitchUp, pitchDown]
-    std::array<double, 2> presentDirection; //[yaw, pitch]
-    std::array<double, 2> rotateSpeed; //[yaw, pitch]
+    AngleZone fireZone; //[yawLeft, yawRight, pitchUp, pitchDown]
+    AngleZone rotateZone; //[yawLeft, yawRight, pitchUp, pitchDown]
+    Direction presentDirection; //[yaw, pitch]
+    Direction rotateSpeed; //[yaw, pitch]
     Weapon weapon;
 };
 
 // carsensor
 struct SensorData{
+    constexpr static const char* token_list[] = {"type"};
     std::string type;
-};
-
-enum class ENTITY_TYPE{
-    CAR,
-    UNKNOWN,
 };
 
 // vehicle ID
@@ -93,7 +109,10 @@ using VID = size_t;
 struct EntityInfo{
     Vector3 position;
     Vector3 velocity;
-    ENTITY_TYPE type;
+    enum class ENTITY_TYPE{
+        CAR,
+        UNKNOWN,
+    } type;
     VID id;
     double lastScanned;
 };
@@ -110,6 +129,16 @@ using CID = size_t;
 using ScannedMemory = std::map<VID, EntityInfo>;
 
 struct WheelMotionParamList{
+    constexpr static const char* token_list[] = {
+        "radius",
+        "LENGTH",
+        "MAX_ANGLE",
+        "ROTATE_SPEED",
+        "MAX_LINEAR_SPEED",
+        "MAX_FRONT_ACCELERATION",
+        "MAX_BRAKE_ACCELERATION",
+        "MAX_LATERAL_ACCELERATION"
+    };
     // 车轮转角，右为正
     double radius;
     // 前后轴距
@@ -128,17 +157,21 @@ struct WheelMotionParamList{
     double MAX_LATERAL_ACCELERATION;
 };
 
+using FireEventQueue = std::vector<FireEvent>;
+
 using Components = ComponentManager<
     SingletonComponent<
+        Coordinate,
+        FireEventQueue,
         WheelMotionParamList,
         ScannedMemory,
-        Hull,
+        Hull
     >, NormalComponent<
         Coordinate,
         ProtectionModel,
         PartDamageModel,
         FireUnit,
-        SensorData,
+        SensorData
     >>;
 
-#endif
+};

@@ -15,7 +15,7 @@ using ABFactory = Factory<A>;
 
 inline ABFactory::LUT ABFactory::look_up_table{
     {"A", std::shared_ptr<A>(new A())},
-    {"B", std::shared_ptr<A>(new B())}
+    {"B", std::shared_ptr<A>((A*)new B())}
 };
 
 namespace test09{

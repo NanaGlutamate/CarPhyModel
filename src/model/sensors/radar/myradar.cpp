@@ -6,11 +6,13 @@ namespace {
     //using namespace radar;
 }
 
+namespace carPhyModel{
+
 bool MyRadar::isDetectable(const Coordinate& self, const EntityInfo& e, const SensorData& sensor, const Hull& hull) const
 {
     static radar::Radar PdRadar1;
     static bool uninit = true;
-    if(uninit){
+    if(uninit)[[unlikely]]{
         PdRadar1.Init();
         PdRadar1.Set_JamPower(0);
     }
@@ -22,3 +24,5 @@ bool MyRadar::isDetectable(const Coordinate& self, const EntityInfo& e, const Se
     PdRadar1.update();
     return PdRadar1.ENUTargetState.detected;
 }
+
+};

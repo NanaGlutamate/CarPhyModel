@@ -11,33 +11,35 @@ const double INF_SMALL = 1e-6;
 const double INF_BIG = 1e8;
 
 // 投射到给定范围内
-inline double clamp(double value, double min, double max){
-    if(value < min) return min;
-    else if(value > max) return max;
+double clamp(double value, double min, double max){
+    if(value < min) value = min;
+    if(value > max) value = max;
     return value;
 };
-inline double clamp(double value, double bound){
-    if(value < -bound) return -bound;
-    else if(value > bound) return bound;
+double clamp(double value, double bound){
+    if(value < -bound) value = -bound;
+    if(value > bound) value = bound;
     return value;
 };
-inline double softClamp(double value, double bound){
+double softClamp(double value, double bound){
     return atan(value * (PI/2.) / bound) / (PI/2.) * bound;
 };
 
 // 获取当前转角时角速度与速度比例
-inline double angularLinearRatio(double rad, double LENGTH){
+double angularLinearRatio(double rad, double LENGTH){
     return tan(rad) / LENGTH;
 };
 
 // 获取符号
-inline int sign(double value){
+int sign(double value){
     if(value > INF_SMALL) return 1;
-    else if(value < -INF_SMALL) return -1;
-    else return 0;
+    if(value < -INF_SMALL) return -1;
+    return 0;
 };
 
 };
+
+namespace carPhyModel{
 
 // 采用前右下坐标系，速度和转角分别控制以支持原地转方向盘、缓慢转弯、行进中变向等操作
 // 由于动力学之上会采用控制器，无需考虑显式欧拉法的不稳定问题，出于简单考虑直接使用显式欧拉法
@@ -60,7 +62,7 @@ void CarHullSystem::tick(double dt, Coordinate& baseCoordinate, Hull& hull, cons
     const Vector3 front_direction = baseCoordinate.directionBodyToWorld(Vector3(1., 0., 0.));
     const Vector3 local_exp_direction = baseCoordinate.directionWorldToBody(exp_direction);
     val speed = hull.velocity.norm();
-
+    
     // 获得当前坡度，得到局部的一维运动环境参数
     val slope = env.getSlope(baseCoordinate.position, front_direction);
 
@@ -134,4 +136,6 @@ void CarHullSystem::unconstrainedTick(double dt, Coordinate& baseCoordinate, Hul
 
 void CarHullSystem::updateState(double dt, Coordinate& baseCoordinate, Hull& hull, WheelMotionParamList& params){
     using val = const double;
+};
+
 };

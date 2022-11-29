@@ -3,6 +3,10 @@
 #include "communication.hpp"
 #include "../framework/pattern.hpp"
 
-using CommunicationFactory = Factory<Communication>;
+namespace carPhyModel{
+
+class CommunicationFactory : public Factory<Communication>{};
 
 inline CommunicationFactory::LUT CommunicationFactory::look_up_table{};
+
+};

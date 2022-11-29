@@ -14,7 +14,11 @@
 #include "../src/model/tools/coordinate.hpp"
 #include "../src/model/framework/entitysynthesizer.hpp"
 #include "../src/model/hull/wheel.h"
-#include "../src/model/ammunitions/ammunitionfactory.hpp"
+#include "../src/model/ammunition/ammunitionfactory.hpp"
+#include "../src/extern/pfr.hpp"
+#include "../src/model/framework/component.hpp"
+
+using namespace carPhyModel;
 
 std::ostream& operator<<(std::ostream& os, const Vector3& v){
     os << "(" << v.x << ", " << v.y << ", " << v.z << ")";

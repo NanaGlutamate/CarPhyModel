@@ -1,11 +1,9 @@
-#ifndef __SRC_MODEL_CARBUILDER_H__
-#define __SRC_MODEL_CARBUILDER_H__
+#pragma once
 
 #include <string>
-#include <algorithm>
-#include "../extern/rapidxml-1.13/rapidxml.hpp"
-#include "carprotection.h"
 #include "carmodel.h"
+
+namespace carPhyModel{
 
 class CarBuilder{
 private:
@@ -21,4 +19,4 @@ public:
     void build(const std::string& srcXML, CarModel& model, bool need_erase=false);
 };
 
-#endif
+}

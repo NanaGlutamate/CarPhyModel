@@ -4,6 +4,8 @@
 #include <tuple>
 #include <vector>
 
+namespace carPhyModel{
+
 // template <typename _Ty>
 // struct is_const{constexpr static bool value=false;using origin_type = typename _Ty;};
 
@@ -114,13 +116,17 @@ public:
 
 // 将component组装成entity对应的tuple，其中只有第一个component可修改，避免system间数据竞争
 template<typename _Index, typename _Key, typename... _Element>
+[[deprecated("use component manager instead")]]
 decltype(auto) make_entity(std::vector<std::tuple<_Index, _Key>>& mainKey, const std::vector<std::tuple<_Index, _Element>>&... rest){
     return EntitySynthesizer<_Index, _Key, _Element...>(mainKey, rest...);
 };
 
 template<typename _Index, typename _Key, typename... _Element>
+[[deprecated("use component manager instead")]]
 decltype(auto) make_entity(const std::vector<std::tuple<_Index, _Key>>& mainKey, const std::vector<std::tuple<_Index, _Element>>&... rest){
     return EntitySynthesizer<_Index, const _Key, _Element...>(mainKey, rest...);
+};
+
 };
 
 #endif

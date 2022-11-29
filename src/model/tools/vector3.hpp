@@ -1,8 +1,9 @@
-﻿#ifndef __SRC_MODEL_VECTOR3_H__
-#define __SRC_MODEL_VECTOR3_H__
+﻿#pragma once
 
 #include <cmath>
 #include <iostream>
+
+namespace carPhyModel{
 
 //三维向量
 struct Vector3{
@@ -51,13 +52,13 @@ struct Vector3{
         y /= f;
         z /= f;
     };
-    inline element dot(const Vector3& v) const{
+    element dot(const Vector3& v) const{
         return x * v.x + y * v.y + z * v.z;
     };
-    inline Vector3 out(const Vector3& v) const{
+    Vector3 out(const Vector3& v) const{
         return Vector3(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x);
     };
-    inline element norm() const{
+    [[nodiscard("this function will not modify original vector")]] element norm() const{
         using std::sqrt;
         return sqrt(x * x + y * y + z * z);
     };
@@ -65,7 +66,7 @@ struct Vector3{
     //! act as a rotation quaternion (x, y, z, w=sqrt(1-x^2-y^2-z^2))
     //! @param p original position
     //! @return position after rotation
-    Vector3 rotate(const Vector3& p) const;
+    [[nodiscard("this function will not modify original vector")]] Vector3 rotate(const Vector3& p) const;
 
     element operator[](size_t index) const{
         return (&x)[index];
@@ -73,11 +74,14 @@ struct Vector3{
     element& operator[](size_t index){
         return (&x)[index];
     };
+    friend std::ostream& operator<<(std::ostream o, Vector3& v) {
+        return (o << "(" << v.x << ", " << v.y << ", " << v.z << ")");
+    };
 };
 
 //四元数
 struct Quaternion{
-    using element=double;
+    using element = double;
     element x, y, z, w;
     Quaternion(){};
     Quaternion(element x, element y, element z, element w):x(x), y(y), z(z), w(w) {};
@@ -145,14 +149,14 @@ struct Quaternion{
     Quaternion operator/(element f) const{
         return Quaternion(x / f, y / f, z / f, w / f);
     };
-    Quaternion conjugate() const{
+    [[nodiscard("this function will not modify original quaternion")]] Quaternion conjugate() const{
         return Quaternion(-x, -y, -z, w);
     };
-    Quaternion inverse() const{
+    [[nodiscard("this function will not modify original quaternion")]] Quaternion inverse() const{
         return conjugate() / (x * x + y * y + z * z + w * w);
     };
     //用当前四元数旋转作为参数的向量四元数
-    Quaternion rotate(const Quaternion& p) const{
+    [[nodiscard("this function will not modify original quaternion")]] Quaternion rotate(const Quaternion& p) const{
         return (*this) * p * inverse();
     };
 };
@@ -176,4 +180,4 @@ inline Vector3 Vector3::rotate(const Vector3& p) const{
     return Vector3(r.x, r.y, r.z);
 };
 
-#endif
+};

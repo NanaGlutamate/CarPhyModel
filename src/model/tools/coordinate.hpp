@@ -1,7 +1,8 @@
-﻿#ifndef __SRC_MODEL_COORDINATE_H__
-#define __SRC_MODEL_COORDINATE_H__
+﻿#pragma once
 
 #include "vector3.hpp"
+
+namespace carPhyModel{
 
 struct Coordinate{
     // 新坐标系原点在基坐标系中的位置
@@ -47,4 +48,4 @@ struct Coordinate{
     };
 };
 
-#endif
+};

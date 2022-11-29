@@ -2,7 +2,7 @@
 
 #include <array>
 
-namespace mymeta{
+namespace carPhyModel::mymeta{
 
 // 类型列表
 template <typename ...T>
@@ -16,7 +16,7 @@ struct get_type_list_index{
 
 template <typename Test, typename ListStart, typename ...List>
 struct get_type_list_index<Test, ListStart, List...>{
-    constexpr static std::size_t value = type_list_index<Test, List...>::value + 1;
+    constexpr static std::size_t value = get_type_list_index<Test, List...>::value + 1;
 };
 
 template <typename Test, typename ...List>
@@ -24,18 +24,18 @@ struct get_type_list_index<Test, Test, List...>{
     constexpr static std::size_t value = 0;
 };
 
+// 静态列表
+template <std::size_t ...indexes>
+struct static_list {};
+
 // 类型列表转index列表
 template <typename Tar, typename LookUp>
 struct to_index_static_list;
 
 template <typename ...Tar, typename ...LookUp>
 struct to_index_static_list<type_list<Tar...>, type_list<LookUp...>>{
-    using type = static_list<type_list_index<Tar, LookUp...>::value...>;
+    using type = typename static_list<get_type_list_index<Tar, LookUp...>::value...>;
 };
-
-// 静态列表
-template <std::size_t ...indexes>
-struct static_list{};
 
 // 静态列表转array
 template <typename T>
@@ -118,7 +118,7 @@ struct deduplicate_sort<static_list<>>{
     using type = static_list<>;
 };
 
-using t = typename deduplicate_sort<static_list<3, 1, 2, 5, 5, 2, 0>>::type;
-auto v = to_array<t>::value;
+// using t = typename deduplicate_sort<static_list<3, 1, 2, 5, 5, 2, 0>>::type;
+// auto v = to_array<t>::value;
 
 };

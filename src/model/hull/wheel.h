@@ -1,9 +1,10 @@
-﻿#ifndef __SRC_MODEL_HULL_WHELL_H__
-#define __SRC_MODEL_HULL_WHELL_H__
+﻿#pragma once
 
 #include <cmath>
 #include "../tools/datastructure.hpp"
 #include "../environment.h"
+
+namespace carPhyModel{
 
 // 轮式车辆运动系统
 class CarHullSystem{
@@ -40,4 +41,4 @@ public:
     );
 };
 
-#endif
+};
