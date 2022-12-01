@@ -9,6 +9,21 @@
 //#include "test08.hpp"
 //#include "test09.hpp"
 
+template<typename T1>
+struct A{
+    inline static int cnt = 0;
+    template<typename T2>
+    struct B{
+        inline static int cnt = 0;
+        B(){if(cnt==0)cnt=++A::cnt;}
+    };
+    template<typename T3>
+    static int count(){
+        B<T3> b;
+        return b.cnt;
+    };
+};
+
 struct Arefl{
     constexpr static const char* token_list[] = {"a", "b", "c"};
     int a;
@@ -41,5 +56,11 @@ int main(){
     auto root=doc.first_node("A");
     Arefl ta = carPhyModel::components::componentDeserialize<Arefl>(root);
     auto tmp = pfr::structure_to_tuple(ta);
+
+    auto ta1 = A<int>::count<int>();
+    auto ta2 = A<int>::count<float>();
+
+    auto ta3 = A<float>::count<int>();
+
     return 0;
 };

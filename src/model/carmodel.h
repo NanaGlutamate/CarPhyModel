@@ -1,7 +1,9 @@
 ﻿#pragma once
 
 #include <vector>
+#include <unordered_map>
 #include <memory>
+#include <any>
 #include "tools/datastructure.hpp"
 #include "framework/system.hpp"
 
@@ -13,6 +15,8 @@ private:
 
     std::vector<std::unique_ptr<System>> system;
     Components components;
+
+    std::unordered_map<std::string, std::any> buffer;
 public:
     CarModel() = default;
     void setInput(){};

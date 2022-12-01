@@ -62,7 +62,7 @@ public:
 private:
     // counter of instance of EntityList<>
     // used to give each instance of EntityList<> a token to access cached entity list
-    static size_t entityGroupCounter = 0;
+    inline static size_t entityGroupCounter = 0;
     bool lock;
     size_t entityCounter;
     NormalComponents normalComponents;
@@ -164,38 +164,35 @@ private:
                 ),
                 0
             )...};
-            componentManager.lock = false;
             entityGroupCache.content.clear();
+            componentManager.lock = false;
         };
     };
 public:
     // get a component-manager modifier to modify the components of entities;
     // must be destructed before visit component
     Modifier getModifier(){return Modifier(*this);};
-
+private:
     // TODO: lock to disable modify during iteration?
     template <typename ...ComponentTypes>
     struct EntityList{
-        static size_t entityGroupID = 0;
+        inline static size_t entityGroupID = 0;
     public:
+        ComponentManager* cm;
         EntityList(ComponentManager* cm):cm(cm){
             if(entityGroupID == 0){
                 entityGroupID = ++entityGroupCounter;
             }
             if(cm->entityGroupCache.content.find(entityGroupID) == cm->entityGroupCache.content.end()){
                 // TODO: sort types to reduce times of cache building?
-                cm->buildCache<ComponentTypes>(entityGroupID);
+                cm->buildCache<ComponentTypes...>(entityGroupID);
             }
         };
-        ComponentManager* cm;
         struct ComponentIterator{
+            size_t entityGroupID;
+            size_t currentEntityIndexInBuffer;
             ComponentManager* cm;
-            Entities::iterator current_entity;
-            bool aviliable(){
-                auto current_entity_ID = *current_entity;
-                return ((std::get<type_list_index<ComponentTypes, Normals...>::value>(cm->normalComponents).find(current_entity_ID)
-                      != std::get<type_list_index<ComponentTypes, Normals...>::value>(cm->normalComponents).end()) && ...);
-            };
+            std::tuple<std::vector<std::pair<std::size_t, ComponentTypes>>::iterator...> iters;
             void operator++(){
                 do{
                     ++current_entity;
@@ -222,6 +219,7 @@ public:
             return ComponentIterator{cm, cm->entities.end()};
         };
     };
+public:
     template <typename ...ComponentTypes>
     decltype(auto) getNormalComponent(){
         assert(!lock);
@@ -231,7 +229,6 @@ public:
     };
     template <typename ...ComponentTypes>
     decltype(auto) getSingletonComponent(){
-        assert(!lock);
         static_assert((... && type_list_contains_v<ComponentTypes, Singletons...>),
             "component manager doesnot contain singleton component of that type");
         return std::tuple<std::optional<ComponentTypes>&...>{
