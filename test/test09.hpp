@@ -1,4 +1,4 @@
-#include "test/basetest.h"
+#include "basetest.h"
 #include "../src/model/framework/pattern.hpp"
 
 class A{
