@@ -248,8 +248,7 @@ private:
                 constexpr EndIterator() = default;
             };
             ComponentManager* cm;
-            std::vector<size_t>::iterator entityIDIterator;
-            std::vector<size_t>::iterator entityIDIteratorEnd;
+            std::vector<size_t>::iterator entityIDIterator, entityIDIteratorEnd;
             std::tuple<typename std::vector<std::pair<std::size_t, ComponentTypes>>::iterator...> iters;
             ComponentIterator(ComponentManager* cm): cm(cm){
                 auto& cacheLine = cm->entityGroupCache[entityGroupID];
