@@ -1,17 +1,14 @@
-#ifndef __SRC_MODEL_CARFIREUNIT_H__
-#define __SRC_MODEL_CARFIREUNIT_H__
+#pragma once
 
 #include "../tools/datastructure.hpp"
 #include "../framework/system.hpp"
 
 namespace carPhyModel{
 
-class FireControlSystem : public System{
+class FireUnitSystem : public System{
 public:
-    FireControlSystem() = default;
+    FireUnitSystem() = default;
     virtual void tick(double dt, Components& c) override;
 };
 
 }
-
-#endif

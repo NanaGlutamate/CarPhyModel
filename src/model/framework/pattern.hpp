@@ -4,34 +4,30 @@
 #include <memory>
 #include <string>
 
-// template <typename T>
-// class Singleton{
-// protected:
-//     Singleton();
-// public:
-//     static T* getInstance(){
-//         static Singleton t;
-//         return (T*)&t;
-//     };
-// };
-
 namespace carPhyModel{
 
 template <typename T>
+class Singleton{
+public:
+    static T* getInstance(){
+        static T t;
+        return std::addressof(t);
+    };
+};
+
+template <typename Fac, typename T>
 class Factory{
 public:
-    using LUT = std::map<std::string, std::shared_ptr<T>>;
-private:
-    Factory(){};
-    static LUT look_up_table;
-public:
-    static void emplaceProduct(std::string name, std::shared_ptr<T> value){
-        look_up_table.emplace(name, value);
+    using LUT = std::map<std::string_view, std::shared_ptr<T>>;
+    static void emplaceProduct(std::string_view name, std::shared_ptr<T> value){
+        Fac::look_up_table.emplace(name, value);
     };
-    static std::weak_ptr<T> getProduct(std::string name){
-        auto it = look_up_table.find(name);
+    static std::weak_ptr<T> getProduct(std::string_view name){
+        auto it = Fac::look_up_table.find(name);
         return it->second;
     };
+private:
+    Factory() = delete;
 };
 
 };

@@ -5,12 +5,25 @@
 #include <map>
 #include <tuple>
 #include <array>
+#include <unordered_map>
+#include <any>
 #include "vector3.hpp"
 #include "coordinate.hpp"
 #include "../framework/componentmanager.hpp"
-#include "../framework/component.hpp"
 
 namespace carPhyModel{
+
+struct Square{
+    constexpr static const char* token_list[] = {"length", "width", "height"};
+    constexpr operator Vector3() const{
+        return Vector3{length, width, height};
+    };
+    constexpr double operator[](size_t i) const {return (&length)[i];};
+    double& operator[](size_t i){return (&length)[i];};
+    double length;
+    double width;
+    double height;
+};
 
 // carprotection
 struct ProtectionModel{
@@ -40,7 +53,7 @@ enum class DAMAGE_LEVEL{
 struct PartDamageModel{
     constexpr static const char* token_list[] = {"damageLevel", "size"};
     DAMAGE_LEVEL damageLevel;
-    Vector3 size;
+    Square size;
 };
 
 struct FireEvent{
@@ -88,7 +101,7 @@ struct Direction{
 };
             
 struct FireUnit{
-    constexpr static const char* token_list[] = {"state", "fireZone", "rotateZone", "presentDirection", "rotateSpeed"};
+    constexpr static const char* token_list[] = {"state", "fireZone", "rotateZone", "presentDirection", "rotateSpeed", "weapon"};
     FIRE_UNIT_STATE state;
     AngleZone fireZone; //[yawLeft, yawRight, pitchUp, pitchDown]
     AngleZone rotateZone; //[yawLeft, yawRight, pitchUp, pitchDown]
@@ -126,7 +139,7 @@ using CID = size_t;
 // using DamageList = std::vector<std::tuple<CID, PartDamageModel>>;
 // using FireUnitList = std::vector<std::tuple<CID, FireUnit>>;
 // using SensorList = std::vector<std::tuple<CID, SensorData>>;
-using ScannedMemory = std::map<VID, EntityInfo>;
+struct ScannedMemory : public std::map<VID, EntityInfo>{};
 
 struct WheelMotionParamList{
     constexpr static const char* token_list[] = {
@@ -157,10 +170,13 @@ struct WheelMotionParamList{
     double MAX_LATERAL_ACCELERATION;
 };
 
-using FireEventQueue = std::vector<FireEvent>;
+struct FireEventQueue : public std::vector<FireEvent>{};
+
+struct OutputBuffer : public std::unordered_map<std::string, std::any>{};
 
 using Components = ComponentManager<
     SingletonComponent<
+        OutputBuffer,
         Coordinate,
         FireEventQueue,
         WheelMotionParamList,

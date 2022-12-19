@@ -4,7 +4,7 @@
 // #include <iomanip>
 // #include <inverse.h>
 
-namespace comm
+namespace externModel::comm
 {
 
 	// using namespace splab;
@@ -78,20 +78,12 @@ namespace comm
 			j_ = std::any_cast<double>(it->second);
 		}
 
-		WriteLog("Comm model SetInput", 1);
 		return true;
 	}
 
 	std::unordered_map<std::string, std::any> *Comm::GetOutput()
 	{
-		state_ = CSInstanceState::IS_RUNNING;
-		params_.emplace("ForceSideID", GetForceSideID());
-		params_.emplace("ModelID", GetModelID());
-		params_.emplace("InstanceName", GetInstanceName());
-		params_.emplace("ID", GetID());
-		params_.emplace("State", uint16_t(GetState()));
 		params_.emplace("out", Get_tran());
-		WriteLog("Comm model GetOutPut", 1);
 		return &params_;
 	}
 

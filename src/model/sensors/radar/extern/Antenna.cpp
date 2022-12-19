@@ -1,6 +1,6 @@
 #include "Antenna.h"
 
-namespace radar {
+namespace externModel::radar {
 
 	Antenna::Antenna()
 	{
@@ -25,7 +25,7 @@ namespace radar {
 
 	bool Antenna::bInConeAngle(TARGETSTATE p_TarState)
 	{
-		//¼ÆËãÌìÏß²¨ÊøµÄ·½Î»½Ç[-PI,PI]¡¢¸©Ñö½Ç[-PI/2,PI/2]
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß²ï¿½ï¿½ï¿½ï¿½Ä·ï¿½Î»ï¿½ï¿½[-PI,PI]ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[-PI/2,PI/2]
 		AZ = std::atan2(p_TarState.tPos.x, p_TarState.tPos.y);
 		EL = -std::atan2(p_TarState.tPos.z, sqrt(p_TarState.tPos.x * p_TarState.tPos.x + p_TarState.tPos.y * p_TarState.tPos.y));
 
@@ -47,7 +47,7 @@ namespace radar {
 		return;
 	}
 
-	//¼ÆËãÊÓÔÚ¶àÆÕÀÕÆµÂÊ
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½
 	double Antenna::CalDopplerFrequency(RADARSTATE p_RdState, TARGETSTATE p_TarState)
 	{
 		double Vr, fd;

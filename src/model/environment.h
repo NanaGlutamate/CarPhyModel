@@ -1,17 +1,15 @@
 ﻿#pragma once
 
+#include <memory>
+#include "framework/pattern.hpp"
 #include "tools/vector3.hpp"
 
 namespace carPhyModel {
 
-class Environment {
+class Environment{
 private:
     friend class EnvironmentInfoAgent;
-    static Environment* getInstance() {
-        static Environment e;
-        return &e;
-    };
-    Environment() {};
+    Environment(){};
     Environment(const Environment&) = delete;
     Environment& operator=(const Environment&) = delete;
     double getAltitude(const Vector3& pos)const { return 0.; };
@@ -21,11 +19,11 @@ private:
 
 class EnvironmentInfoAgent {
 private:
-    Environment* env;
+    inline static std::unique_ptr<Environment> env = std::make_unique<Environment>();
 public:
-    EnvironmentInfoAgent() :env(Environment::getInstance()) {};
+    EnvironmentInfoAgent(){};
 
-    void changeEnvironmentSupplier(Environment* n) { env = n; return; };
+    void changeEnvironmentSupplier(std::unique_ptr<Environment>&& n) { env = std::move(n); return; };
 
     //! 采用北东地坐标系
     //! @param pos: 位置坐标(北东地)

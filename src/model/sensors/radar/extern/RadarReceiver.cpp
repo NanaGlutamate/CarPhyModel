@@ -1,7 +1,7 @@
 #include "RadarReceiver.h"
 #include <math.h>
 
-namespace radar {
+namespace externModel::radar {
 
 	RadarReceiver::RadarReceiver()
 	{

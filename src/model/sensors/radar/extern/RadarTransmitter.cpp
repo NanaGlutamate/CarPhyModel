@@ -1,6 +1,6 @@
 #include "RadarTransmitter.h"
 
-namespace radar {
+namespace externModel::radar {
 
 	RadarTransmitter::RadarTransmitter()
 	{
@@ -25,14 +25,14 @@ namespace radar {
 		Frequency = p_Params.Frequency;
 		lamda = 3e8 / Frequency;
 		Power = true;
-		//·åÖµ¹¦ÂÊPt = 10Kw
-		//Âö³åÖØ¸´ÆµÂÊ 20e3£¬Âö³å¿í¶È¼´Îª: plus_width = 1/20e3 = 5e-5
-		//ÓÐÐ§Âö³å¿í¶È 1e-6£¬ËùÒÔÕ¼¿Õ±ÈÎª: tplus_ratio = 1e-6/plus_width = 2e-2;
-		//Òò´Ë£¬Æ½¾ù¹¦ÂÊPav = Pt*tplus_ratio = 200W
+		//ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½Pt = 10Kw
+		//ï¿½ï¿½ï¿½ï¿½ï¿½Ø¸ï¿½Æµï¿½ï¿½ 20e3ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¼ï¿½Îª: plus_width = 1/20e3 = 5e-5
+		//ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 1e-6ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½Õ±ï¿½Îª: tplus_ratio = 1e-6/plus_width = 2e-2;
+		//ï¿½ï¿½Ë£ï¿½Æ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Pav = Pt*tplus_ratio = 200W
 		Pav = p_Params.Pt * Tpulse * PRF;
 	}
 
-	double RadarTransmitter::CalDav()	//¼ÆËã¾àÀëËðÊ§ÏµÊý
+	double RadarTransmitter::CalDav()	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê§Ïµï¿½ï¿½
 	{
 		double temp = Tpulse / Tgate;
 		if (temp <= 1)

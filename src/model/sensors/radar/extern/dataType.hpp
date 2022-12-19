@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-namespace radar {
+namespace externModel::radar {
 
     constexpr double PI{ 3.14159265358979323846 };
     constexpr double TWO_PI{ 6.28318530717958647692 };
@@ -229,11 +229,11 @@ namespace radar {
 
     typedef enum {
         NULLPTR = 0,
-        FIRECONTROL_RADAR,			//»ð¿ØÀ×´ï
-        EARLYWARNING_RADAR,			//Ô¤¾¯À×´ï
-        ANTI_SUBMARINE_SYSTEM,		//·´Ç±ÏµÍ³
-        RADARWARNING_RECEIVER,		//À×´ï¸æ¾¯ÏµÍ³
-        MTI, FTI, ISAR				//ÎÞÈË»úSAR³ÉÏñÀ×´ï£¨¶¯Ä¿±êÌ½²â¡¢¹Ì¶¨Ä¿±êÌ½²â¡¢½¢´¬³ÉÏñ£©
+        FIRECONTROL_RADAR,			//ï¿½ï¿½ï¿½ï¿½×´ï¿½
+        EARLYWARNING_RADAR,			//Ô¤ï¿½ï¿½ï¿½×´ï¿½
+        ANTI_SUBMARINE_SYSTEM,		//ï¿½ï¿½Ç±ÏµÍ³
+        RADARWARNING_RECEIVER,		//ï¿½×´ï¿½æ¾¯ÏµÍ³
+        MTI, FTI, ISAR				//ï¿½ï¿½ï¿½Ë»ï¿½SARï¿½ï¿½ï¿½ï¿½ï¿½×´ï£¨ï¿½ï¿½Ä¿ï¿½ï¿½Ì½ï¿½â¡¢ï¿½Ì¶ï¿½Ä¿ï¿½ï¿½Ì½ï¿½â¡¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     } RadarType;
 
     struct RadarBasicInfo {
@@ -245,52 +245,52 @@ namespace radar {
     };
 
     struct TemporaryDetectSwitch {
-        int RD_Mode;//Ä£ÐÍµÄÔËÐÐÄ£Ê½ ModeÎª0±íÊ¾ÒÀ¾ÝGranularityLevelµÄÖµ¾ö¶¨Á£¶È£¬ModeÎª1±íÊ¾ÒÀ¾Ý¸÷Ïî¿ª¹Ø¿ØÖÆÁ¿¾ö¶¨Ä£ÐÍµÄÁ£¶È
-        bool RD_FlagMeasurement;//²â¾à²âËÙÄ£ÐÍ
-        bool RD_FlagNoise;//½ÓÊÕ»úÔëÉùÄ£ÐÍ
-        bool RD_FlagRandomization;//Ëæ»úÌ½²âÄ£ÐÍ
-        bool RD_FlagSurfaceClutter;//ÃæÔÓ²¨Ä£ÐÍ
-        bool RD_FlagTargetRCS;//Ä¿±êÉ¢ÉäÄ£ÐÍ
-        bool RD_FlagTerrain;//µØÐÎÄ£ÐÍ
-        bool RD_FlagVolumeClutter;//ÌåÔÓ²¨Ä£ÐÍ
+        int RD_Mode;//Ä£ï¿½Íµï¿½ï¿½ï¿½ï¿½ï¿½Ä£Ê½ ModeÎª0ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½GranularityLevelï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È£ï¿½ModeÎª1ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½Ý¸ï¿½ï¿½î¿ªï¿½Ø¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½Íµï¿½ï¿½ï¿½ï¿½ï¿½
+        bool RD_FlagMeasurement;//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½
+        bool RD_FlagNoise;//ï¿½ï¿½ï¿½Õ»ï¿½ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½
+        bool RD_FlagRandomization;//ï¿½ï¿½ï¿½Ì½ï¿½ï¿½Ä£ï¿½ï¿½
+        bool RD_FlagSurfaceClutter;//ï¿½ï¿½ï¿½Ó²ï¿½Ä£ï¿½ï¿½
+        bool RD_FlagTargetRCS;//Ä¿ï¿½ï¿½É¢ï¿½ï¿½Ä£ï¿½ï¿½
+        bool RD_FlagTerrain;//ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½
+        bool RD_FlagVolumeClutter;//ï¿½ï¿½ï¿½Ó²ï¿½Ä£ï¿½ï¿½
 
-        bool RD_HasJam;//[¶ÀÁ¢]ÊÇ·ñ¿¼ÂÇ¸ÉÈÅ
-        bool RD_HasClutter;//[¶ÀÁ¢]ÊÇ·ñ¿¼ÂÇÔÓ²¨
-        int RD_JammerNum;//[¶ÀÁ¢]¸ÉÈÅ»úÊýÁ¿
+        bool RD_HasJam;//[ï¿½ï¿½ï¿½ï¿½]ï¿½Ç·ï¿½ï¿½Ç¸ï¿½ï¿½ï¿½
+        bool RD_HasClutter;//[ï¿½ï¿½ï¿½ï¿½]ï¿½Ç·ï¿½ï¿½ï¿½ï¿½Ó²ï¿½
+        int RD_JammerNum;//[ï¿½ï¿½ï¿½ï¿½]ï¿½ï¿½ï¿½Å»ï¿½ï¿½ï¿½ï¿½ï¿½
     };
 
-    struct RADARSTATE {	//À×´ï×´Ì¬²ÎÊý
-        //Î»ÖÃÓëËÙ¶È
+    struct RADARSTATE {	//ï¿½×´ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½
+        //Î»ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
         Vector3 rPos, rVel;
-        double Height;		//À×´ï¸ß¶È
-        double fre_center; //À×´ïÖÐÐÄÆµÂÊ
-        double fre_band; //À×´ï´ø¿í
+        double Height;		//ï¿½×´ï¿½ß¶ï¿½
+        double fre_center; //ï¿½×´ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½
+        double fre_band; //ï¿½×´ï¿½ï¿½ï¿½ï¿½
     };
 
-    struct TARGETSTATE {	//Ä¿±ê×´Ì¬²ÎÊý
+    struct TARGETSTATE {	//Ä¿ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½
         int id;
-        //¼¸ºÎ²ÎÊý
+        //ï¿½ï¿½ï¿½Î²ï¿½ï¿½ï¿½
         Vector3 tPos, tVel;
-        double RCS;//Ä¿±êRCS
-        short surfaceType;   //Ä¿±êÊÇ´¦ÓÚº£Ãæ»¹ÊÇµØÃæ¡£¼ÆËãÔÓ²¨Ê¹ÓÃ
-        bool detected; // ÊÇ·ñ±»Ì½²âµ½
+        double RCS;//Ä¿ï¿½ï¿½RCS
+        short surfaceType;   //Ä¿ï¿½ï¿½ï¿½Ç´ï¿½ï¿½Úºï¿½ï¿½æ»¹ï¿½Çµï¿½ï¿½æ¡£ï¿½ï¿½ï¿½ï¿½ï¿½Ó²ï¿½Ê¹ï¿½ï¿½
+        bool detected; // ï¿½Ç·ï¿½Ì½ï¿½âµ½
         TARGETSTATE() :detected(false), surfaceType(0), RCS(0) {};
     };
 
     struct RadarParams {
-        double ScanAzRange;//ÌìÏßÉ¨Ãè·½Î»½Ç¶È·¶Î§
-        double ScanElRangeUl;//ÌìÏßÉ¨Ãè¸©Ñö½ÇÉÏÏÞ
-        double ScanElRangeLl;//ÌìÏßÉ¨Ãè¸©Ñö½ÇÏÂÏÞ
-        double ThetaAZ05;//ÌìÏß·½Î»°ë¹¦ÂÊ½Ç
-        double ThetaEL05;//ÌìÏß¸©Ñö°ë¹¦ÂÊ½Ç
-        double ScanPeriod;//ÌìÏßÉ¨ÃèÖÜÆÚ
+        double ScanAzRange;//ï¿½ï¿½ï¿½ï¿½É¨ï¿½è·½Î»ï¿½Ç¶È·ï¿½Î§
+        double ScanElRangeUl;//ï¿½ï¿½ï¿½ï¿½É¨ï¿½è¸©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        double ScanElRangeLl;//ï¿½ï¿½ï¿½ï¿½É¨ï¿½è¸©ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        double ThetaAZ05;//ï¿½ï¿½ï¿½ß·ï¿½Î»ï¿½ë¹¦ï¿½Ê½ï¿½
+        double ThetaEL05;//ï¿½ï¿½ï¿½ß¸ï¿½ï¿½ï¿½ï¿½ë¹¦ï¿½Ê½ï¿½
+        double ScanPeriod;//ï¿½ï¿½ï¿½ï¿½É¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-        double PRF;//Âö³åÖØ¸´ÆµÂÊ
-        double Tpulse;//ÓÐÐ§Âö³å¿í¶È
-        double Tgate;//²¨ÃÅ¿í¶È
-        int NFilters;//Ã¿²¨ÃÅ¶àÆÕÀÕÂË²¨Æ÷ÊýÄ¿
-        double Frequency;//À×´ïÔØÆµHz
-        double Pt; //·åÖµ¹¦ÂÊ
+        double PRF;//ï¿½ï¿½ï¿½ï¿½ï¿½Ø¸ï¿½Æµï¿½ï¿½
+        double Tpulse;//ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        double Tgate;//ï¿½ï¿½ï¿½Å¿ï¿½ï¿½ï¿½
+        int NFilters;//Ã¿ï¿½ï¿½ï¿½Å¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë²ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿
+        double Frequency;//ï¿½×´ï¿½ï¿½ï¿½ÆµHz
+        double Pt; //ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½
         double fre_center;
         double fre_band;
     };

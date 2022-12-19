@@ -4,8 +4,9 @@
 #include <type_traits>
 #include "src/extern/pfr.hpp"
 #include "src/extern/rapidxml-1.13/rapidxml.hpp"
+#include "../tools/datastructure.hpp"
 
-namespace carPhyModel::components{
+namespace carPhyModel::component{
 
 template<typename RETURN_TYPE> inline RETURN_TYPE componentDeserialize(rapidxml::xml_node<char>* node);
 
@@ -25,9 +26,13 @@ inline void emplace(T& tar, rapidxml::xml_node<char>* node) {
 
 template<typename RETURN_TYPE>
 inline RETURN_TYPE componentDeserialize(rapidxml::xml_node<char>* node){
-    RETURN_TYPE tmp;
-    emplace<RETURN_TYPE, 0>(tmp, node);
-    return tmp;
+    if constexpr (std::is_enum_v<RETURN_TYPE>){
+        return (RETURN_TYPE)componentDeserialize<int>(node);
+    }else{
+        RETURN_TYPE tmp;
+        emplace<RETURN_TYPE, 0>(tmp, node);
+        return tmp;
+    }
 }
 
 template<> inline double componentDeserialize<double>(rapidxml::xml_node<char>* node){
@@ -45,5 +50,38 @@ template<> inline int componentDeserialize<int>(rapidxml::xml_node<char>* node){
 template<> inline std::string componentDeserialize<std::string>(rapidxml::xml_node<char>* node){
     return std::string(node->value());
 }
+
+template<> inline Vector3 componentDeserialize<Vector3>(rapidxml::xml_node<char>* node){
+    if (node->first_node("x") != 0){
+        return Vector3{
+            std::stof(node->first_node("x")->value()),
+            std::stof(node->first_node("y")->value()),
+            std::stof(node->first_node("z")->value())};
+    }else{
+        Quaternion q(
+            std::stof(node->first_node("roll")->value()),
+            std::stof(node->first_node("pitch")->value()),
+            std::stof(node->first_node("yaw")->value()));
+        return (Vector3)q;
+    }
+}
+
+template<> inline Coordinate componentDeserialize<Coordinate>(rapidxml::xml_node<char>* node){
+    return Coordinate{
+        componentDeserialize<Vector3>(node->first_node("position")),
+        componentDeserialize<Vector3>(node->first_node("altitude"))
+    };
+}
+
+// template<typename T> 
+// inline std::vector<T> componentDeserialize<std::vector<T>>(rapidxml::xml_node<char>* node){
+//     std::vector<T> tmp;
+//     auto child = node->first_node(0);
+//     while(child){
+//         tmp.push_back(componentDeserialize<T>(child));
+//         child = child->next_sibling(0);
+//     }
+//     return tmp;
+// }
 
 }

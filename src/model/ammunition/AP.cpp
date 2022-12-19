@@ -1,15 +1,9 @@
 #include "AP.h"
+#include "../tools/constant.hpp"
 
 namespace{
-
-// gravity
-constexpr const double G = 9.8;
-// PI
-constexpr const double PI = 3.1415926535897932384626433;
-// inf_s
-constexpr const double INF_SMALL = 1e-10;
-// inf_m
-constexpr const double INF_BIG = 1e+10;
+    
+using namespace carPhyModel;
 
 // array collision with AABB
 std::tuple<double, bool> collision(
@@ -17,20 +11,19 @@ std::tuple<double, bool> collision(
     const carPhyModel::Vector3& pos,
     const carPhyModel::PartDamageModel& pdm,
     const carPhyModel::Coordinate& coordinate)
-    {
+{
     using std::fabs;
     using std::fmax;
     using std::fmin;
     const carPhyModel::Vector3 dir_local = coordinate.directionWorldToBody(dir);
     const carPhyModel::Vector3 pos_local = coordinate.positionWorldToBody(pos);
     double depth_min = -INF_BIG, depth_max = INF_BIG;
-    // array collision with AABB
     for(size_t i=0; i<3; ++i){
         if(fabs(dir_local[i]) < INF_SMALL){
-            if(pos_local[i] < -pdm.size[i] || pos_local[i] > pdm.size[i])return std::make_tuple(0., false);
+            if(pos_local[i] < -pdm.size[i] / 2. || pos_local[i] > pdm.size[i] / 2.){return std::make_tuple(0., false);}
         }else{
-            const double d1 = (pdm.size[i] - pos_local[i]) / dir_local[i];
-            const double d2 = (-pdm.size[i] - pos_local[i]) / dir_local[i];
+            const double d1 = (pdm.size[i] / 2. - pos_local[i]) / dir_local[i];
+            const double d2 = (-pdm.size[i] / 2. - pos_local[i]) / dir_local[i];
             depth_min = fmax(depth_min, fmin(d1, d2));
             depth_max = fmin(depth_max, fmax(d1, d2));
         }

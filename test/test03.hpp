@@ -53,8 +53,9 @@ int test_main(){
     assertVector3Equal(p1, {1., 0., sqrt(2)}, __LINE__);
 
     // 欧拉角测试
-    Quaternion q2(PI/4., -PI/4., PI/2.);
+    Quaternion q2(PI/2., -PI/4., PI/4.);
     assertVector3Equal(q2.getEuler(), {PI/2., -PI/4., PI/4.}, __LINE__);
+    
     Coordinate c2{{0., 0., 0.}, {q2.x, q2.y, q2.z}};
     assertVector3Equal(c2.positionWorldToBody({0.5, 0.5, sqrt(2.)/2.}), {1., 0., 0.}, __LINE__);
     assertVector3Equal(c2.positionWorldToBody({-0.5, -0.5, sqrt(2.)/2.}), {0., 1., 0.}, __LINE__);

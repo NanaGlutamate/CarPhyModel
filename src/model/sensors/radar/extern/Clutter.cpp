@@ -1,6 +1,6 @@
 #include "Clutter.h"
 
-namespace radar {
+namespace externModel::radar {
 
     Clutter::Clutter() {
 
@@ -15,7 +15,7 @@ namespace radar {
         m_Trans.Init(p_Params);
         Lsys = 4;	//dB
 
-        //20191101 GH µØº£ÔÓ²¨dll¼ÓÔØ
+        //20191101 GH ï¿½Øºï¿½ï¿½Ó²ï¿½dllï¿½ï¿½ï¿½ï¿½
         string landclutteDir = GetAppPath() + "\\landclutter.dll";
         string seaclutteDir = GetAppPath() + "\\seaclutter.dll";
         hlandclutter = LoadLibraryEx(TEXT("D:\\landclutter.dll"), NULL,
@@ -24,7 +24,7 @@ namespace radar {
             LOAD_WITH_ALTERED_SEARCH_PATH);
 
         if (NULL == hlandclutter || NULL == hseaclutter) {
-            //	AfxMessageBox(_T("ÎÞ·¨loadÔÓ²¨¿â"), MB_OK | MB_ICONSTOP);
+            //	AfxMessageBox(_T("ï¿½Þ·ï¿½loadï¿½Ó²ï¿½ï¿½ï¿½"), MB_OK | MB_ICONSTOP);
         }
     }
 
@@ -45,7 +45,7 @@ namespace radar {
 
         AntennaBWR = AntennaBw * DEG2RAD;
 
-        //¼ÆËãÌìÏß²¨ÊøµÄ¹éÒ»»¯ÏòÁ¿ ±±¶«µØ×ø±êÏµ
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß²ï¿½ï¿½ï¿½ï¿½Ä¹ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµ
         Anti = cos(AntennaEl * DEG2RAD) * cos(AntennaAzi * DEG2RAD);
         Antj = cos(AntennaEl * DEG2RAD) * sin(AntennaAzi * DEG2RAD);
         Antk = -sin(AntennaEl * DEG2RAD);
@@ -56,10 +56,10 @@ namespace radar {
 
     double Clutter::Gain(double DEL, double AntennaBWR) {
         double Gt = 0.0;
-        //DEL = DEL * PI/180; //´Ó½Ç¶È×ª»¯Îª»¡¶È
-        //ÒÔÏÂ¼ÆËã·½Ê½Í¬  ¸ÉÈÅ»ú½ÓÊÕÌìÏßÔöÒæ¼ÆËã
-        double HalfPow_sita = AntennaBWR / 180. * PI;//°ë¹¦ÂÊ¿í¶È(Õý³£1-2¶È)
-        double sing_lamda = 4.0 * PI / (3.0 * HalfPow_sita);//singaº¯ÊýµÄÏµÊýlamda
+        //DEL = DEL * PI/180; //ï¿½Ó½Ç¶ï¿½×ªï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½
+        //ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ã·½Ê½Í¬  ï¿½ï¿½ï¿½Å»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        double HalfPow_sita = AntennaBWR / 180. * PI;//ï¿½ë¹¦ï¿½Ê¿ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½1-2ï¿½ï¿½)
+        double sing_lamda = 4.0 * PI / (3.0 * HalfPow_sita);//singaï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½lamda
         DEL = fabs(DEL);
 
         if (DEL <= 1e-15) {
@@ -84,13 +84,13 @@ namespace radar {
 
 
         PreProcess();
-        //3±¶Ä£ºý¾àÀëÖ®ÄÚ¼ÆËãÔÓ²¨
+        //3ï¿½ï¿½Ä£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö®ï¿½Ú¼ï¿½ï¿½ï¿½ï¿½Ó²ï¿½
         RangeMAX = 3 * RUnamb + AircraftAlt;
         Lambda = C / Freq;
         RK = pow(Lambda, 2) * m_Trans.Pav * m_Trans.Dav / (pow(4 * PI, 3) * pow(10,
-            Lsys / 10));	//¼ÙÉè·åÖµ¹¦ÂÊ100KW
+            Lsys / 10));	//ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½100KW
         DAZ = 0.002;
-        Gama = pow(10, Sig0DB / 10);  //½«Sig0DBµÄµ¥Î»×ª»¯ÎªÍß
+        Gama = pow(10, Sig0DB / 10);  //ï¿½ï¿½Sig0DBï¿½Äµï¿½Î»×ªï¿½ï¿½Îªï¿½ï¿½
         FilterBW = m_Trans.PRF / m_Trans.NFilters;
         GMax = 4 * PI / (AntennaBWR * AntennaBWR);
 
@@ -105,16 +105,16 @@ namespace radar {
             AZ = PI / 2;
 
             while ((AZ >= 0) && (M == M1)) {
-                //¼ÆËãÔÓ²¨µ¥ÔªµÄÊÓÏß¹éÒ»»¯ÏòÁ¿
+                //ï¿½ï¿½ï¿½ï¿½ï¿½Ó²ï¿½ï¿½ï¿½Ôªï¿½ï¿½ï¿½ï¿½ï¿½ß¹ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                 CEL = cos(EL);
                 Inti = CEL * cos(AZ);
                 Intj = CEL * sin(AZ);
                 Intk = -sin(EL);
 
-                //¼ÆËãÌìÏß²¨ÊøÓëÔÓ²¨µ¥ÔªÊÓÏßÖ®¼äµÄ¼Ð½Ç
+                //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó²ï¿½ï¿½ï¿½Ôªï¿½ï¿½ï¿½ï¿½Ö®ï¿½ï¿½Ä¼Ð½ï¿½
                 DEL = acos(Inti * Anti + Intj * Antj + Intk * Antk);
 
-                //¼ÆËãÔÓ²¨µ¥Ôª·½ÏòµÄÌìÏßÔöÒæ
+                //ï¿½ï¿½ï¿½ï¿½ï¿½Ó²ï¿½ï¿½ï¿½Ôªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                 GANT = Gain(DEL, AntennaBWR) * GMax;
                 //GANT = 1.0*GMax;
                 SigC = RRes * Range * DAZ * Sig0 / CEL;
@@ -142,7 +142,7 @@ namespace radar {
             for (j = 0; j < m_Trans.NFilters; j++)
                 RangeDoppler[i][j] = 10 * log10(RangeDoppler[i][j]);
 
-        //		Êä³öRangeDoppler£¬¡¾É÷ÓÃ¡¿ÔËÐÐÊ±¼ä¼«³¤£¬»áÈÃ³ÌÐò²»ÊµÊ±
+        //		ï¿½ï¿½ï¿½RangeDopplerï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¡ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ä¼«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã³ï¿½ï¿½ï¿½ÊµÊ±
         // 		FILE *fp;
         // 		fp = fopen("Result.m","w");
         // 		for(i=0; i<NRangeGates; i++)
@@ -159,7 +159,7 @@ namespace radar {
     double Clutter::CPower(RADARSTATE p_RdState, TARGETSTATE p_TarState,
         RADARSTATE p_NUERdState, TARGETSTATE p_NUETarState) {
         //TODO
-        //ÅÐ±ðÄ¿±ê¶ÔÓ¦µÄ²¨ÃÅ-¶àÆÕÀÕµ¥ÔªºÅ
+        //ï¿½Ð±ï¿½Ä¿ï¿½ï¿½ï¿½Ó¦ï¿½Ä²ï¿½ï¿½ï¿½-ï¿½ï¿½ï¿½ï¿½ï¿½Õµï¿½Ôªï¿½ï¿½
         double R, Rres, Fres;
         R = p_TarState.tPos.magnitude();
         m_Trans.Ru = 3e8 / (2 * m_Trans.PRF);
@@ -169,7 +169,7 @@ namespace radar {
         N = (int)(AMOD(m_Ant.CalDopplerFrequency(p_RdState, p_TarState),
             m_Trans.PRF) / Fres);
 
-        //½âËã¸Ã¾àÀëÃÅ£­¶àÆÕÀÕµ¥ÔªµÄ¸±°êÔÓ²¨¹¦ÂÊ
+        //ï¿½ï¿½ï¿½ï¿½Ã¾ï¿½ï¿½ï¿½ï¿½Å£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õµï¿½Ôªï¿½Ä¸ï¿½ï¿½ï¿½ï¿½Ó²ï¿½ï¿½ï¿½ï¿½ï¿½
         AircraftAlt = p_RdState.Height;
         AircraftVel = p_RdState.rVel.x;
         AntennaAzi = m_Ant.AZ;
@@ -180,16 +180,16 @@ namespace radar {
 
         double ClutterP = CalClutterPower(M, N);
 
-        //¼ÆËãÖ÷°êÔÓ²¨¹¦ÂÊ
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó²ï¿½ï¿½ï¿½ï¿½ï¿½
         double rx = p_NUETarState.tPos.x - p_NUERdState.rPos.x;
         double ry = p_NUETarState.tPos.y - p_NUERdState.rPos.y;
         double rz = p_NUETarState.tPos.z - p_NUERdState.rPos.z;
-        //À×´ïÓëÄ¿±êµÄ¾àÀë
+        //ï¿½×´ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½Ä¾ï¿½ï¿½ï¿½
         double r = sqrt(rx * rx + ry * ry + rz * rz);
-        //Ö÷²¨Êø²ÁµØ½Ç
+        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø½ï¿½
         double theta = asin(ry / r);
         if (theta == 0) theta = 10e-16;
-        //À×´ï¾àÀëµØÃæµÄ³¤¶È(½«Ö÷²¨ÊøÕÕÉäµØÃæ¿´ÎªÄ¿±ê)
+        //ï¿½×´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä³ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ¿´ÎªÄ¿ï¿½ï¿½)
         double R2Surface = fabs(p_NUERdState.rPos.y / sin(theta));
 
         if (theta < 0) {
@@ -199,16 +199,16 @@ namespace radar {
             double shortaxis = 2 * p_NUERdState.rPos.y / sin(fabs(theta)) * tan(
                 0.5 * PI / 180.);
             double s = PI *
-                longaxis * shortaxis;    //Ö÷²¨ÊøÕÕÃæ»ý¡£°´ÕÕ°ë¹¦ÂÊ½Ç·¶Î§¼ÆËã
+                longaxis * shortaxis;    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ°ë¹¦ï¿½Ê½Ç·ï¿½Î§ï¿½ï¿½ï¿½ï¿½
 
             double A1 = 10 * log10(m_Trans.Pav * pow(m_Trans.lamda, 2) * m_Trans.Dav)
                 + 10 * log10(s) + Sig0DB + 2 * m_Ant.Gml;
             double B1 = 30 * log10(4 * PI) + 40 * log10(R2Surface) + Lsys;
             double mainBeamClutter = A1 - B1;  //dB
 
-            //¼ÆËã¸ÄÉÆÏµÊý
-            //À×´ïµÄÂö³å´®¸öÊý
-            double K = -65;    //¸ÄÉÆÏµÊý¡£dB
+            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½
+            //ï¿½×´ï¿½ï¿½ï¿½ï¿½ï¿½å´®ï¿½ï¿½ï¿½ï¿½
+            double K = -65;    //ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½dB
 
             double pow_mainbeam = pow(10., mainBeamClutter / 10.);
             double pow_clu = pow(10., ClutterP / 10.);
@@ -222,53 +222,53 @@ namespace radar {
         TARGETSTATE p_NUETarState) {
         double sigma = -22.0;
 
-        typedef double(*lpComputefun)(int, int, int, double);//µØ
+        typedef double(*lpComputefun)(int, int, int, double);//ï¿½ï¿½
         lpComputefun Computefun;
-        typedef double(*lpTSCfun)(int, int, int, float, float);//º£
+        typedef double(*lpTSCfun)(int, int, int, float, float);//ï¿½ï¿½
         lpTSCfun TSCfun;
         double currTime = 0;
 
-        //ÅÐ¶ÏÊÇµØ/º£
+        //ï¿½Ð¶ï¿½ï¿½Çµï¿½/ï¿½ï¿½
         if (p_NUETarState.surfaceType == 0) {
             Computefun = (lpComputefun)GetProcAddress(hlandclutter, "compute");
             if (Computefun != NULL) {
-                int a = 2; //µØÐÎrock=0 Trees=1 grasses=2 shrub=3 shortvegetation=4 DrySnow=5 WetSnow=6
-                int b = 4; //²¨¶Î(0=P²¨¶Î 1=L²¨¶Î 2=S²¨¶Î 3=C²¨¶Î 4=X²¨¶Î 5=Ku²¨¶Î 6=Ka²¨¶Î)
-                int c = 0; //¼«»¯·½Ê½HH=0 HV=1 VV=2
+                int a = 2; //ï¿½ï¿½ï¿½ï¿½rock=0 Trees=1 grasses=2 shrub=3 shortvegetation=4 DrySnow=5 WetSnow=6
+                int b = 4; //ï¿½ï¿½ï¿½ï¿½(0=Pï¿½ï¿½ï¿½ï¿½ 1=Lï¿½ï¿½ï¿½ï¿½ 2=Sï¿½ï¿½ï¿½ï¿½ 3=Cï¿½ï¿½ï¿½ï¿½ 4=Xï¿½ï¿½ï¿½ï¿½ 5=Kuï¿½ï¿½ï¿½ï¿½ 6=Kaï¿½ï¿½ï¿½ï¿½)
+                int c = 0; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½HH=0 HV=1 VV=2
 
-                //¼ÆËã²ÁµØ½Ç
+                //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø½ï¿½
                 double rx = p_NUETarState.tPos.x - p_NUERdState.rPos.x;
                 double ry = p_NUETarState.tPos.y - p_NUERdState.rPos.y;
                 double rz = p_NUETarState.tPos.z - p_NUERdState.rPos.z;
 
-                //¼ÆËã²ÁµØ½Ç(0~90¶È)
+                //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø½ï¿½(0~90ï¿½ï¿½)
                 double tarDis = sqrt(rx * rx + ry * ry + rz * rz);
                 double d = asin(ry / tarDis);
                 // ASSERT(d<=0); 071226
                 d = fabs(d) * 180.0 / PI;
-                //double d = 45; //ÊäÈë²ÁµØ½Ç(0~90¶È)
-                //°ÑÉÏÃæ³õÊ¼µÄa-dµÄÖµ£¬ÓÃ¶©¹ºÀ´µÄÊý¾Ý¸³Öµ
+                //double d = 45; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø½ï¿½(0~90ï¿½ï¿½)
+                //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½a-dï¿½ï¿½Öµï¿½ï¿½ï¿½Ã¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¸ï¿½Öµ
                 // ...
                 sigma = Computefun(a, b, c, d);
             }
         }
         else if (p_NUETarState.surfaceType == 1) {
             TSCfun = (lpTSCfun)GetProcAddress(hseaclutter, "sigmaTSC");
-            int a = 4; //²¨¶Î(0=P²¨¶Î 1=L²¨¶Î 2=S²¨¶Î 3=C²¨¶Î 4=X²¨¶Î 5=Ku²¨¶Î 6=Ka²¨¶Î)
-            int b = 2; //º£¿ö(0~5¼¶)
-            int c = 0; //¼«»¯(HH=0,VV=1)
+            int a = 4; //ï¿½ï¿½ï¿½ï¿½(0=Pï¿½ï¿½ï¿½ï¿½ 1=Lï¿½ï¿½ï¿½ï¿½ 2=Sï¿½ï¿½ï¿½ï¿½ 3=Cï¿½ï¿½ï¿½ï¿½ 4=Xï¿½ï¿½ï¿½ï¿½ 5=Kuï¿½ï¿½ï¿½ï¿½ 6=Kaï¿½ï¿½ï¿½ï¿½)
+            int b = 2; //ï¿½ï¿½ï¿½ï¿½(0~5ï¿½ï¿½)
+            int c = 0; //ï¿½ï¿½ï¿½ï¿½(HH=0,VV=1)
 
-            //double d = 30.0; //²ÁµØ½Ç(0.1~90¶È)
-            //¼ÆËã²ÁµØ½Ç(0.1~90¶È)
+            //double d = 30.0; //ï¿½ï¿½ï¿½Ø½ï¿½(0.1~90ï¿½ï¿½)
+            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø½ï¿½(0.1~90ï¿½ï¿½)
             double rx = p_NUETarState.tPos.x - p_NUERdState.rPos.x;
             double ry = p_NUETarState.tPos.y - p_NUERdState.rPos.y;
             double rz = p_NUETarState.tPos.z - p_NUERdState.rPos.z;
             double tarDis = sqrt(rx * rx + ry * ry + rz * rz);
             double d = asin(ry / tarDis);
             // ASSERT(d<=0); 071226
-            d = fabs(d) * 180.0 / PI;    //»¡¶È->¶È
+            d = fabs(d) * 180.0 / PI;    //ï¿½ï¿½ï¿½ï¿½->ï¿½ï¿½
 
-            double e = 0; //·½Î»½Ç(0~180¶È)
+            double e = 0; //ï¿½ï¿½Î»ï¿½ï¿½(0~180ï¿½ï¿½)
 
             sigma = TSCfun(a, b, c, d, e);
         }

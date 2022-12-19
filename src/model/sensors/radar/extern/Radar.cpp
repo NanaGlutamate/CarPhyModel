@@ -1,15 +1,15 @@
 #include "Radar.h"
-#include "radar66.h"
+//#include "radar66.h"
 #include <time.h>
 #include <iostream>
 //#include <atlbase.h>
 //#include <atlwin.h>
 
-namespace radar {
+namespace externModel::radar {
 
 	bool Radar::Init()
 	{
-		//TO DO! ²¹³äÂ·¾¶
+		//TO DO! ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½
 		/*HMODULE hModuleInstance = _AtlBaseModule.GetModuleInstance();*/
 		char* Radar_file_name = (char*)malloc(1000 * sizeof(char));
 		/*char DllPath[MAX_PATH] = { 0 };
@@ -28,9 +28,9 @@ namespace radar {
 			return false;
 		}
 		TiXmlHandle hDoc(&doc);
-		TiXmlElement* pElem;//¶¨ÒåÒ»¸öÖ¸ÏòÔªËØµÄÖ¸Õë
-		pElem = hDoc.FirstChildElement().Element();//½«¸ÃÖ¸ÕëÖ¸Ïò¸ù½Úµã£»¼´Ö¸ÏòÁË¡°bluePADGroup"½áµã
-		//¶àÆÕÀÕÀ×´ïµÄ²ÎÊý
+		TiXmlElement* pElem;//ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ö¸ï¿½ï¿½Ôªï¿½Øµï¿½Ö¸ï¿½ï¿½
+		pElem = hDoc.FirstChildElement().Element();//ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Úµã£»ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ë¡ï¿½bluePADGroup"ï¿½ï¿½ï¿½
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´ï¿½Ä²ï¿½ï¿½ï¿½
 		p_Params.PRF = stod(pElem->FirstChildElement("Radar")->FirstChildElement("PRF")->GetText());
 		p_Params.Tpulse = stod(pElem->FirstChildElement("Radar")->FirstChildElement("Tpulse")->GetText());
 		p_Params.Tgate = stod(pElem->FirstChildElement("Radar")->FirstChildElement("Tgate")->GetText());
@@ -58,7 +58,7 @@ namespace radar {
 
 	bool Radar::InitValue(const std::string& name, void* value)
 	{
-		//À×´ïÎ»ÖÃ¡¢ËÙ¶È¡¢ÆµÂÊºÍ´ø¿í
+		//ï¿½×´ï¿½Î»ï¿½Ã¡ï¿½ï¿½Ù¶È¡ï¿½Æµï¿½ÊºÍ´ï¿½ï¿½ï¿½
 		if ("RPos" == name) {
 			ENURadarState.rPos = *(Vector3*)value;
 		}
@@ -76,7 +76,7 @@ namespace radar {
 
 	bool Radar::SetInput(const std::unordered_map<std::string, std::any>& value)
 	{
-		//ÉèÖÃ´ýÌ½²âÄ¿±êµÄÎ»ÖÃ¡¢ËÙ¶È
+		//ï¿½ï¿½ï¿½Ã´ï¿½Ì½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½Î»ï¿½Ã¡ï¿½ï¿½Ù¶ï¿½
 		try {
 			auto param = value.find("Target_Position");
 			if (param != value.end()) {
@@ -116,24 +116,24 @@ namespace radar {
 
 				double C1, C2, C3, C4;
 				if (m_Switch.RD_HasClutter)
-					C2 = 0;//pow(10.0, m_Clutter.CPower(NEDRadarState, NEDTargetState, NUERadarState, NUETargetState) / 10.0);					//µØ/º£ÔÓ²¨¸ÉÈÅ¹¦ÂÊ¡£Íß
+					C2 = 0;//pow(10.0, m_Clutter.CPower(NEDRadarState, NEDTargetState, NUERadarState, NUETargetState) / 10.0);					//ï¿½ï¿½/ï¿½ï¿½ï¿½Ó²ï¿½ï¿½ï¿½ï¿½Å¹ï¿½ï¿½Ê¡ï¿½ï¿½ï¿½
 				else
 					C2 = 0;
-				C3 = pow(10.0, m_Receiver.CalNPower() / 10.0);					//À×´ïÏµÍ³ÈÈÔëÉù¹¦ÂÊ¡£Íß
+				C3 = pow(10.0, m_Receiver.CalNPower() / 10.0);					//ï¿½×´ï¿½ÏµÍ³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¡ï¿½ï¿½ï¿½
 				if (m_Switch.RD_HasJam)
-					C4 = CJam; //¸ÉÈÅ»ú¹¦ÂÊ;µ¥Î»£ºÍß
+					C4 = CJam; //ï¿½ï¿½ï¿½Å»ï¿½ï¿½ï¿½ï¿½ï¿½;ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½
 				else
 					C4 = 0;
-				if (ENUTargetState.tPos.z > ENURadarState.rPos.z)   //±±¶«µØ£ºzÎª´¹Ö±·½Ïò
-					C1 = 10.0 * log10(C2 + C3 + C4);        //È«²¿ÔëÉù¹¦ÂÊ¡£DB
+				if (ENUTargetState.tPos.z > ENURadarState.rPos.z)   //ï¿½ï¿½ï¿½ï¿½ï¿½Ø£ï¿½zÎªï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½
+					C1 = 10.0 * log10(C2 + C3 + C4);        //È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¡ï¿½DB
 				else
 					C1 = m_Receiver.CalNPower();
 
 				double DetectRange;
 				DetectRange = pow(10, (A1 - B1 - C1 - 10 * log10(SNRThreshold)) /
-					40);	//ÄÜ¹»Ì½²â¾àÀë
+					40);	//ï¿½Ü¹ï¿½Ì½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-  //Âö³åÀÛ»ý£¬¾àÀëÎªR´¦µÄÐÅÔë±ÈÎªSNR2,·¢ÏÖ¸ÅÂÊÎªPd2
+  //ï¿½ï¿½ï¿½ï¿½ï¿½Û»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªRï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªSNR2,ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ÎªPd2
 				double SNR2 = pow(10, (A1 - B1 - C1 - 10 * log10(pow(range, 4))) / 10);
 				double bSNR2 = (pow(10, SNR2 / 10.)) / 1.7;
 				double Pd2 = 0.0;
@@ -144,7 +144,7 @@ namespace radar {
 
 				//std::cout << Pd2 << std::endl;
 
-				//Èô²»Ïë¿¼ÂÇ¸ÅÂÊ£¬Ö±½ÓÉèÖÃPd2 = 1;
+				//ï¿½ï¿½ï¿½ï¿½ï¿½ë¿¼ï¿½Ç¸ï¿½ï¿½Ê£ï¿½Ö±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Pd2 = 1;
 				srand(time(NULL));
 				double randnum = ((double)rand()) / ((double)RAND_MAX);
 				if (randnum <= Pd2 && range <= DetectRange)

@@ -34,7 +34,7 @@ struct to_index_static_list;
 
 template <typename ...Tar, typename ...LookUp>
 struct to_index_static_list<type_list<Tar...>, type_list<LookUp...>>{
-    using type = typename static_list<get_type_list_index<Tar, LookUp...>::value...>;
+    using type = static_list<get_type_list_index<Tar, LookUp...>::value...>;
 };
 
 // 静态列表转array

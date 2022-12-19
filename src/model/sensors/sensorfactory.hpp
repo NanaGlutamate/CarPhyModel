@@ -6,10 +6,10 @@
 
 namespace carPhyModel{
 
-class SensorFactory : public Factory<Sensor>{};
-
-inline SensorFactory::LUT SensorFactory::look_up_table{
-    {"radar", std::make_shared<MyRadar>()},
+struct SensorFactory : public Factory<SensorFactory, Sensor>{
+    inline static LUT look_up_table{
+        {"radar", std::make_shared<MyRadar>()}
+    };
 };
 
 };

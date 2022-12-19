@@ -2,7 +2,7 @@
 
 #include "common_struct.h"
 
-namespace comm
+namespace externModel::comm
 {
 
     typedef struct Atmosphere

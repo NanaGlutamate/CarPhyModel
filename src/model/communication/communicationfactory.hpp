@@ -5,8 +5,8 @@
 
 namespace carPhyModel{
 
-class CommunicationFactory : public Factory<Communication>{};
-
-inline CommunicationFactory::LUT CommunicationFactory::look_up_table{};
+struct CommunicationFactory : public Factory<CommunicationFactory, Communication>{
+    inline static LUT look_up_table{};
+};
 
 };

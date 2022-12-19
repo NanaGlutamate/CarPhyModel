@@ -2,7 +2,6 @@
 #include <string>
 #include "tinyxml.h"
 #include "Radar.h"
-#include "radar66.h"
 #include <time.h>
 #include <iostream>
 //#include <atlbase.h>
@@ -10,7 +9,7 @@
 
 using namespace std;
 
-namespace radar {
+namespace externModel::radar {
 
 	Jammer::Jammer()
 	{
@@ -24,7 +23,7 @@ namespace radar {
 
 	bool Jammer::Init()
 	{
-		//TO DO! ²¹³äÂ·¾¶
+		//TO DO! ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½
 		// HMODULE hModuleInstance = _AtlBaseModule.GetModuleInstance();
 		// char* Radar_file_name = (char*)malloc(1000 * sizeof(char));
 		// char   DllPath[MAX_PATH] = { 0 };
@@ -43,9 +42,9 @@ namespace radar {
 		if (!doc.LoadFile())
 			return 0;
 		TiXmlHandle hDoc(&doc);
-		TiXmlElement* pElem;//¶¨ÒåÒ»¸öÖ¸ÏòÔªËØµÄÖ¸Õë
-		pElem = hDoc.FirstChildElement().Element();//½«¸ÃÖ¸ÕëÖ¸Ïò¸ù½Úµã£»¼´Ö¸ÏòÁË¡°bluePADGroup"½áµã
-		//À×´ï¼°¸ÉÈÅ»úµÄ²ÎÊý
+		TiXmlElement* pElem;//ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ö¸ï¿½ï¿½Ôªï¿½Øµï¿½Ö¸ï¿½ï¿½
+		pElem = hDoc.FirstChildElement().Element();//ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Úµã£»ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ë¡ï¿½bluePADGroup"ï¿½ï¿½ï¿½
+		//ï¿½×´ï¼°ï¿½ï¿½ï¿½Å»ï¿½ï¿½Ä²ï¿½ï¿½ï¿½
 		//p_Params.PRF = stod(pElem->FirstChildElement("Radar")->FirstChildElement("PRF")->GetText());
 		//p_Params.Tpulse = stod(pElem->FirstChildElement("Radar")->FirstChildElement("Tpulse")->GetText());
 		//p_Params.Tgate = stod(pElem->FirstChildElement("Radar")->FirstChildElement("Tgate")->GetText());
@@ -67,7 +66,7 @@ namespace radar {
 		FreqRange = stod(pElem->FirstChildElement("Jammer")->FirstChildElement("FreqRange")->GetText());
 		P_j = stod(pElem->FirstChildElement("Jammer")->FirstChildElement("P_j")->GetText());
 		m_Ant.Init(p_Params);
-		//¶Ô¸ÉÈÅ»úµÄÐÅÏ¢½øÐÐ³õÊ¼»¯
+		//ï¿½Ô¸ï¿½ï¿½Å»ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½Ð³ï¿½Ê¼ï¿½ï¿½
 		Gama_j = 0.5;
 		Gt_sita = 0;
 		Lamda = 3e8 / Frequency;
@@ -80,7 +79,7 @@ namespace radar {
 
 	bool Jammer::InitValue(const std::string& name, void* value)
 	{
-		//¸ÉÈÅ»úÎ»ÖÃ¡¢ËÙ¶È¡¢¸ÉÈÅµÄÆµÂÊºÍ·¶Î§
+		//ï¿½ï¿½ï¿½Å»ï¿½Î»ï¿½Ã¡ï¿½ï¿½Ù¶È¡ï¿½ï¿½ï¿½ï¿½Åµï¿½Æµï¿½ÊºÍ·ï¿½Î§
 		if ("JPos" == name) {
 			JPos = *(Vector3*)value;
 		}
@@ -98,7 +97,7 @@ namespace radar {
 
 	bool Jammer::SetInput(const std::unordered_map<std::string, std::any>& value)
 	{
-		//ÉèÖÃ´ý¸ÉÈÅ À×´ï¡¢À×´ïÌ½²âÄ¿±êµÄÎ»ÖÃ¡¢ËÙ¶È
+		//ï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×´ï¡¢ï¿½×´ï¿½Ì½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½Î»ï¿½Ã¡ï¿½ï¿½Ù¶ï¿½
 		try {
 			auto param = value.find("Target_Position");
 			if (param != value.end()) {
@@ -144,10 +143,10 @@ namespace radar {
 		double bei = p_RdState.rPos.x - JPos.x;
 		double tian = p_RdState.rPos.y - JPos.y;
 		double tmpsita = 0;
-		double lxz = 0.0;    //¶«-±±Æ½Ãæ¾àÀë
+		double lxz = 0.0;    //ï¿½ï¿½-ï¿½ï¿½Æ½ï¿½ï¿½ï¿½ï¿½ï¿½
 		//added by pj 071217{{
 		double nowdis = sqrt(dong * dong + bei * bei + tian * tian);
-		//¸©Ñö¼Ð½Ç
+		//ï¿½ï¿½ï¿½ï¿½ï¿½Ð½ï¿½
 		if (tian <= 0)
 		{
 			lxz = sqrt(bei * bei + dong * dong);
@@ -156,7 +155,7 @@ namespace radar {
 				isInFuyang = true;
 			}
 		}
-		//·½Î»½Ç¼Ð½Ç. ±±Ìì¶«×ø±ê
+		//ï¿½ï¿½Î»ï¿½Ç¼Ð½ï¿½. ï¿½ï¿½ï¿½ì¶«ï¿½ï¿½ï¿½ï¿½
 		if (isInFuyang)
 		{
 			tmpsita = 0;
@@ -165,15 +164,15 @@ namespace radar {
 			}
 			catch (...) {
 			}
-			if (dong >= 0 && bei >= 0) { //µÚÒ»ÏóÏÞ
+			if (dong >= 0 && bei >= 0) { //ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½
 			}
-			else if (dong >= 0 && bei <= 0) { //µÚ¶þÏóÏÞ
+			else if (dong >= 0 && bei <= 0) { //ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½ï¿½
 				tmpsita = PI - tmpsita;
 			}
-			else if (dong <= 0 && bei <= 0) { //µÚÈý
+			else if (dong <= 0 && bei <= 0) { //ï¿½ï¿½ï¿½ï¿½
 				tmpsita += PI;
 			}
-			else if (dong <= 0 && bei >= 0) { // µÚËÄ
+			else if (dong <= 0 && bei >= 0) { // ï¿½ï¿½ï¿½ï¿½
 				tmpsita = 2 * PI - tmpsita;
 			}
 			if (fabs(tmpsita - BeamAzCenter) <= (BeamAzSweep / 2))
@@ -181,18 +180,18 @@ namespace radar {
 				isInFangwei = true;
 			}
 		}
-		//ÅÐ¶ÏÊÇ·ñÔÚ¸ÉÈÅ»úÉ¨Éä×µÌåÄÚ
+		//ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½Ú¸ï¿½ï¿½Å»ï¿½É¨ï¿½ï¿½×µï¿½ï¿½ï¿½ï¿½
 		sign = isInFangwei && isInFuyang;
 		if (isInFangwei && isInFuyang)
 		{
-			//Èç¹ûÄ¿±êÔÚÌ½²â×¶ÌåÄÚ£¬ÇÒÎÒ»úÔÚ¸ÉÈÅ²¨µÄ×÷ÓÃ·¶Î§ÄÚ
-			//²Å¼ÆËã¸ÉÈÅ»úÏà¹Ø²ÎÊý
+			//ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ï¿½×¶ï¿½ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ú¸ï¿½ï¿½Å²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã·ï¿½Î§ï¿½ï¿½
+			//ï¿½Å¼ï¿½ï¿½ï¿½ï¿½ï¿½Å»ï¿½ï¿½ï¿½Ø²ï¿½ï¿½ï¿½
 
-			//ÓÃÃÜ¶Èº¯Êý¼ÆËãGt_sita
-			//ÎªÀ×´ïÌìÏßÔÚ¸ÉÈÅ·½ÏòµÄÔöÒæ		
+			//ï¿½ï¿½ï¿½Ü¶Èºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Gt_sita
+			//Îªï¿½×´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½Å·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½		
 			double Gose_lib(double);
 
-			//¼ÆËã¸ÉÈÅ²¨ÓëÀ×´ïÊÓÏßÖ®¼äµÄ¼Ð½Ç
+			//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å²ï¿½ï¿½ï¿½ï¿½×´ï¿½ï¿½ï¿½ï¿½ï¿½Ö®ï¿½ï¿½Ä¼Ð½ï¿½
 			Vector3 mt, mj;
 			mt.x = p_TarState.tPos.x - p_RdState.rPos.x;
 			mt.y = p_TarState.tPos.y - p_RdState.rPos.y;
@@ -201,15 +200,15 @@ namespace radar {
 			mj.y = JPos.y - p_RdState.rPos.y;
 			mj.z = JPos.z - p_RdState.rPos.z;
 
-			//¸ù¾Ý¸ÉÈÅ²¨µÄÕÕÉä½Ç¶È¼ÆËã¸±°êÔöÒæ
+			//ï¿½ï¿½ï¿½Ý¸ï¿½ï¿½Å²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¶È¼ï¿½ï¿½ã¸±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			double tmp_d = sqrt(mt.x * mt.x + mt.y * mt.y + mt.z * mt.z) *
 				sqrt(mj.x * mj.x + mj.y * mj.y + mj.z * mj.z);
 			double tmp_vector = mt.x * mj.x + mt.y * mj.y + mt.z * mj.z;
 			double alpha = acos(tmp_vector / tmp_d);
 
 			//modefied by pj 071220 {{
-			double HalfPow_sita = 1.0 / 180 * PI;//°ë¹¦ÂÊ¿í¶È(Õý³£1-2¶È)
-			double sing_lamda = 4.0 * PI / (3.0 * HalfPow_sita);//singaº¯ÊýµÄÏµÊýlamda
+			double HalfPow_sita = 1.0 / 180 * PI;//ï¿½ë¹¦ï¿½Ê¿ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½1-2ï¿½ï¿½)
+			double sing_lamda = 4.0 * PI / (3.0 * HalfPow_sita);//singaï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½lamda
 			alpha = fabs(alpha);
 			double AntennaGain = pow(10., m_Ant.Gml / 10.);
 			//modefied by pj 071220 {{
@@ -225,15 +224,15 @@ namespace radar {
 			else
 				Gt_sita = AntennaGain * (1e-10);
 			//modefied by pj 071220 }}
-						//Îªµç´Å²¨Òò´óÆø¡¢½µÓêµÈÒòËØµÄËðÊ§ÏµÊý
-			LL = 0.005;  //¼ÆËã µ¥Î»¾àÀë´óÆø´«ÊäËðºÄ modified by pj 071220£¿
+						//Îªï¿½ï¿½Å²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½Ê§Ïµï¿½ï¿½
+			LL = 0.005;  //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ modified by pj 071220ï¿½ï¿½
 
 			Gama_j = 0.5;
 
-			//ÎªÀ×´ïÓë¸ÉÈÅÔ´µÄ¾àÀë
+			//Îªï¿½×´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½Ä¾ï¿½ï¿½ï¿½
 			R_j = sqrt(lxz * lxz + tian * tian);
 
-			//¸ÉÈÅ»ú¹¦ÂÊ;µ¥Î»£ºÍß
+			//ï¿½ï¿½ï¿½Å»ï¿½ï¿½ï¿½ï¿½ï¿½;ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½
 			jamPower += PrjPower(p_RdState.fre_center, p_RdState.fre_band, Frequency, FreqRange);
 		}
 		return jamPower;

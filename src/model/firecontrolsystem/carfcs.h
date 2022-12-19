@@ -5,10 +5,9 @@
 
 namespace carPhyModel{
 
-class ProtectionSystem : public System{
+class FireControlSystem{
 public:
-    ProtectionSystem(){};
-    virtual void tick(double dt, Components& c){};
+    FireControlSystem() = default;
 };
 
 }

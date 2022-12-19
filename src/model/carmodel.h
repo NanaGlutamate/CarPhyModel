@@ -10,18 +10,24 @@
 namespace carPhyModel{
 
 class CarModel{
-private:
     friend class CarBuilder;
-
-    std::vector<std::unique_ptr<System>> system;
-    Components components;
-
-    std::unordered_map<std::string, std::any> buffer;
 public:
+    using CSValueMap = std::unordered_map<std::string, std::any>;
+    void setInput(const CSValueMap& inputValue){};
+    void tick(double dt){
+        components.getSpecificSingletonComponent<OutputBuffer>()->clear();
+        for(auto&& sys : systems){
+            sys->tick(dt, components);
+        }
+    };
+    CSValueMap* getOutput(){
+        return &(components.getSpecificSingletonComponent<OutputBuffer>().value());
+    };
+private:
     CarModel() = default;
-    void setInput(){};
-    void tick(double dt){};
-    void getOutput(){};
+
+    Components components;
+    static std::vector<std::shared_ptr<System>> systems;
 };
 
 }

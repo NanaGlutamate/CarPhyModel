@@ -6,15 +6,6 @@
 
 namespace carPhyModel{
 
-// template <typename _Ty>
-// struct is_const{constexpr static bool value=false;using origin_type = typename _Ty;};
-
-// template <typename _Ty>
-// struct is_const<const _Ty>{constexpr static bool value=true;using origin_type = typename _Ty;};
-
-// template <typename _Ty>
-// using origin_type = typename is_const<_Ty>::origin_type;
-
 template <bool _Condition, typename _TrueType, typename _FalseType>
 struct conditional_type{};
 

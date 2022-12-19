@@ -6,7 +6,7 @@
 #include <any>
 #include <string>
 
-namespace comm
+namespace externModel::comm
 {
 
     using CSValueMap = std::unordered_map<std::string, std::any>;

@@ -11,7 +11,7 @@ public:
     virtual void t(){std::cout<<"B"<<std::endl;};
 };
 
-using ABFactory = Factory<A>;
+class ABFactory : public Factory<A> {};
 
 inline ABFactory::LUT ABFactory::look_up_table{
     {"A", std::shared_ptr<A>(new A())},

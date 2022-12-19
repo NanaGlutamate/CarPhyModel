@@ -6,7 +6,7 @@
 #include "Clutter.h"
 #include "RadarTransmitter.h"
 
-namespace radar {
+namespace externModel::radar {
 
 	class Radar
 	{
@@ -16,17 +16,17 @@ namespace radar {
 		bool InitValue(const std::string& name, void* value);
 		bool SetInput(const std::unordered_map<std::string, std::any>& value);
 		void update();
-		//ÉèÖÃ¸ÉÈÅ»ú¹¦ÂÊ
+		//ï¿½ï¿½ï¿½Ã¸ï¿½ï¿½Å»ï¿½ï¿½ï¿½ï¿½ï¿½
 		void Set_JamPower(double JamP);
 		void Set_radar_state(Vector3& Pos, Vector3& Vel);
 		string Get_detect_result();
 	//private:
 		double SystemLoss;			//dB
-		double SNRThreshold;		//ÐÅÔë±ÈãÐÖµ
-		double MaxDetectRange;		//²ÎÊý¾ö¶¨µÄ×î´óÐ±¾à
-		double Phi;					//×ø±ê×ª»»ÓÃ
-		double MaxDetectAngle;		//[ÎÞÈË»úÀ×´ï]²ÎÊý¾ö¶¨µÄ×î´óÌ½²â½Ç¶È
-		double CJam;                //ÊÜ¸ÉÈÅµÄ¹¦ÂÊ
+		double SNRThreshold;		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+		double MaxDetectRange;		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð±ï¿½ï¿½
+		double Phi;					//ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½
+		double MaxDetectAngle;		//[ï¿½ï¿½ï¿½Ë»ï¿½ï¿½×´ï¿½]ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ï¿½Ç¶ï¿½
+		double CJam;                //ï¿½Ü¸ï¿½ï¿½ÅµÄ¹ï¿½ï¿½ï¿½
 		Antenna m_Antenna;
 		Clutter m_Clutter;
 		//Jammer m_Jammer;

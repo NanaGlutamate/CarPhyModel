@@ -1,15 +1,9 @@
 ﻿#include "HE.h"
+#include "../tools/constant.hpp"
 
 namespace{
-
-// 重力加速度
-constexpr const double G = 9.8;
-// PI
-constexpr const double PI = 3.1415926535897932384626433;
-// 无穷小量
-constexpr const double INF_SMALL = 1e-10;
-// 无穷大量
-constexpr const double INF_BIG = 1e10;
+    
+using namespace carPhyModel;
 
 // 计算毁伤碰撞盒与球距离
 double collision(const carPhyModel::Vector3& pos, const carPhyModel::PartDamageModel& pdm, const carPhyModel::Coordinate& coordinate){
@@ -18,8 +12,8 @@ double collision(const carPhyModel::Vector3& pos, const carPhyModel::PartDamageM
     const carPhyModel::Vector3 pos_local = coordinate.positionWorldToBody(pos);
     double r2 = 0.;
     for(size_t i=0; i<3; ++i){
-        if(pos_local[i] < -pdm.size[i])r2 += pow(pos_local[i] + pdm.size[i], 2);
-        if(pos_local[i] > pdm.size[i])r2 += pow(pos_local[i] - pdm.size[i], 2);
+        if(pos_local[i] < -pdm.size[i] / 2.)r2 += pow(pos_local[i] + pdm.size[i] / 2., 2);
+        if(pos_local[i] > pdm.size[i] / 2.)r2 += pow(pos_local[i] - pdm.size[i] / 2., 2);
     }
     return sqrt(r2);
 };

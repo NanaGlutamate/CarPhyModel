@@ -9,9 +9,9 @@ namespace carPhyModel{
 struct Vector3{
     using element=double;
 	element x, y, z;
-	Vector3()=default;
-	Vector3(element x, element y, element z):x(x), y(y), z(z) {};
-	Vector3(const Vector3& v):x(v.x), y(v.y), z(v.z) {};
+	constexpr Vector3() = default;
+	constexpr Vector3(element x, element y, element z):x(x), y(y), z(z) {};
+	constexpr Vector3(const Vector3& v):x(v.x), y(v.y), z(v.z) {};
 	void operator=(const Vector3& v){
         x = v.x;
         y = v.y;
@@ -83,10 +83,16 @@ struct Vector3{
 struct Quaternion{
     using element = double;
     element x, y, z, w;
-    Quaternion(){};
+    Quaternion() = default;
     Quaternion(element x, element y, element z, element w):x(x), y(y), z(z), w(w) {};
     Quaternion(const Quaternion& q):x(q.x), y(q.y), z(q.z), w(q.w) {};
-    Quaternion(element yaw, element pitch, element roll){
+    operator Vector3() const { return Vector3{x, y, z};}
+
+    // yaw -> pitch -> roll, right handed
+    //! @param roll angle rotated around x
+    //! @param pitch angle rotated around y
+    //! @param yaw angle rotated around z
+    Quaternion(element roll, element pitch, element yaw){
         using std::sin;
         using std::cos;
         element cy = cos(yaw * 0.5);
