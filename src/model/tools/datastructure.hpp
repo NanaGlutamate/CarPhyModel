@@ -99,7 +99,7 @@ struct Direction{
     double& operator[](size_t index){return (&yaw)[index];};
     const double& operator[](size_t index) const {return (&yaw)[index];};
 };
-            
+
 struct FireUnit{
     constexpr static const char* token_list[] = {"state", "fireZone", "rotateZone", "presentDirection", "rotateSpeed", "weapon"};
     FIRE_UNIT_STATE state;
@@ -133,12 +133,6 @@ struct EntityInfo{
 // component ID
 using CID = size_t;
 
-// car model component list
-// using CoordinateList = std::vector<std::tuple<CID, Coordinate>>;
-// using ProtectionList = std::vector<std::tuple<CID, ProtectionModel>>;
-// using DamageList = std::vector<std::tuple<CID, PartDamageModel>>;
-// using FireUnitList = std::vector<std::tuple<CID, FireUnit>>;
-// using SensorList = std::vector<std::tuple<CID, SensorData>>;
 struct ScannedMemory : public std::map<VID, EntityInfo>{};
 
 struct WheelMotionParamList{

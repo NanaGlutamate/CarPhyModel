@@ -7,12 +7,12 @@
 namespace carPhyModel{
 
 // 轮式车辆运动系统
-class CarHullSystem{
+class WheelMoveSystem{
 private:
     EnvironmentInfoAgent env;
     void updateState(double dt, Coordinate& baseCoordinate, Hull& hull, WheelMotionParamList& params);
 public:
-    CarHullSystem():env(){};
+    WheelMoveSystem():env(){};
 
     //! @param dt: 上一次调用后的时间
     //! @param baseCoordinate: 车辆随体坐标系

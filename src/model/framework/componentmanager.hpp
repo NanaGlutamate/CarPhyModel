@@ -18,12 +18,28 @@ inline void my_assert(bool condition, std::string message = ""){
     }
 }
 
+// #if __cplusplus >= 202002L
+
+// template<typename T>
+// concept ComponentType = std::is_trivial_v<T>;
+
+// // decorator for singleton component and normal component
+// template <ComponentType ...T>
+// struct SingletonComponent{};
+
+// template <ComponentType ...T>
+// struct NormalComponent{};
+
+// #else
+
 // decorator for singleton component and normal component
 template <typename ...T>
 struct SingletonComponent{};
 
 template <typename ...T>
 struct NormalComponent{};
+
+// #endif
 
 // indexer for type list
 template <typename Test, typename ...List>
@@ -139,6 +155,7 @@ public:
             "component manager doesnot contain normal component of that type");
         return EntityList<ComponentTypes...>(this);
     };
+    
     // TODO: debug
     template <typename ComponentType>
     std::optional<std::reference_wrapper<ComponentType>> getSpecificNormalComponent(size_t ID){
@@ -149,6 +166,7 @@ public:
         if(auto it = cache.find(ID); it != cache.end()){return std::get<std::vector<std::pair<size_t, ComponentType>>>(normalComponents)[it->second].second;}
         else{return std::nullopt;}
     };
+    
     template <typename ...ComponentTypes>
     decltype(auto) getSingletonComponents(){
         static_assert((... && type_list_contains_v<ComponentTypes, Singletons...>),
@@ -159,12 +177,14 @@ public:
             )...
         };
     };
+    
     template <typename ComponentType>
     decltype(auto) getSpecificSingletonComponent(){
         static_assert(type_list_contains_v<ComponentType, Singletons...>,
             "component manager doesnot contain singleton component of that type");
         return std::get<type_list_index<ComponentType, Singletons...>::value>(singletonComponents);
     }
+    
     void clear(){
         my_assert(!lock);
         entityCounter = 0;
@@ -176,7 +196,9 @@ public:
             0
         )...};
     }
+
 private:
+
     using NormalComponents = std::tuple<std::vector<std::pair<std::size_t, Normals>>...>;
     using SingletonComponents = std::tuple<std::optional<Singletons>...>;
     // counter of instance of EntityList<>

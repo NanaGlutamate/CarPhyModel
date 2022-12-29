@@ -46,7 +46,7 @@ namespace carPhyModel{
 // 由于前轮转向需要时间，故速度也需要受最大侧向加速度约束
 // 控制方法：符合上述约束的条件下尽可能快速地向目标调整
 // TODO：向后运动
-void CarHullSystem::tick(double dt, Coordinate& baseCoordinate, Hull& hull, const Vector3& exp_direction, double exp_speed, WheelMotionParamList& params){
+void WheelMoveSystem::tick(double dt, Coordinate& baseCoordinate, Hull& hull, const Vector3& exp_direction, double exp_speed, WheelMotionParamList& params){
     using std::atan2;
     using std::tan;
     using std::fabs;
@@ -122,7 +122,7 @@ void CarHullSystem::tick(double dt, Coordinate& baseCoordinate, Hull& hull, cons
     return;
 };
 
-void CarHullSystem::unconstrainedTick(double dt, Coordinate& baseCoordinate, Hull& hull, double wheel_angle, double acceleration, WheelMotionParamList& params){
+void WheelMoveSystem::unconstrainedTick(double dt, Coordinate& baseCoordinate, Hull& hull, double wheel_angle, double acceleration, WheelMotionParamList& params){
     using std::atan2;
     using std::tan;
     using std::fabs;
@@ -134,7 +134,7 @@ void CarHullSystem::unconstrainedTick(double dt, Coordinate& baseCoordinate, Hul
     using var = double;
 };
 
-void CarHullSystem::updateState(double dt, Coordinate& baseCoordinate, Hull& hull, WheelMotionParamList& params){
+void WheelMoveSystem::updateState(double dt, Coordinate& baseCoordinate, Hull& hull, WheelMotionParamList& params){
     using val = const double;
 };
 
