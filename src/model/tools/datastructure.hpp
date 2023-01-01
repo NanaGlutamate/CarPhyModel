@@ -52,7 +52,7 @@ enum class DAMAGE_LEVEL{
     KK, //失去结构
 };
 
-struct PartDamageModel{
+struct DamageModel{
     constexpr static const char* token_list[] = {"damageLevel"};//, "size"};
     DAMAGE_LEVEL damageLevel;
     // Block size;
@@ -119,7 +119,7 @@ struct SensorData{
 };
 
 // vehicle ID
-using VID = size_t;
+using VID = std::size_t;
 
 struct EntityInfo{
     Vector3 position;
@@ -181,6 +181,7 @@ using Components = ComponentManager<
         InputBuffer,
         OutputBuffer,
         Coordinate,
+        DamageModel,
         HitEventQueue,
         FireEventQueue,
         WheelMotionParamList,
@@ -188,10 +189,10 @@ using Components = ComponentManager<
         HitBox,
         Hull
     >, NormalComponent<
-        Block,
         Coordinate,
+        DamageModel,
+        Block,
         ProtectionModel,
-        PartDamageModel,
         FireUnit,
         SensorData
     >>;

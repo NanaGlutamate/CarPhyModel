@@ -13,7 +13,7 @@ void DamageSystem::tick(double dt, Components& c){
         auto local_d = baseCoordinate.directionWorldToBody(fireEvent.direction);
         auto local_v = baseCoordinate.directionWorldToBody(fireEvent.velocity);
 
-        for(auto&& [id, _damage_model, _size, _coordinate] : c.getNormalComponents<PartDamageModel, Block, Coordinate>()){
+        for(auto&& [id, _damage_model, _size, _coordinate] : c.getNormalComponents<DamageModel, Block, Coordinate>()){
             ammunitionModel->updateDamage(_damage_model, _size, _coordinate, local_p, local_d, local_v, fireEvent.range);
         }
     }

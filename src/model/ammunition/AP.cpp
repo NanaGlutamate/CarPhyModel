@@ -38,7 +38,7 @@ void updateDamage(DAMAGE_LEVEL ){}
 namespace carPhyModel{
 
 void APDamage::updateDamage(
-    PartDamageModel& pdm, 
+    DamageModel& pdm, 
     const Block& size,
     const Coordinate& coordinate, 
     const Vector3& pos, 

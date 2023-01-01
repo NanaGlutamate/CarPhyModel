@@ -10,6 +10,7 @@ class Environment{
 private:
     friend class EnvironmentInfoAgent;
     Environment(){}
+    ~Environment() = default;
     Environment(const Environment&) = delete;
     Environment& operator=(const Environment&) = delete;
     double getAltitude(const Vector3& pos)const { return 0.; }
@@ -19,7 +20,7 @@ private:
 
 class EnvironmentInfoAgent {
 public:
-    EnvironmentInfoAgent(){};
+    EnvironmentInfoAgent() = default;
 
     void changeEnvironmentSupplier(std::unique_ptr<Environment>&& n) { env = std::move(n); return; }
 

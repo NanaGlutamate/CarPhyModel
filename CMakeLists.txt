@@ -20,5 +20,5 @@ add_subdirectory(lib)
 add_subdirectory(src)
 add_subdirectory(test)
 
-message(STATUS "file:" ${PROJ_SRC})
+# message(STATUS "file:" ${PROJ_SRC})
 add_executable(TestMain ${PROJ_SRC})

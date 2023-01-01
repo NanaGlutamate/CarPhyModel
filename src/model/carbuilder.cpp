@@ -84,8 +84,8 @@ struct loadComponent<SingletonComponent<Ty...>>{
 //         handle.addNormalComponents<Coordinate>(ID, componentDeserialize<Coordinate>(component));
 //     }else if(component->name() == "ProtectionModel"sv){
 //         handle.addNormalComponents<ProtectionModel>(ID, componentDeserialize<ProtectionModel>(component));
-//     }else if(component->name() == "PartDamageModel"sv){
-//         handle.addNormalComponents<PartDamageModel>(ID, componentDeserialize<PartDamageModel>(component));
+//     }else if(component->name() == "DamageModel"sv){
+//         handle.addNormalComponents<DamageModel>(ID, componentDeserialize<DamageModel>(component));
 //     }else if(component->name() == "FireUnit"sv){
 //         handle.addNormalComponents<FireUnit>(ID, componentDeserialize<FireUnit>(component));
 //     }else if(component->name() == "SensorData"sv){
@@ -118,11 +118,12 @@ void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model){
     if(auto handle = model.components.getModifier()){
         handle.addSingletonComponents<
             OutputBuffer,
+            DamageModel,
             Coordinate,
             HitEventQueue,
             ScannedMemory,
             Hull
-        >({}, {}, {}, {}, {});
+        >({}, {}, {}, {}, {}, {});
 
         loadComponent<SingletonComponent<
             WheelMotionParamList
@@ -134,17 +135,17 @@ void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model){
             auto ID = handle.newEntity();
             for(auto component = entity->first_node(0); component; component = component->next_sibling()){
                 loadComponent<NormalComponent<
-                    Block,
                     Coordinate,
+                    DamageModel,
+                    Block,
                     ProtectionModel,
-                    PartDamageModel,
                     FireUnit,
                     SensorData
                 >>{}(ID, component, handle, {
-                    "Block",
                     "Coordinate",
+                    "DamageModel",
+                    "Block",
                     "ProtectionModel",
-                    "PartDamageModel",
                     "FireUnit",
                     "SensorData"
                 });

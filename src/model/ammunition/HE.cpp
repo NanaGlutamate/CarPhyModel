@@ -26,7 +26,7 @@ double collision(
 namespace carPhyModel{
 
 void HEDamage::updateDamage(
-    PartDamageModel& pdm, 
+    DamageModel& pdm, 
     const Block& size,
     const Coordinate& coordinate, 
     const Vector3& pos, 

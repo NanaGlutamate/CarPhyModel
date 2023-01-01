@@ -17,8 +17,8 @@ void SensorSystem::tick(double dt, Components& c)
         x.second.lastScanned += dt;
     }
     for(auto&& [id, _sensor] : c.getNormalComponents<SensorData>()){
-        if(auto _damage = c.getSpecificNormalComponent<PartDamageModel>(id); _damage.has_value()){
-            PartDamageModel& damage = _damage.value();
+        if(auto _damage = c.getSpecificNormalComponent<DamageModel>(id); _damage.has_value()){
+            DamageModel& damage = _damage.value();
             if(damage.damageLevel == DAMAGE_LEVEL::K || damage.damageLevel == DAMAGE_LEVEL::KK){
                 continue;
             }
