@@ -5,16 +5,16 @@
 namespace carPhyModel{
 
 struct Coordinate{
-    // 新坐标系原点在基坐标系中的位置
+    // 本坐标系原点在基坐标系中的位置
     Vector3 position;
-    // 与基坐标系方向相同、原点与新坐标系重合的坐标系中基矢到新坐标系基矢的旋转四元数的前三个分量
+    // 与基坐标系方向相同、原点与本坐标系重合的坐标系中基矢到本坐标系基矢的旋转四元数的前三个分量
     // 由于旋转四元数有模长为1的约束，若直接保存四元数，则为了避免迭代过程中的累计误差，需要在每次迭代中进行归一化
     // 若只保存旋转四元数的x, y, z三个分量，则只需要在迭代时计算w分量
     Vector3 altitude;
 
     //! 坐标转换
     //! @param p 基坐标系中的坐标
-    //! @return 基坐标系中的坐标表示的点在新坐标系中的坐标
+    //! @return 基坐标系中的坐标表示的点在本坐标系中的坐标
     Vector3 positionWorldToBody(const Vector3& p) const{
         auto inverse = Quaternion(altitude, true).inverse();
         auto p1 = inverse.rotate(Quaternion(p - position, false));
@@ -22,8 +22,8 @@ struct Coordinate{
     };
 
     //! 坐标转换
-    //! @param p 新坐标系中的坐标
-    //! @return 新坐标系中的坐标表示的点在基坐标系中的坐标
+    //! @param p 本坐标系中的坐标
+    //! @return 本坐标系中的坐标表示的点在基坐标系中的坐标
     Vector3 positionBodyToWorld(const Vector3& p) const{
         Vector3 p1 = altitude.rotate(p);
         p1 += position;
@@ -32,7 +32,7 @@ struct Coordinate{
 
     //! 方向转换
     //! @param dir 基坐标系中的方向向量坐标
-    //! @return 基坐标系中的方向向量坐标表示的点在新坐标系中的坐标
+    //! @return 基坐标系中的方向向量坐标表示的点在本坐标系中的坐标
     Vector3 directionWorldToBody(const Vector3& dir) const{
         auto inverse = Quaternion(altitude, true).inverse();
         auto dir1 = inverse.rotate(Quaternion(dir, false));
@@ -40,8 +40,8 @@ struct Coordinate{
     };
 
     //! 方向转换
-    //! @param dir 新坐标系中的方向向量坐标
-    //! @return 新坐标系中的方向向量坐标表示的点在基坐标系中的坐标
+    //! @param dir 本坐标系中的方向向量坐标
+    //! @return 本坐标系中的方向向量坐标表示的点在基坐标系中的坐标
     Vector3 directionBodyToWorld(const Vector3& dir) const{
         Vector3 dir1 = altitude.rotate(dir);
         return dir1;

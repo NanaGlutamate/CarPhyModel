@@ -9,41 +9,20 @@ namespace externModel::radar {
 
 	bool Radar::Init()
 	{
-		//TO DO! ����·��
-		/*HMODULE hModuleInstance = _AtlBaseModule.GetModuleInstance();*/
-		char* Radar_file_name = (char*)malloc(1000 * sizeof(char));
-		/*char DllPath[MAX_PATH] = { 0 };
-		GetModuleFileNameA(hModuleInstance, DllPath, _countof(DllPath));
-		char drive[_MAX_DRIVE];
-		char dir[_MAX_DIR];
-		char fname[_MAX_FNAME];
-		char ext[_MAX_EXT];
-		_splitpath_s(DllPath, drive, dir, fname, ext);*/
-		//TODO: reduce hard-coded path
-		string  maneuver_file = "D:/Desktop/workspace/12others/2022-04-01CarModelling/P0_carModel/src/config/Jammer_property.xml";
-		strcpy(Radar_file_name, maneuver_file.data());
-		TiXmlDocument doc(Radar_file_name);
-		if (!doc.LoadFile()){
-			std::cout << "no file found";
-			return false;
-		}
-		TiXmlHandle hDoc(&doc);
-		TiXmlElement* pElem;//����һ��ָ��Ԫ�ص�ָ��
-		pElem = hDoc.FirstChildElement().Element();//����ָ��ָ����ڵ㣻��ָ���ˡ�bluePADGroup"���
-		//�������״�Ĳ���
-		p_Params.PRF = stod(pElem->FirstChildElement("Radar")->FirstChildElement("PRF")->GetText());
-		p_Params.Tpulse = stod(pElem->FirstChildElement("Radar")->FirstChildElement("Tpulse")->GetText());
-		p_Params.Tgate = stod(pElem->FirstChildElement("Radar")->FirstChildElement("Tgate")->GetText());
-		p_Params.NFilters = stod(pElem->FirstChildElement("Radar")->FirstChildElement("NFilters")->GetText());
-		p_Params.Frequency = stod(pElem->FirstChildElement("Radar")->FirstChildElement("fre_center")->GetText());
-		p_Params.fre_band = stod(pElem->FirstChildElement("Radar")->FirstChildElement("fre_band")->GetText());
-		p_Params.Pt = stod(pElem->FirstChildElement("Radar")->FirstChildElement("Pt")->GetText());
-		p_Params.ScanAzRange = stod(pElem->FirstChildElement("Antenna")->FirstChildElement("ScanAzRange")->GetText());
-		p_Params.ScanElRangeLl = stod(pElem->FirstChildElement("Antenna")->FirstChildElement("ScanElRangeLl")->GetText());
-		p_Params.ScanElRangeUl = stod(pElem->FirstChildElement("Antenna")->FirstChildElement("ScanElRangeUl")->GetText());
-		p_Params.ScanPeriod = stod(pElem->FirstChildElement("Antenna")->FirstChildElement("ScanPeriod")->GetText());
-		p_Params.ThetaAZ05 = stod(pElem->FirstChildElement("Antenna")->FirstChildElement("ThetaAZ05")->GetText());
-		p_Params.ThetaEL05 = stod(pElem->FirstChildElement("Antenna")->FirstChildElement("ThetaEL05")->GetText());
+		p_Params.PRF = 20e3;
+		p_Params.Tpulse = 6.4e-6;
+		p_Params.Tgate = 6.4e-6;
+		p_Params.NFilters = 128;
+		p_Params.Frequency = 3.1e9;
+		p_Params.fre_band = 0.2e6;
+		p_Params.Pt = 10000;
+		p_Params.ScanAzRange = 360;
+		p_Params.ScanElRangeLl = 0.0;
+		p_Params.ScanElRangeUl = 90.0;
+		p_Params.ScanPeriod = 10;
+		p_Params.ThetaAZ05 = 1.3;
+		p_Params.ThetaEL05 = 1.3;
+
 		m_Antenna.Init(p_Params);
 		m_Transmitter.Init(p_Params);
 		m_Clutter.Init(p_Params);
@@ -53,6 +32,7 @@ namespace externModel::radar {
 		MaxDetectRange = 10e7;
 		MaxDetectAngle = 90 * DEG2RAD;
 		Phi = 0.0;
+
 		return true;
 	}
 

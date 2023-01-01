@@ -7,6 +7,6 @@ namespace{
 
 namespace carPhyModel{
 
-void CarHullSystem::tick(double dt, Components& c){};
+void HullSystem::tick(double dt, Components& c){};
 
 }

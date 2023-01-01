@@ -1,6 +1,6 @@
 #include "Jammer.h"
 #include <string>
-#include "tinyxml.h"
+//#include "tinyxml.h"
 #include "Radar.h"
 #include <time.h>
 #include <iostream>
@@ -23,58 +23,32 @@ namespace externModel::radar {
 
 	bool Jammer::Init()
 	{
-		//TO DO! ����·��
-		// HMODULE hModuleInstance = _AtlBaseModule.GetModuleInstance();
-		// char* Radar_file_name = (char*)malloc(1000 * sizeof(char));
-		// char   DllPath[MAX_PATH] = { 0 };
-		// GetModuleFileNameA(hModuleInstance, DllPath, _countof(DllPath));
-		// char drive[_MAX_DRIVE];
-		// char dir[_MAX_DIR];
-		// char fname[_MAX_FNAME];
-		// char ext[_MAX_EXT];
-		// _splitpath_s(DllPath, drive, dir, fname, ext);
-		// string  maneuver_file = drive + std::string(dir) + "Jammer_property.xml";
-		// strcpy(Radar_file_name, maneuver_file.data());
-		char* Radar_file_name = (char*)malloc(1000 * sizeof(char));
-		string  maneuver_file = "D:/Desktop/workspace/12others/2022-04-01CarModelling/P0_carModel/src/config/Jammer_property.xml";
-		strcpy(Radar_file_name, maneuver_file.data());
-		TiXmlDocument doc(Radar_file_name);
-		if (!doc.LoadFile())
-			return 0;
-		TiXmlHandle hDoc(&doc);
-		TiXmlElement* pElem;//����һ��ָ��Ԫ�ص�ָ��
-		pElem = hDoc.FirstChildElement().Element();//����ָ��ָ����ڵ㣻��ָ���ˡ�bluePADGroup"���
-		//�״Ｐ���Ż��Ĳ���
-		//p_Params.PRF = stod(pElem->FirstChildElement("Radar")->FirstChildElement("PRF")->GetText());
-		//p_Params.Tpulse = stod(pElem->FirstChildElement("Radar")->FirstChildElement("Tpulse")->GetText());
-		//p_Params.Tgate = stod(pElem->FirstChildElement("Radar")->FirstChildElement("Tgate")->GetText());
-		//p_Params.NFilters = stod(pElem->FirstChildElement("Radar")->FirstChildElement("NFilters")->GetText());
-		//p_Params.Frequency = stod(pElem->FirstChildElement("Radar")->FirstChildElement("fre_center")->GetText());
-		//p_Params.fre_band = stod(pElem->FirstChildElement("Radar")->FirstChildElement("fre_band")->GetText());
-		//p_Params.Pt = stod(pElem->FirstChildElement("Radar")->FirstChildElement("Pt")->GetText());
-		p_Params.ScanAzRange = stod(pElem->FirstChildElement("Antenna")->FirstChildElement("ScanAzRange")->GetText());
-		p_Params.ScanElRangeLl = stod(pElem->FirstChildElement("Antenna")->FirstChildElement("ScanElRangeLl")->GetText());
-		p_Params.ScanElRangeUl = stod(pElem->FirstChildElement("Antenna")->FirstChildElement("ScanElRangeUl")->GetText());
-		p_Params.ScanPeriod = stod(pElem->FirstChildElement("Antenna")->FirstChildElement("ScanPeriod")->GetText());
-		p_Params.ThetaAZ05 = stod(pElem->FirstChildElement("Antenna")->FirstChildElement("ThetaAZ05")->GetText());
-		p_Params.ThetaEL05 = stod(pElem->FirstChildElement("Antenna")->FirstChildElement("ThetaEL05")->GetText());
-		BeamAzCenter = DEG2RAD * stod(pElem->FirstChildElement("Jammer")->FirstChildElement("BeamAzCenter")->GetText());
-		BeamAzSweep = DEG2RAD * stod(pElem->FirstChildElement("Jammer")->FirstChildElement("BeamAzSweep")->GetText());
-		BeamElCenter = DEG2RAD * stod(pElem->FirstChildElement("Jammer")->FirstChildElement("BeamElCenter")->GetText());
-		BeamElSweep = DEG2RAD * stod(pElem->FirstChildElement("Jammer")->FirstChildElement("BeamElSweep")->GetText());
-		Frequency = stod(pElem->FirstChildElement("Jammer")->FirstChildElement("Frequency")->GetText());
-		FreqRange = stod(pElem->FirstChildElement("Jammer")->FirstChildElement("FreqRange")->GetText());
-		P_j = stod(pElem->FirstChildElement("Jammer")->FirstChildElement("P_j")->GetText());
+		p_Params.ScanAzRange = 360;
+		p_Params.ScanElRangeLl = 0.0;
+		p_Params.ScanElRangeUl = 90.0;
+		p_Params.ScanPeriod = 10;
+		p_Params.ThetaAZ05 = 1.3;
+		p_Params.ThetaEL05 = 1.3;
+		BeamAzCenter = DEG2RAD * 90.0;
+		BeamAzSweep = DEG2RAD * 360.0;
+		BeamElCenter = DEG2RAD * (-45.0);
+		BeamElSweep = DEG2RAD * 180.0;
+		Frequency = 3.1e9;
+		FreqRange = 0.5e6;
+		P_j = 1000;
+		
+		
 		m_Ant.Init(p_Params);
 		//�Ը��Ż�����Ϣ���г�ʼ��
 		Gama_j = 0.5;
 		Gt_sita = 0;
 		Lamda = 3e8 / Frequency;
 		LL = 1;
-		R_j = 1;
+		R_j = 1;   
 		sign = 0;
 		//p_RdState.fre_band = p_Params.fre_band;
 		//p_RdState.fre_center = p_Params.fre_center;
+		return true;
 	}
 
 	bool Jammer::InitValue(const std::string& name, void* value)

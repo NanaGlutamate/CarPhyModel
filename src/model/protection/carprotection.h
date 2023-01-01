@@ -7,8 +7,9 @@ namespace carPhyModel{
 
 class ProtectionSystem : public System{
 public:
-    ProtectionSystem(){};
+    ProtectionSystem() = default;
     virtual void tick(double dt, Components& c){};
+    virtual ~ProtectionSystem() = default;
 };
 
 }

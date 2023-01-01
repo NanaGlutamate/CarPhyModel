@@ -7,6 +7,27 @@
 #include "../tools/datastructure.hpp"
 
 namespace carPhyModel::component{
+    
+// #if __cplusplus >= 202002L
+
+// template<typename T>
+// concept Component = 
+//     std::is_same_v<T, int> ||
+//     std::is_same_v<T, float> ||
+//     std::is_same_v<T, double> ||
+//     std::is_enum_v<T> || 
+//     requires{
+//         std::string(T::token_list[0]);
+//         pfr::get<0>(T{});
+//     };
+
+// #define Restrict Component
+
+// #else
+
+// #define Restrict typename
+
+// #endif
 
 template<typename RETURN_TYPE> inline RETURN_TYPE componentDeserialize(rapidxml::xml_node<char>* node);
 

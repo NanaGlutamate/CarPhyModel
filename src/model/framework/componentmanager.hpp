@@ -78,6 +78,9 @@ class ComponentManager;
 template <typename ...Singletons, typename ...Normals>
 class ComponentManager<SingletonComponent<Singletons...>, NormalComponent<Normals...>>{
 public:
+    using SingletonComponentTypes = SingletonComponent<Singletons...>;
+    using NormalComponentTypes = NormalComponent<Normals...>;
+
     ComponentManager(): lock(false), entityCounter(0), normalComponents(), singletonComponents(), entityGroupCache(), entityComponentCache(){};
 
     class Modifier{
@@ -156,7 +159,6 @@ public:
         return EntityList<ComponentTypes...>(this);
     };
     
-    // TODO: debug
     template <typename ComponentType>
     std::optional<std::reference_wrapper<ComponentType>> getSpecificNormalComponent(size_t ID){
         my_assert(!lock);

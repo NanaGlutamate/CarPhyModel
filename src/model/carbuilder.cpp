@@ -1,9 +1,16 @@
-﻿#include "carbuilder.h"
-#include <algorithm>
+﻿#include <algorithm>
+#include "carbuilder.h"
+
+#include "tools/metatools.hpp"
 #include "framework/component.hpp"
 #include "src/extern/rapidxml-1.13/rapidxml.hpp"
+
+#include "hull/carhull.h"
 #include "protection/carprotection.h"
 #include "damage/cardamage.h"
+#include "sensors/carsensor.h"
+#include "toolsystem/hitsystem.hpp"
+#include "toolsystem/ballisticsystem.hpp"
 
 namespace{
 
@@ -11,10 +18,11 @@ using namespace rapidxml;
 using namespace std;
 using namespace carPhyModel;
 using namespace carPhyModel::component;
+using namespace carPhyModel::mymeta;
 
-class BadComponentName : public runtime_error {
+class BadComponentName : public logic_error {
 public:
-    BadComponentName(const string& what): runtime_error(what){};
+    BadComponentName(const string& what): logic_error(what){};
 };
 
 class CStyleString{
@@ -22,59 +30,127 @@ public:
     char*s;
     CStyleString(size_t n):s(new char[n]){};
     CStyleString(const CStyleString& s)=delete;
+    void operator=(const CStyleString& s)=delete;
     CStyleString(const std::string& str):s(new char[str.size()+5]){memcpy(s,str.c_str(),str.size()+1);};
     ~CStyleString(){delete[] s;};
 };
 
-void loadComponent(size_t ID, rapidxml::xml_node<char>* component, carPhyModel::Components::Modifier& handle){
-    // name must be a string like "Name"sv to enable operator== between string
-    if(component->name() == "Coordinate"sv){
-        handle.addNormalComponents<Coordinate>(ID, componentDeserialize<Coordinate>(component));
-    }else if(component->name() == "ProtectionModel"sv){
-        handle.addNormalComponents<ProtectionModel>(ID, componentDeserialize<ProtectionModel>(component));
-    }else if(component->name() == "PartDamageModel"sv){
-        handle.addNormalComponents<PartDamageModel>(ID, componentDeserialize<PartDamageModel>(component));
-    }else if(component->name() == "FireUnit"sv){
-        handle.addNormalComponents<FireUnit>(ID, componentDeserialize<FireUnit>(component));
-    }else if(component->name() == "SensorData"sv){
-        handle.addNormalComponents<SensorData>(ID, componentDeserialize<SensorData>(component));
-    }else throw BadComponentName("do not have a component named "s + component->name());
-}
+template<typename Ty>
+struct loadComponent;
+
+template<typename ...Ty>
+struct loadComponent<NormalComponent<Ty...>>{
+    void operator()(
+        size_t ID, 
+        rapidxml::xml_node<char>* component, 
+        carPhyModel::Components::Modifier& handle, 
+        const std::vector<string_view>& token_list
+    ){
+        bool tmp[sizeof...(Ty)] = {[&](){
+            bool match = component->name() == token_list[get_type_list_index<Ty, Ty...>::value];
+            if(match){
+                handle.addNormalComponents<Ty>(ID, componentDeserialize<Ty>(component));
+            }
+            return match;
+        }()...};
+        size_t i;
+        for(i = 0; i < sizeof...(Ty); ++i){
+            if(tmp[i]){
+                break;
+            }
+        }
+        if(i == sizeof...(Ty))throw BadComponentName("do not have a component named '"s + component->name() + "'"s);
+    }
+};
+
+template<typename ...Ty>
+struct loadComponent<SingletonComponent<Ty...>>{
+    void operator()(
+        rapidxml::xml_node<char>* root, 
+        carPhyModel::Components::Modifier& handle,
+        const std::vector<string_view>& token_list){
+        int tmp[sizeof...(Ty)] = {[&](){
+            if(auto p = root->first_node(token_list[get_type_list_index<Ty, Ty...>::value].data()); p != 0){
+                handle.addSingletonComponents<Ty>(componentDeserialize<Ty>(p));
+            }
+            return 0;
+        }()...};
+    }
+};
+
+// void loadComponent(size_t ID, rapidxml::xml_node<char>* component, carPhyModel::Components::Modifier& handle){
+//     // name must be a string like "Name"sv to enable operator== between string
+//     if(component->name() == "Coordinate"sv){
+//         handle.addNormalComponents<Coordinate>(ID, componentDeserialize<Coordinate>(component));
+//     }else if(component->name() == "ProtectionModel"sv){
+//         handle.addNormalComponents<ProtectionModel>(ID, componentDeserialize<ProtectionModel>(component));
+//     }else if(component->name() == "PartDamageModel"sv){
+//         handle.addNormalComponents<PartDamageModel>(ID, componentDeserialize<PartDamageModel>(component));
+//     }else if(component->name() == "FireUnit"sv){
+//         handle.addNormalComponents<FireUnit>(ID, componentDeserialize<FireUnit>(component));
+//     }else if(component->name() == "SensorData"sv){
+//         handle.addNormalComponents<SensorData>(ID, componentDeserialize<SensorData>(component));
+//     }else throw BadComponentName("do not have a component named "s + component->name());
+// }
 
 }
 
 namespace carPhyModel{
 
 void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model){
+    if(model.systems.empty()){
+        model.systems.push_back(std::make_unique<SensorSystem>());
+
+        model.systems.push_back(std::make_unique<BallisticSystem>());
+        model.systems.push_back(std::make_unique<HitSystem>());
+        model.systems.push_back(std::make_unique<ProtectionSystem>());
+        model.systems.push_back(std::make_unique<DamageSystem>());
+
+        model.systems.push_back(std::make_unique<HullSystem>());
+    }
+
     //初始化xml解析器
     xml_document<> doc;
     CStyleString s(srcXML);
     doc.parse<parse_default>(s.s);
     auto root=doc.first_node("car");
-
-    if(CarModel::systems.empty()){
-        CarModel::systems = {
-            make_shared<ProtectionSystem>(),
-            make_shared<DamageSystem>(),
-        };
-    }
+    
     if(auto handle = model.components.getModifier()){
         handle.addSingletonComponents<
             OutputBuffer,
             Coordinate,
-            FireEventQueue,
+            HitEventQueue,
             ScannedMemory,
             Hull
         >({}, {}, {}, {}, {});
-        // TODO: wheel motion
+
+        loadComponent<SingletonComponent<
+            WheelMotionParamList
+        >>{}(root, handle, {
+            "WheelMotionParamList"
+        });
 
         for(auto entity = root->first_node("entity"); entity; entity = entity->next_sibling("entity")){
             auto ID = handle.newEntity();
             for(auto component = entity->first_node(0); component; component = component->next_sibling()){
-                loadComponent(ID, component, handle);
+                loadComponent<NormalComponent<
+                    Block,
+                    Coordinate,
+                    ProtectionModel,
+                    PartDamageModel,
+                    FireUnit,
+                    SensorData
+                >>{}(ID, component, handle, {
+                    "Block",
+                    "Coordinate",
+                    "ProtectionModel",
+                    "PartDamageModel",
+                    "FireUnit",
+                    "SensorData"
+                });
             }
         }
     }
-};
+}
 
 }

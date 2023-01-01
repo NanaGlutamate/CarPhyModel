@@ -13,7 +13,7 @@
 
 namespace carPhyModel{
 
-struct Square{
+struct Block{
     constexpr static const char* token_list[] = {"length", "width", "height"};
     constexpr operator Vector3() const{
         return Vector3{length, width, height};
@@ -25,13 +25,15 @@ struct Square{
     double height;
 };
 
+struct HitBox : public Block{};
+
 // carprotection
 struct ProtectionModel{
-    constexpr static const char* token_list[] = {"armor", "activeProtectionAmmo", "reactiveArmor", "protectZone"};
+    constexpr static const char* token_list[] = {"armor", "activeProtectionAmmo", "reactiveArmor"};//, "protectZone"};
     double armor;
     int activeProtectionAmmo;
     int reactiveArmor;
-    Vector3 protectZone;
+    // Block protectZone;
 };
 
 // carhull
@@ -51,9 +53,9 @@ enum class DAMAGE_LEVEL{
 };
 
 struct PartDamageModel{
-    constexpr static const char* token_list[] = {"damageLevel", "size"};
+    constexpr static const char* token_list[] = {"damageLevel"};//, "size"};
     DAMAGE_LEVEL damageLevel;
-    Square size;
+    // Block size;
 };
 
 struct FireEvent{
@@ -164,19 +166,29 @@ struct WheelMotionParamList{
     double MAX_LATERAL_ACCELERATION;
 };
 
+struct HitEventQueue : public std::vector<FireEvent>{};
+
 struct FireEventQueue : public std::vector<FireEvent>{};
+
+struct InputBuffer{
+    const std::unordered_map<std::string, std::any>* p;
+};
 
 struct OutputBuffer : public std::unordered_map<std::string, std::any>{};
 
 using Components = ComponentManager<
     SingletonComponent<
+        InputBuffer,
         OutputBuffer,
         Coordinate,
+        HitEventQueue,
         FireEventQueue,
         WheelMotionParamList,
         ScannedMemory,
+        HitBox,
         Hull
     >, NormalComponent<
+        Block,
         Coordinate,
         ProtectionModel,
         PartDamageModel,

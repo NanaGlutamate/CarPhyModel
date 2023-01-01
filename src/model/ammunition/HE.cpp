@@ -6,14 +6,17 @@ namespace{
 using namespace carPhyModel;
 
 // 计算毁伤碰撞盒与球距离
-double collision(const carPhyModel::Vector3& pos, const carPhyModel::PartDamageModel& pdm, const carPhyModel::Coordinate& coordinate){
+double collision(
+    const Vector3& pos, 
+    const Block& size, 
+    const Coordinate& coordinate){
     using std::pow;
     using std::sqrt;
-    const carPhyModel::Vector3 pos_local = coordinate.positionWorldToBody(pos);
+    const Vector3 pos_local = coordinate.positionWorldToBody(pos);
     double r2 = 0.;
     for(size_t i=0; i<3; ++i){
-        if(pos_local[i] < -pdm.size[i] / 2.)r2 += pow(pos_local[i] + pdm.size[i] / 2., 2);
-        if(pos_local[i] > pdm.size[i] / 2.)r2 += pow(pos_local[i] - pdm.size[i] / 2., 2);
+        if(pos_local[i] < -size[i] / 2.)r2 += pow(pos_local[i] + size[i] / 2., 2);
+        if(pos_local[i] > size[i] / 2.)r2 += pow(pos_local[i] - size[i] / 2., 2);
     }
     return sqrt(r2);
 };
@@ -22,8 +25,15 @@ double collision(const carPhyModel::Vector3& pos, const carPhyModel::PartDamageM
 
 namespace carPhyModel{
 
-void HEDamage::updateDamage(PartDamageModel& pdm, const Coordinate& coordinate, const Vector3& pos, const Vector3& dir, const Vector3& vel, double range) const{
-    auto radius = collision(pos, pdm, coordinate);
+void HEDamage::updateDamage(
+    PartDamageModel& pdm, 
+    const Block& size,
+    const Coordinate& coordinate, 
+    const Vector3& pos, 
+    const Vector3& dir, 
+    const Vector3& vel, 
+    double range) const{
+    auto radius = collision(pos, size, coordinate);
     if(radius <= damageTable[0]){
         pdm.damageLevel = DAMAGE_LEVEL::KK;
     }else if(radius <= damageTable[1]){

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<COMM_property>
+  <tran>
+    <Comm_Set_A>10.0</Comm_Set_A>
+	<Comm_Set_i>1</Comm_Set_i>
+	<Comm_Set_azi>0.0</Comm_Set_azi>
+	<Comm_Set_alt>0.0</Comm_Set_alt>
+	<Comm_Set_Freq>3.5e-01</Comm_Set_Freq>
+	<Comm_Set_Freq_Bw>36e06</Comm_Set_Freq_Bw>
+	<Comm_Set_Power>100.0</Comm_Set_Power>
+	<Comm_Set_T>500.0</Comm_Set_T>
+  </tran>
+
+  <rec>
+    <Comm_Set_A>0.5</Comm_Set_A>
+	<Comm_Set_i>2</Comm_Set_i>
+	<Comm_Set_azi>0.0</Comm_Set_azi>
+	<Comm_Set_alt>00.0</Comm_Set_alt>
+	<Comm_Set_Freq>3.5e-01</Comm_Set_Freq>
+	<Comm_Set_Freq_Bw>36e06</Comm_Set_Freq_Bw>
+	<Comm_Set_Power>100.0</Comm_Set_Power>
+	<Comm_Set_T>500.0</Comm_Set_T>
+	<Comm_tran>1</Comm_tran>
+  </rec>
+  
+  
+  
+  
+  
+  
+
+</COMM_property>

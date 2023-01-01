@@ -5,6 +5,6 @@
 namespace carPhyModel{
 
 // HEAT
-using HEATDamage = APDamage;
+class HEATDamage : public APDamage{};
 
 };

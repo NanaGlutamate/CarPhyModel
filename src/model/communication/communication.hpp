@@ -5,7 +5,8 @@ namespace carPhyModel{
 class Communication{
 public:
     virtual void sendMessage()=0;
-    virtual ~Communication(){};
+    virtual void receiveMessage()=0;
+    virtual ~Communication() = default;
 };
 
 };

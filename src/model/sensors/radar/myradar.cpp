@@ -6,8 +6,8 @@ namespace {
 //using namespace radar;
 
 struct DoJobOnConstruct{
-    template<typename Job>
-    DoJobOnConstruct(Job&& j){j();};
+    template<typename Job, typename ...Params>
+    DoJobOnConstruct(Job&& j, Params&& ...params){std::invoke(std::forward<Job>(j), std::forward<Params>(params)...);};
 };
 
 }
@@ -21,11 +21,10 @@ bool MyRadar::isDetectable(const Coordinate& self, const EntityInfo& e, const Se
         PdRadar1.Init();
         PdRadar1.Set_JamPower(0);
     }};
-    externModel::radar::Vector3 rpos{ self.position.x, self.position.y, self.position.z }, rvel{ hull.velocity.x, hull.velocity.y, hull.velocity.z };
-    externModel::radar::Vector3 tpos{ e.position.x, e.position.y, e.position.z }, tvel{ e.velocity.x, e.velocity.y, e.velocity.z };
-    PdRadar1.InitValue("RPos", &rpos);
-    PdRadar1.InitValue("RVel", &rvel);
-    PdRadar1.SetInput({ {"Target_Position", tpos}, {"Target_Velocity", tvel} });
+    PdRadar1.ENURadarState.rPos = { self.position.x, self.position.y, self.position.z };
+    PdRadar1.ENURadarState.rVel = { hull.velocity.x, hull.velocity.y, hull.velocity.z };
+    PdRadar1.ENUTargetState.tPos = { e.position.x, e.position.y, e.position.z };
+    PdRadar1.ENUTargetState.tVel = { e.velocity.x, e.velocity.y, e.velocity.z };
     PdRadar1.update();
     return PdRadar1.ENUTargetState.detected;
 }

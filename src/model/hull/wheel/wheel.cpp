@@ -1,5 +1,5 @@
 ﻿#include "wheel.h"
-#include "../tools/constant.hpp"
+#include "../../tools/constant.hpp"
 
 namespace{
 
@@ -56,8 +56,6 @@ void WheelMoveSystem::tick(double dt, Coordinate& baseCoordinate, Hull& hull, co
     using std::cos;
     using val = const double;
     using var = double;
-
-
 
     // const Vector3 front_direction = baseCoordinate.directionBodyToWorld(Vector3(1., 0., 0.));
     // const Vector3 local_exp_direction = baseCoordinate.directionWorldToBody(exp_direction);

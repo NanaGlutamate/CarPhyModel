@@ -6,28 +6,37 @@
 #include <any>
 #include "tools/datastructure.hpp"
 #include "framework/system.hpp"
+#include "toolsystem/iosystem.hpp"
 
 namespace carPhyModel{
 
 class CarModel{
-    friend class CarBuilder;
 public:
+    friend class CarBuilder;
+    CarModel() = default;
     using CSValueMap = std::unordered_map<std::string, std::any>;
-    void setInput(const CSValueMap& inputValue){};
+    void setInput(const CSValueMap& inputValue){
+        components.getSpecificSingletonComponent<InputBuffer>()->p = &inputValue;
+        inputSystem.tick(0, components);
+    }
     void tick(double dt){
         components.getSpecificSingletonComponent<OutputBuffer>()->clear();
         for(auto&& sys : systems){
             sys->tick(dt, components);
         }
-    };
+        outputSystem.tick(0, components);
+    }
     CSValueMap* getOutput(){
         return &(components.getSpecificSingletonComponent<OutputBuffer>().value());
-    };
+    }
 private:
-    CarModel() = default;
+    CarModel(const CarModel&) = default;
 
     Components components;
-    static std::vector<std::shared_ptr<System>> systems;
+
+    inline static InputSystem inputSystem{};
+    inline static OutputSystem outputSystem{};
+    inline static std::vector<std::unique_ptr<System>> systems{};
 };
 
 }

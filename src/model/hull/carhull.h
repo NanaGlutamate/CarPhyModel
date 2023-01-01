@@ -6,11 +6,11 @@
 
 namespace carPhyModel{
 
-class CarHullSystem : public System{
-private:
-    EnvironmentInfoAgent env;
+class HullSystem : public System{
 public:
+    HullSystem() = default;
     virtual void tick(double dt, Components& c) override;
+    virtual ~HullSystem() = default;
 };
 
 };
