@@ -20,10 +20,10 @@ using namespace carPhyModel;
 using namespace carPhyModel::component;
 using namespace carPhyModel::mymeta;
 
-class BadComponentName : public logic_error {
-public:
-    BadComponentName(const string& what): logic_error(what){};
-};
+// class BadComponentName : public logic_error {
+// public:
+//     BadComponentName(const string& what): logic_error(what){};
+// };
 
 class CStyleString{
 public:
@@ -53,13 +53,13 @@ struct loadComponent<NormalComponent<Ty...>>{
             }
             return match;
         }()...};
-        size_t i;
-        for(i = 0; i < sizeof...(Ty); ++i){
-            if(tmp[i]){
-                break;
-            }
-        }
-        if(i == sizeof...(Ty))throw BadComponentName("do not have a component named '"s + component->name() + "'"s);
+        // size_t i;
+        // for(i = 0; i < sizeof...(Ty); ++i){
+        //     if(tmp[i]){
+        //         break;
+        //     }
+        // }
+        assert(std::find(tmp, tmp + sizeof...(Ty), true) != tmp + sizeof...(Ty));
     }
 };
 
@@ -103,6 +103,7 @@ void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model){
 
         model.systems.push_back(std::make_unique<BallisticSystem>());
         model.systems.push_back(std::make_unique<HitSystem>());
+
         model.systems.push_back(std::make_unique<ProtectionSystem>());
         model.systems.push_back(std::make_unique<DamageSystem>());
 

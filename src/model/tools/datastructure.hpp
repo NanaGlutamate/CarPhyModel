@@ -25,7 +25,9 @@ struct Block{
     double height;
 };
 
-struct HitBox : public Block{};
+struct Sphere{
+    double r;
+};
 
 // carprotection
 struct ProtectionModel{
@@ -59,6 +61,7 @@ struct DamageModel{
 };
 
 struct FireEvent{
+    constexpr static const char* token_list[] = {"weaponName", "position", "direction", "velocity", "range"};
     std::string weaponName;
     // 命中点的世界坐标
     Vector3 position;
@@ -120,15 +123,22 @@ struct SensorData{
 
 // vehicle ID
 using VID = std::size_t;
+// side ID
+using SID = uint16_t;
 
-struct EntityInfo{
-    Vector3 position;
-    Vector3 velocity;
+struct BaseInfo{
     enum class ENTITY_TYPE{
         CAR,
         UNKNOWN,
     } type;
     VID id;
+    SID side;
+};
+
+struct EntityInfo{
+    Vector3 position;
+    Vector3 velocity;
+    BaseInfo baseInfo;
     double lastScanned;
 };
 
@@ -186,7 +196,7 @@ using Components = ComponentManager<
         FireEventQueue,
         WheelMotionParamList,
         ScannedMemory,
-        HitBox,
+        Sphere,
         Hull
     >, NormalComponent<
         Coordinate,

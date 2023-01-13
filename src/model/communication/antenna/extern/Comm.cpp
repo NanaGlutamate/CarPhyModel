@@ -21,7 +21,7 @@ Comm::~Comm(){}
 bool Comm::Comm_test(double Posa_x, double Posa_y, double Posa_z,
 	double Posb_x, double Posb_y, double Posb_z, double FT_comm)
 {
-	Comm comm1, comm2;
+	static Comm comm1, comm2;
 	Comm* c1 = &comm1;
 	Comm* c2 = &comm2;
 	comm1.Init();
@@ -63,51 +63,7 @@ bool Comm::Comm_test(double Posa_x, double Posa_y, double Posa_z,
 	return connect;
 }
 
-bool Comm::Init()
-{
-	
-	//TiXmlDocument doc("Comm_property.xml");
-	
-	//if (!doc.LoadFile()) {
-	//	tran_para.Comm_Set_A = 10.0;
-	//	tran_para.Comm_Set_i = 1;
-	//	tran_para.Comm_Set_azi = 0.0;
-	//	tran_para.Comm_Set_alt = 0.0;
-	//	tran_para.Comm_Set_Freq = 3.5e-01;
-	//	tran_para.Comm_Set_Freq_Bw = 36e06;
-	//	tran_para.Comm_Set_Power = 100.0;
-	//	tran_para.Comm_Set_T = 500.0;
-	//	rec_para.Comm_Set_A = 0.5;
-	//	rec_para.Comm_Set_i = 2;
-	//	rec_para.Comm_Set_azi = 0.0;
-	//	rec_para.Comm_Set_alt = 0.0;
-	//	rec_para.Comm_Set_Freq = 3.5e-01;
-	//	rec_para.Comm_Set_Freq_Bw = 36e06;
-	//	rec_para.Comm_Set_Power = 100.0;
-	//	rec_para.Comm_Set_T = 500.0;
-	//	return 0;
-	//}
-	//	
-	//TiXmlHandle hDoc(&doc);
-	//TiXmlElement* pElem;//定义一个指向元素的指针
-	//pElem = hDoc.FirstChildElement().Element();//将该指针指向根节点；即指向了“bluePADGroup"结点
-	//tran_para.Comm_Set_A= stod(pElem->FirstChildElement("tran")->FirstChildElement("Comm_Set_A")->GetText());
-	//tran_para.Comm_Set_i = stod(pElem->FirstChildElement("tran")->FirstChildElement("Comm_Set_i")->GetText());
-	//tran_para.Comm_Set_azi = stod(pElem->FirstChildElement("tran")->FirstChildElement("Comm_Set_azi")->GetText());
-	//tran_para.Comm_Set_alt = stod(pElem->FirstChildElement("tran")->FirstChildElement("Comm_Set_alt")->GetText());
-	//tran_para.Comm_Set_Freq = stod(pElem->FirstChildElement("tran")->FirstChildElement("Comm_Set_Freq")->GetText());
-	//tran_para.Comm_Set_Freq_Bw = stod(pElem->FirstChildElement("tran")->FirstChildElement("Comm_Set_Freq_Bw")->GetText());
-	//tran_para.Comm_Set_Power = stod(pElem->FirstChildElement("tran")->FirstChildElement("Comm_Set_Power")->GetText());
-	//tran_para.Comm_Set_T = stod(pElem->FirstChildElement("tran")->FirstChildElement("Comm_Set_T")->GetText());
-	//rec_para.Comm_Set_A = stod(pElem->FirstChildElement("rec")->FirstChildElement("Comm_Set_A")->GetText());
-	//rec_para.Comm_Set_i = stod(pElem->FirstChildElement("rec")->FirstChildElement("Comm_Set_i")->GetText());
-	//rec_para.Comm_Set_azi = stod(pElem->FirstChildElement("rec")->FirstChildElement("Comm_Set_azi")->GetText());
-	//rec_para.Comm_Set_alt = stod(pElem->FirstChildElement("rec")->FirstChildElement("Comm_Set_alt")->GetText());
-	//rec_para.Comm_Set_Freq = stod(pElem->FirstChildElement("rec")->FirstChildElement("Comm_Set_Freq")->GetText());
-	//rec_para.Comm_Set_Freq_Bw = stod(pElem->FirstChildElement("rec")->FirstChildElement("Comm_Set_Freq_Bw")->GetText());
-	//rec_para.Comm_Set_Power = stod(pElem->FirstChildElement("rec")->FirstChildElement("Comm_Set_Power")->GetText());
-	//rec_para.Comm_Set_T = stod(pElem->FirstChildElement("rec")->FirstChildElement("Comm_Set_T")->GetText());
-
+bool Comm::Init(){
 	tran_para.Comm_Set_A = 10.0;
 	tran_para.Comm_Set_i = 1;
 	tran_para.Comm_Set_azi = 0.0;
@@ -125,7 +81,6 @@ bool Comm::Init()
 	rec_para.Comm_Set_Power = 100.0;
 	rec_para.Comm_Set_T = 500.0;
 	
-
 	return true;
 }
 
@@ -366,8 +321,8 @@ void Comm::postion()
 	double deltax = comm_pos.Comm_Set_longitude - tran_pos.Comm_Set_longitude;
 	double deltay = comm_pos.Comm_Set_latitude - tran_pos.Comm_Set_latitude;
 	double deltaz = comm_pos.Comm_Set_altitude - tran_pos.Comm_Set_altitude;
-	rel.azimuth = atan(deltay/deltax)/3.1415926*180.0;
-	rel.altitude = atan(deltaz / pow((deltax * deltax + deltay * deltay), 0.5)) / 3.1415926 * 180.0;
+	rel.azimuth = atan2(deltay, deltax)/3.1415926*180.0;
+	rel.altitude = atan2(deltaz, pow((deltax * deltax + deltay * deltay), 0.5)) / 3.1415926 * 180.0;
 	rel.d = pow((deltax * deltax + deltay * deltay + deltaz * deltaz), 0.5);
 }
 

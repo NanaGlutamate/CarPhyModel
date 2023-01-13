@@ -2,7 +2,7 @@
 
 #include "communication.hpp"
 #include "../framework/pattern.hpp"
-#include "antenna/myantenna.hpp"
+#include "antenna/myantenna.h"
 
 namespace carPhyModel{
 

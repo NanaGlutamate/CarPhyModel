@@ -4,6 +4,8 @@
 #include "../environment.h"
 #include "../framework/system.hpp"
 
+// 标准坐标系：北东地与前右下
+
 namespace carPhyModel{
 
 class HullSystem : public System{
@@ -13,4 +15,4 @@ public:
     virtual ~HullSystem() = default;
 };
 
-};
+}

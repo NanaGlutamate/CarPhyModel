@@ -11,4 +11,7 @@ constexpr inline double INF_SMALL = 1e-10;
 // inf_m
 constexpr inline double INF_BIG = 1e+10;
 
+constexpr double RAD2DEG(double rad){return rad * 180. / PI;}
+constexpr double DEG2RAD(double deg){return deg * PI / 180.;}
+
 }

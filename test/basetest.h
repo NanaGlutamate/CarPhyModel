@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iterator>
 #include <tuple>
+#include <algorithm>
 #include "../src/model/carbuilder.h"
 #include "../src/extern/rapidxml-1.13/rapidxml.hpp"
 #include "../src/model/tools/vector3.hpp"

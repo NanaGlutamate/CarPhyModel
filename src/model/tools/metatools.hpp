@@ -11,18 +11,22 @@ struct type_list{};
 // 获取类型在类型列表中index
 template <typename Test, typename ...List>
 struct get_type_list_index{
-    constexpr static std::size_t value = 0;
+    constexpr static inline std::size_t value = 0;
 };
 
 template <typename Test, typename ListStart, typename ...List>
 struct get_type_list_index<Test, ListStart, List...>{
-    constexpr static std::size_t value = get_type_list_index<Test, List...>::value + 1;
+    constexpr static inline std::size_t value = get_type_list_index<Test, List...>::value + 1;
 };
 
 template <typename Test, typename ...List>
 struct get_type_list_index<Test, Test, List...>{
-    constexpr static std::size_t value = 0;
+    constexpr static inline std::size_t value = 0;
 };
+
+// 判断是否在列表
+template <typename Test, typename ...List>
+inline constexpr bool is_in_list_v = (get_type_list_index<Test, List...>::value != sizeof...(List));
 
 // 静态列表
 template <std::size_t ...indexes>
@@ -53,6 +57,29 @@ struct concatenate;
 template <std::size_t ...L1Value, std::size_t ...L2Value>
 struct concatenate<static_list<L1Value...>, static_list<L2Value...>>{
     using type = static_list<L1Value..., L2Value...>;
+};
+
+// 对类型的find_if
+
+template <template <typename t> typename func, typename fallback, typename ...L>
+struct find_if;
+
+template <template <typename t> typename func, typename fallback, typename L1, typename ...L>
+struct find_if<func, fallback, L1, L...>{
+    using type = typename std::conditional_t<
+        func<L1>::value,
+        L1,
+        typename find_if<func, L...>::type
+    >;
+};
+
+template <template <typename t> typename func, typename fallback, typename L1>
+struct find_if<func, fallback, L1>{
+    using type = typename std::conditional_t<
+        func<L1>::value,
+        L1,
+        fallback
+    >;
 };
 
 // 函数式filter

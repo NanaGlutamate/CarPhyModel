@@ -12,7 +12,7 @@ struct Vector3{
 	constexpr Vector3() = default;
 	constexpr Vector3(element x, element y, element z):x(x), y(y), z(z) {};
 	constexpr Vector3(const Vector3& v):x(v.x), y(v.y), z(v.z) {};
-	void operator=(const Vector3& v){
+	constexpr void operator=(const Vector3& v){
         x = v.x;
         y = v.y;
         z = v.z;
@@ -68,12 +68,17 @@ struct Vector3{
     //! @return position after rotation
     [[nodiscard("this function will not modify original vector")]] Vector3 rotate(const Vector3& p) const;
 
-    element operator[](size_t index) const{
+    constexpr element operator[](size_t index) const{
         return (&x)[index];
     };
-    element& operator[](size_t index){
+    constexpr element& operator[](size_t index){
         return (&x)[index];
-    };
+        // switch(index){
+        //     case 0: return x;
+        //     case 1: return y;
+        //     case 2: [[fallthrough]]; default: return z;
+        // };
+    }
     friend std::ostream& operator<<(std::ostream o, Vector3& v) {
         return (o << "(" << v.x << ", " << v.y << ", " << v.z << ")");
     };
@@ -123,7 +128,7 @@ struct Quaternion{
     };
 
     //! 将四元数转为欧拉角
-    //! @return Vector3: x=roll, y=pitch, z=yaw
+    //! @return Vector3: x=roll, y=pitch, z=yaw; xyz euler angles
     inline Vector3 getEuler() const{
         using std::asin;
         using std::atan2;

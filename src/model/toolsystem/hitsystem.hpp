@@ -12,13 +12,13 @@ public:
     HitSystem() = default;
     virtual void tick(double dt, Components& c) override {
         using std::max;
-        auto& opt_hitbox = c.getSpecificSingletonComponent<HitBox>();
+        auto& opt_hitbox = c.getSpecificSingletonComponent<Sphere>();
         if(!opt_hitbox.has_value()){
             double r = 0.;
             for(auto&& [id, _coordinate, _size] : c.getNormalComponents<Coordinate, Block>()){
                 r = max(r, _coordinate.position.norm() + max(_size[0], max(_size[1], _size[2])));
             }
-            opt_hitbox = HitBox{r, r, r};
+            opt_hitbox = Sphere{r};
         }
         auto& hitbox = opt_hitbox.value();
         //TODO:

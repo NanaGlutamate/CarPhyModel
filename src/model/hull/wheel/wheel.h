@@ -10,7 +10,7 @@ namespace carPhyModel{
 class WheelMoveSystem{
 private:
     EnvironmentInfoAgent env;
-    void updateState(double dt, Coordinate& baseCoordinate, Hull& hull, WheelMotionParamList& params);
+    // void updateState(double dt, Coordinate& baseCoordinate, Hull& hull, WheelMotionParamList& params);
 public:
     WheelMoveSystem():env(){};
 
@@ -29,16 +29,15 @@ public:
         WheelMotionParamList& params
     );
 
-    // 最小运动限制下的tick
-    // 未完成
-    void unconstrainedTick(
-        double dt, 
-        Coordinate& baseCoordinate, 
-        Hull& hull, 
-        double wheel_angle, 
-        double acceleration, 
-        WheelMotionParamList& params
-    );
+    // // TODO: 最小运动限制下的tick
+    // void unconstrainedTick(
+    //     double dt, 
+    //     Coordinate& baseCoordinate, 
+    //     Hull& hull, 
+    //     double wheel_angle, 
+    //     double acceleration, 
+    //     WheelMotionParamList& params
+    // );
 };
 
 };
