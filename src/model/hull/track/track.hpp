@@ -28,9 +28,8 @@ public:
     ){
         using namespace externModel::track;
         static SixDof sixDOF;
-        static DataStore param{
-            .tracked_ = {},
-        };
+        static DataStore param;
+        param.init();
     }
 };
 

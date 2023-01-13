@@ -14,13 +14,13 @@ using E = double;
 inline constexpr double min(double a, double b) {return (((a) < (b)) ? (a) : (b));}
 
 namespace {
-    const double mass = 80000.0;
-    const double inertia = 100000.0;
-    const double PI = 3.14159265358979323;
-    const double g = 9.8;
-    const double muRoll = 0.05;
-    const double muSlide = 0.2;
-    const double muRollT = 0.2;
+    // const double mass = 80000.0;
+    // const double inertia = 100000.0;
+    // const double PI = 3.14159265358979323;
+    // const double g = 9.8;
+    // const double muRoll = 0.05;
+    // const double muSlide = 0.2;
+    // const double muRollT = 0.2;
     double Fl = 40000, Fr = 40000;
     SixDof sixDOF;
     DataStore param;
