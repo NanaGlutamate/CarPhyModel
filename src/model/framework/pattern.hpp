@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 
-namespace carPhyModel{
+namespace carphymodel{
 
 template <typename T>
 class Singleton{

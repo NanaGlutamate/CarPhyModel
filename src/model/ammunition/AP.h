@@ -3,7 +3,7 @@
 #include "../tools/datastructure.hpp"
 #include "ammunition.hpp"
 
-namespace carPhyModel{
+namespace carphymodel{
 
 // AP
 class APDamage : public AmmunitionDamage{

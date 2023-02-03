@@ -6,7 +6,7 @@
 
 // 标准坐标系：北东地与前右下
 
-namespace carPhyModel{
+namespace carphymodel{
 
 class HullSystem : public System{
 public:

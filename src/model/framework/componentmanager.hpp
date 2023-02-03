@@ -9,14 +9,9 @@
 #include <map>
 #include <optional>
 #include "../tools/metatools.hpp"
+#include "../tools/myassert.hpp"
 
-namespace carPhyModel{
-
-inline void my_assert(bool condition, std::string message = ""){
-    if(!condition){
-        throw std::runtime_error(message);
-    }
-}
+namespace carphymodel{
 
 // #if __cplusplus >= 202002L
 
@@ -141,7 +136,7 @@ public:
         ComponentManager& componentManager;
         Modifier(ComponentManager& componentManager): componentManager(componentManager){
             // TODO: multi-threading?
-            my_assert(!componentManager.lock);
+            my_assert(!componentManager.lock, "Component Manager Locked");
             componentManager.lock = true;
         }
     };
@@ -153,7 +148,7 @@ public:
     template <typename ...ComponentTypes>
     decltype(auto) getNormalComponents(){
         // TODO: multithreading?
-        my_assert(!lock);
+        my_assert(!lock, "Component Manager Locked");
         static_assert((... && type_list_contains_v<ComponentTypes, Normals...>),
             "component manager doesnot contain normal component of that type");
         return EntityList<ComponentTypes...>(this);
@@ -161,7 +156,7 @@ public:
     
     template <typename ComponentType>
     std::optional<std::reference_wrapper<ComponentType>> getSpecificNormalComponent(size_t ID){
-        my_assert(!lock);
+        my_assert(!lock, "Component Manager Locked");
         static_assert(type_list_contains_v<ComponentType, Normals...>,
             "component manager doesnot contain normal component of that type");
         auto& cache = entityComponentCache[type_list_index<ComponentType, Normals...>::value];
@@ -188,7 +183,7 @@ public:
     }
     
     void clear(){
-        my_assert(!lock);
+        my_assert(!lock, "Component Manager Locked");
         entityCounter = 0;
         normalComponents.clear();
         int tmp[sizeof...(Singletons)]={(
@@ -218,7 +213,7 @@ private:
     // private function to build entity id cache for specific entity group
     template<typename ...Ty>
     void buildCache(size_t entityGroupID){
-        my_assert(!lock);
+        my_assert(!lock, "Component Manager Locked");
         static_assert((... && type_list_contains_v<Ty, Normals...>),
             "component manager doesnot contain normal component of that type");
         std::vector<size_t> cacheLine;

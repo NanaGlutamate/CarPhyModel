@@ -3,7 +3,7 @@
 #include "../framework/system.hpp"
 // #include "src/model/sensors/radar.h"
 
-namespace carPhyModel{
+namespace carphymodel{
 
 class SensorSystem : public System{
 public:

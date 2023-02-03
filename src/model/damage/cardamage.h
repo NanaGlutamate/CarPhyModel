@@ -3,7 +3,7 @@
 #include "../tools/datastructure.hpp"
 #include "../framework/system.hpp"
 
-namespace carPhyModel{
+namespace carphymodel{
 
 class DamageSystem : public System{
 private:

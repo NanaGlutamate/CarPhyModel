@@ -12,7 +12,7 @@ struct DoJobOnConstruct{
 
 }
 
-namespace carPhyModel{
+namespace carphymodel{
 
 bool MyRadar::isDetectable(const Coordinate& self, const EntityInfo& e, const SensorData& sensor, const Hull& hull) const
 {

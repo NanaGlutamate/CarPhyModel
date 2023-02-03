@@ -10,7 +10,7 @@ struct DoJobOnConstruct{
 
 }
 
-namespace carPhyModel{
+namespace carphymodel{
 
 bool MyAntenna::sendMessage(){
     using namespace externModel::comm;

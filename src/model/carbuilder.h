@@ -4,7 +4,7 @@
 #include <fstream>
 #include "carmodel.hpp"
 
-namespace carPhyModel{
+namespace carphymodel{
 
 class CarBuilder{
 public:

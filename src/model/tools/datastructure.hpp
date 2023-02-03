@@ -11,7 +11,7 @@
 #include "coordinate.hpp"
 #include "../framework/componentmanager.hpp"
 
-namespace carPhyModel{
+namespace carphymodel{
 
 struct Block{
     constexpr static const char* token_list[] = {"length", "width", "height"};

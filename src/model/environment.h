@@ -4,7 +4,7 @@
 #include "framework/pattern.hpp"
 #include "tools/vector3.hpp"
 
-namespace carPhyModel {
+namespace carphymodel {
 
 class Environment{
 private:

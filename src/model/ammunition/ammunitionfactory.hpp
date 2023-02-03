@@ -7,7 +7,7 @@
 #include "HEAT.h"
 #include "../framework/pattern.hpp"
 
-namespace carPhyModel{
+namespace carphymodel{
 
 struct AmmunitionDamageFactory : public Factory<AmmunitionDamageFactory, AmmunitionDamage>{
     inline static LUT look_up_table{

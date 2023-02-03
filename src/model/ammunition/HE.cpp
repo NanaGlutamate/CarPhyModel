@@ -3,7 +3,7 @@
 
 namespace{
     
-using namespace carPhyModel;
+using namespace carphymodel;
 
 // 计算毁伤碰撞盒与球距离
 double collision(
@@ -23,7 +23,7 @@ double collision(
 
 }
 
-namespace carPhyModel{
+namespace carphymodel{
 
 void HEDamage::updateDamage(
     DamageModel& pdm, 

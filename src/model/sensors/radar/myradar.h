@@ -6,7 +6,7 @@
 #include <memory>
 //include <iostream>
 
-namespace carPhyModel{
+namespace carphymodel{
 
 class MyRadar : public Sensor {
 public:

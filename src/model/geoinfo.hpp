@@ -3,7 +3,7 @@
 #include "tools/metatools.hpp"
 #include "tools/vector3.hpp"
 
-namespace carPhyModel {
+namespace carphymodel {
 
 namespace geoInfo{
 
@@ -32,7 +32,7 @@ struct is_base_of_func{
 
 #if __cplusplus >= 202002L
 template<typename Side>
-concept Direction = carPhyModel::mymeta::is_in_list_v<Side, W, E, N, S, U, D>;
+concept Direction = carphymodel::mymeta::is_in_list_v<Side, W, E, N, S, U, D>;
 
 template<Direction X, Direction Y, Direction Z>
 #else

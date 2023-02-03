@@ -2,7 +2,7 @@
 
 #include <array>
 
-namespace carPhyModel::mymeta{
+namespace carphymodel::mymeta{
 
 // 类型列表
 template <typename ...T>

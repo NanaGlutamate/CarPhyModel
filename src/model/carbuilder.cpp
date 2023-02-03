@@ -4,6 +4,7 @@
 #include "tools/metatools.hpp"
 #include "framework/component.hpp"
 #include "src/extern/rapidxml-1.13/rapidxml.hpp"
+#include "tools/myassert.hpp"
 
 #include "hull/carhull.h"
 #include "protection/carprotection.h"
@@ -16,14 +17,9 @@ namespace{
 
 using namespace rapidxml;
 using namespace std;
-using namespace carPhyModel;
-using namespace carPhyModel::component;
-using namespace carPhyModel::mymeta;
-
-// class BadComponentName : public logic_error {
-// public:
-//     BadComponentName(const string& what): logic_error(what){};
-// };
+using namespace carphymodel;
+using namespace carphymodel::component;
+using namespace carphymodel::mymeta;
 
 class CStyleString{
 public:
@@ -43,23 +39,17 @@ struct loadComponent<NormalComponent<Ty...>>{
     void operator()(
         size_t ID, 
         rapidxml::xml_node<char>* component, 
-        carPhyModel::Components::Modifier& handle, 
+        carphymodel::Components::Modifier& handle, 
         const std::vector<string_view>& token_list
     ){
-        bool tmp[sizeof...(Ty)] = {[&](){
-            bool match = component->name() == token_list[get_type_list_index<Ty, Ty...>::value];
-            if(match){
+        bool match = (... || [&](){
+            if(component->name() == token_list[get_type_list_index<Ty, Ty...>::value]){
                 handle.addNormalComponents<Ty>(ID, componentDeserialize<Ty>(component));
+                return true;
             }
-            return match;
-        }()...};
-        // size_t i;
-        // for(i = 0; i < sizeof...(Ty); ++i){
-        //     if(tmp[i]){
-        //         break;
-        //     }
-        // }
-        assert(std::find(tmp, tmp + sizeof...(Ty), true) != tmp + sizeof...(Ty));
+            return false;
+        }());
+        my_assert(match, "Invalid Component Named "s + component->name());
     }
 };
 
@@ -67,9 +57,9 @@ template<typename ...Ty>
 struct loadComponent<SingletonComponent<Ty...>>{
     void operator()(
         rapidxml::xml_node<char>* root, 
-        carPhyModel::Components::Modifier& handle,
+        carphymodel::Components::Modifier& handle,
         const std::vector<string_view>& token_list){
-        int tmp[sizeof...(Ty)] = {[&](){
+        int tmp[] = {[&](){
             if(auto p = root->first_node(token_list[get_type_list_index<Ty, Ty...>::value].data()); p != 0){
                 handle.addSingletonComponents<Ty>(componentDeserialize<Ty>(p));
             }
@@ -95,7 +85,7 @@ struct loadComponent<SingletonComponent<Ty...>>{
 
 }
 
-namespace carPhyModel{
+namespace carphymodel{
 
 void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model){
     if(model.systems.empty()){

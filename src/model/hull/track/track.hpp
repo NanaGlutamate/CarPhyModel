@@ -2,10 +2,11 @@
 
 #include <cmath>
 #include "../../tools/datastructure.hpp"
+#include "../../tools/initjob.hpp"
 #include "../../environment.h"
 #include "./extern/main.h"
 
-namespace carPhyModel{
+namespace carphymodel{
 
 class TrackMoveSystem{
 private:
@@ -29,7 +30,9 @@ public:
         using namespace externModel::track;
         static SixDof sixDOF;
         static DataStore param;
-        param.init();
+        static DoJobOnConstruct init([&](){
+            param.init();
+        });
     }
 };
 

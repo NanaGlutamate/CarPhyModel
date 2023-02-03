@@ -17,7 +17,7 @@
 #include "../src/extern/pfr.hpp"
 #include "../src/model/framework/component.hpp"
 
-using namespace carPhyModel;
+using namespace carphymodel;
 
 std::ostream& operator<<(std::ostream& os, const Vector3& v){
     os << "(" << v.x << ", " << v.y << ", " << v.z << ")";

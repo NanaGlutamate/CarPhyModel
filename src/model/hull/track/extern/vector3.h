@@ -7,8 +7,8 @@
 
 namespace externModel::track{
 
-using Vector33 = carPhyModel::Vector3;
-using Quaternion = carPhyModel::Quaternion;
+using Vector33 = carphymodel::Vector3;
+using Quaternion = carphymodel::Quaternion;
 
 // //三维向量
 // struct Vector33{

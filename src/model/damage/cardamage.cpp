@@ -2,7 +2,7 @@
 #include "../tools/constant.hpp"
 #include "../ammunition/ammunitionfactory.hpp"
 
-namespace carPhyModel{
+namespace carphymodel{
 
 void DamageSystem::tick(double dt, Components& c){
     auto&& baseCoordinate = c.getSpecificSingletonComponent<Coordinate>().value();
@@ -17,6 +17,7 @@ void DamageSystem::tick(double dt, Components& c){
             ammunitionModel->updateDamage(_damage_model, _size, _coordinate, local_p, local_d, local_v, fireEvent.range);
         }
     }
+    c.getSpecificSingletonComponent<HitEventQueue>().value().clear();
     return;
 }
 

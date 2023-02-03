@@ -2,7 +2,7 @@
 
 #include "AP.h"
 
-namespace carPhyModel{
+namespace carphymodel{
 
 // HEAT
 class HEATDamage : public APDamage{};

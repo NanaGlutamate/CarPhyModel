@@ -13,7 +13,7 @@ class DataStore
 {
 public:
 	using E = double;
-	using Vector3 = Vector3;
+	using Vector3 = Vector33;
 	Vector3 cureuler_;
 	Vector3 curpos_;
 	Vector3 curdir_;

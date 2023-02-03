@@ -8,13 +8,21 @@
 #include "framework/system.hpp"
 #include "toolsystem/iosystem.hpp"
 
-namespace carPhyModel{
+namespace carphymodel{
 
 class CarModel{
 public:
     friend class CarBuilder;
     CarModel() = default;
     using CSValueMap = std::unordered_map<std::string, std::any>;
+    void init(const CSValueMap& initValue){
+        using namespace std;
+        if(auto it = initValue.find("filePath"); it!= initValue.end()){
+            CarBuilder::buildFromFile(any_cast<string>(it->second), *this);
+        }else{
+            CarBuilder::buildFromFile("exampleCarV2.xml", *this);
+        }
+    }
     void setInput(const CSValueMap& inputValue){
         components.getSpecificSingletonComponent<InputBuffer>()->p = &inputValue;
         inputSystem.tick(0, components);

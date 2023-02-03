@@ -1,6 +1,6 @@
 #pragma once
 
-namespace carPhyModel{
+namespace carphymodel{
 
 class Communication{
 public:

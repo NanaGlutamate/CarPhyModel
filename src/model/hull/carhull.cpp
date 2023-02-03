@@ -5,7 +5,7 @@ namespace{
 
 };
 
-namespace carPhyModel{
+namespace carphymodel{
 
 void HullSystem::tick(double dt, Components& c){};
 

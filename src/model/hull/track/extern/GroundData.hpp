@@ -30,7 +30,7 @@ public:
 	//void ChaZhi(int N, int xlen, int ylen);//��ֵ��������ǰ��ά����
 	//double* aray;
 private:
-	carPhyModel::EnvironmentInfoAgent env;
+	carphymodel::EnvironmentInfoAgent env;
 	//double *grounddata;
 };
 

@@ -3,7 +3,7 @@
 #include <cmath>
 #include <iostream>
 
-namespace carPhyModel{
+namespace carphymodel{
 
 //三维向量
 struct Vector3{

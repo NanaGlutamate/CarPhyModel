@@ -1,6 +1,6 @@
 #pragma once
 
-namespace carPhyModel{
+namespace carphymodel{
 
 // gravity
 constexpr inline double G = 9.8;

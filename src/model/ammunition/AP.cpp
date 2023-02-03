@@ -3,7 +3,7 @@
 
 namespace{
     
-using namespace carPhyModel;
+using namespace carphymodel;
 
 // array collision with AABB
 std::tuple<double, bool> collision(
@@ -35,7 +35,7 @@ void updateDamage(DAMAGE_LEVEL ){}
 
 };
 
-namespace carPhyModel{
+namespace carphymodel{
 
 void APDamage::updateDamage(
     DamageModel& pdm, 

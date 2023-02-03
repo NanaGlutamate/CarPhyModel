@@ -4,7 +4,7 @@
 #include "radar/myradar.h"
 #include "../framework/pattern.hpp"
 
-namespace carPhyModel{
+namespace carphymodel{
 
 struct SensorFactory : public Factory<SensorFactory, Sensor>{
     inline static LUT look_up_table{

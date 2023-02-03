@@ -9,7 +9,7 @@ namespace{
 
 };
 
-namespace carPhyModel{
+namespace carphymodel{
 
 void SensorSystem::tick(double dt, Components& c)
 {

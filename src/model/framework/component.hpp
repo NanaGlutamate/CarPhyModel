@@ -6,7 +6,7 @@
 #include "src/extern/rapidxml-1.13/rapidxml.hpp"
 #include "../tools/datastructure.hpp"
 
-namespace carPhyModel::component{
+namespace carphymodel::component{
     
 // #if __cplusplus >= 202002L
 

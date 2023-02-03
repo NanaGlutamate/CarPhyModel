@@ -3,7 +3,7 @@
 
 namespace{
 
-using namespace carPhyModel;
+using namespace carphymodel;
 
 // 投射到给定范围内
 double clamp(double value, double min, double max){
@@ -36,7 +36,7 @@ int sign(double value){
 
 };
 
-namespace carPhyModel{
+namespace carphymodel{
 
 // 采用前右下坐标系，速度和转角分别控制以支持原地转方向盘、缓慢转弯、行进中变向等操作
 // 由于动力学之上会采用控制器，无需考虑显式欧拉法的不稳定问题，出于简单考虑直接使用显式欧拉法
