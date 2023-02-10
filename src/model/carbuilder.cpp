@@ -89,6 +89,8 @@ namespace carphymodel{
 
 void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model){
     if(model.systems.empty()){
+        model.systems.push_back(std::make_unique<PrepareSystem>());
+
         model.systems.push_back(std::make_unique<SensorSystem>());
 
         model.systems.push_back(std::make_unique<BallisticSystem>());
@@ -98,6 +100,8 @@ void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model){
         model.systems.push_back(std::make_unique<DamageSystem>());
 
         model.systems.push_back(std::make_unique<HullSystem>());
+
+        model.systems.push_back(std::make_unique<OutputSystem>());
     }
 
     //初始化xml解析器
@@ -108,13 +112,14 @@ void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model){
     
     if(auto handle = model.components.getModifier()){
         handle.addSingletonComponents<
+            InputBuffer,
             OutputBuffer,
             DamageModel,
             Coordinate,
             HitEventQueue,
             ScannedMemory,
             Hull
-        >({}, {}, {}, {}, {}, {});
+        >({}, {}, {}, {}, {}, {}, {});
 
         loadComponent<SingletonComponent<
             WheelMotionParamList

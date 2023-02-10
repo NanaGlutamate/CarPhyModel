@@ -3,12 +3,12 @@
 #if __cplusplus >= 202002L
 
 #include <string>
-#include <source_location>
 #include <iostream>
+#include <source_location>
 #include <format>
 
-void my_assert(bool check,
-    const std::string_view message = "",
+inline void my_assert(bool check,
+    const std::string& message = "",
     const std::source_location location = std::source_location::current())
 {
     using namespace std;
@@ -20,6 +20,22 @@ void my_assert(bool check,
 
 #else
 
+#ifdef assert
+
 #define my_assert(check, message) assert(check)
+
+#else
+
+#include <string>
+#include <iostream>
+
+inline void my_assert(bool check, std::string message){
+    if(!check){
+        std::cout << message << std::endl;
+        abort();
+    }
+}
+
+#endif
 
 #endif

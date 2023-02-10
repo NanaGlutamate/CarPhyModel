@@ -15,35 +15,18 @@ public:
     friend class CarBuilder;
     CarModel() = default;
     using CSValueMap = std::unordered_map<std::string, std::any>;
-    void init(const CSValueMap& initValue){
-        using namespace std;
-        if(auto it = initValue.find("filePath"); it!= initValue.end()){
-            CarBuilder::buildFromFile(any_cast<string>(it->second), *this);
-        }else{
-            CarBuilder::buildFromFile("exampleCarV2.xml", *this);
-        }
-    }
-    void setInput(const CSValueMap& inputValue){
-        components.getSpecificSingletonComponent<InputBuffer>()->p = &inputValue;
-        inputSystem.tick(0, components);
-    }
     void tick(double dt){
         components.getSpecificSingletonComponent<OutputBuffer>()->clear();
         for(auto&& sys : systems){
             sys->tick(dt, components);
         }
-        outputSystem.tick(0, components);
     }
     CSValueMap* getOutput(){
         return &(components.getSpecificSingletonComponent<OutputBuffer>().value());
     }
+    Components components;
 private:
     CarModel(const CarModel&) = default;
-
-    Components components;
-
-    inline static InputSystem inputSystem{};
-    inline static OutputSystem outputSystem{};
     inline static std::vector<std::unique_ptr<System>> systems{};
 };
 

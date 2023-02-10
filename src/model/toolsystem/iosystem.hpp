@@ -5,20 +5,20 @@
 
 namespace carphymodel{
 
-class InputSystem : public System{
+class PrepareSystem : public System{
 public:
-    InputSystem() = default;
+    PrepareSystem() = default;
     virtual void tick(double dt, Components& c) override {
-        auto& input = *(c.getSpecificSingletonComponent<InputBuffer>()->p);
+        c.getSpecificSingletonComponent<OutputBuffer>().value().clear();
     };
-    virtual ~InputSystem() = default;
+    virtual ~PrepareSystem() = default;
 };
 
 class OutputSystem : public System{
 public:
     OutputSystem() = default;
     virtual void tick(double dt, Components& c) override {
-        auto& output = c.getSpecificSingletonComponent<OutputBuffer>().value();
+        c.getSpecificSingletonComponent<InputBuffer>().value().clear();
     };
     virtual ~OutputSystem() = default;
 };

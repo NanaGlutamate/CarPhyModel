@@ -25,14 +25,14 @@ namespace externModel::radar {
 		Frequency = p_Params.Frequency;
 		lamda = 3e8 / Frequency;
 		Power = true;
-		//��ֵ����Pt = 10Kw
-		//�����ظ�Ƶ�� 20e3��������ȼ�Ϊ: plus_width = 1/20e3 = 5e-5
-		//��Ч������� 1e-6������ռ�ձ�Ϊ: tplus_ratio = 1e-6/plus_width = 2e-2;
-		//��ˣ�ƽ������Pav = Pt*tplus_ratio = 200W
+		
+		
+		
+		
 		Pav = p_Params.Pt * Tpulse * PRF;
 	}
 
-	double RadarTransmitter::CalDav()	//���������ʧϵ��
+	double RadarTransmitter::CalDav()	
 	{
 		double temp = Tpulse / Tgate;
 		if (temp <= 1)

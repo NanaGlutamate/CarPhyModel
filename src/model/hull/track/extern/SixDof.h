@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #ifndef SIXDOF_
 #define SIXDOF_
 
@@ -89,7 +89,7 @@ public:
     std::tuple<Vector3, Vector3,Vector3,Vector3, double> carMoveSimplify(DataStore param, const SixDof& sh);
     std::tuple<SixDof::Vector3, SixDof::Vector3, SixDof::Vector3, SixDof::Vector3> carMoveComplex(DataStore param);
     std::tuple<SixDof::Vector3, SixDof::Vector3, SixDof::Vector3, SixDof::Vector3> Tick(double dt, double Fo, double Fi, DataStore param);
-    void setForce(double f1, double f0);//f0Ϊ�Ҳ��Ĵ�������f1Ϊ���
+    void setForce(double f1, double f0);
     double torque = 0;
     Vector3 force = {0.0,0.0,0.0};
     GroundData ground;

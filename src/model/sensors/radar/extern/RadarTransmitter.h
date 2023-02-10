@@ -11,27 +11,27 @@ namespace externModel::radar {
 		~RadarTransmitter();
 		void Init(RadarParams p_Params);
 
-		double Dp;	//���书�� �㶨ʱ��PD�״�ľ�����ʧϵ��
-		double Dav;	//ƽ�����书�ʺ㶨ʱ��PD�״�ľ�����ʧϵ��
-		double Tpulse;		//�������
-		double Tgate;		//���ſ���
-		double PRF;		//�����ظ�Ƶ��
-		int NGates;		//���ڷ�������֮��ĵȿ����벨����
-		int NFilters;			//ÿ���Ŷ������˲�����Ŀ
-		int M;		//Ŀ���Ӧ�ľ����ź�
-		int N;		//Ŀ���Ӧ�Ķ������˲�����
-		double Ru;	//��ģ��̽�����
-		bool bVisible; //Ŀ��ɼ���
-		bool Power; //�״￪��״̬
-		double Pt; //�״��ֵ���� W
-		double Pav; //�״�ƽ������ W
-		double Frequency; //�״���ƵHz
-		double PulseWidth; //�״����� S
-		double lamda; //�״��źŲ��� m
-		double D; //ϵͳ���� dB
+		double Dp;	
+		double Dav;	
+		double Tpulse;		
+		double Tgate;		
+		double PRF;		
+		int NGates;		
+		int NFilters;			
+		int M;		
+		int N;		
+		double Ru;	
+		bool bVisible; 
+		bool Power; 
+		double Pt; 
+		double Pav; 
+		double Frequency; 
+		double PulseWidth; 
+		double lamda; 
+		double D; 
 
 
-		double CalDav();	//���������ʧϵ��
+		double CalDav();	
 	};
 
 }

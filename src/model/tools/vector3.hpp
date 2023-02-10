@@ -6,10 +6,10 @@
 namespace carphymodel{
 
 //三维向量
-struct Vector3{
+struct /* alignas(sizeof(double) * 4) */ Vector3{
     using element=double;
 	element x, y, z;
-	constexpr Vector3() = default;
+	Vector3() = default;
 	constexpr Vector3(element x, element y, element z):x(x), y(y), z(z) {};
 	constexpr Vector3(const Vector3& v):x(v.x), y(v.y), z(v.z) {};
 	constexpr void operator=(const Vector3& v){
@@ -85,7 +85,7 @@ struct Vector3{
 };
 
 //四元数
-struct Quaternion{
+struct /* alignas(sizeof(double) * 4) */ Quaternion {
     using element = double;
     element x, y, z, w;
     Quaternion() = default;
@@ -94,6 +94,7 @@ struct Quaternion{
     operator Vector3() const { return Vector3{x, y, z};}
 
     // yaw -> pitch -> roll, right handed
+    // 
     //! @param roll angle rotated around x
     //! @param pitch angle rotated around y
     //! @param yaw angle rotated around z

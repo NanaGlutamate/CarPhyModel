@@ -1,4 +1,4 @@
-// CoordTransform.cpp: implementation of the CCoordTransform class.
+﻿// CoordTransform.cpp: implementation of the CCoordTransform class.
 //
 //////////////////////////////////////////////////////////////////////
 #include "CoordTransform.hpp"

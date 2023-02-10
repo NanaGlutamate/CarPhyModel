@@ -1,9 +1,9 @@
 #include "Radar.h"
-//#include "radar66.h"
+
 #include <time.h>
 #include <iostream>
-//#include <atlbase.h>
-//#include <atlwin.h>
+
+
 
 namespace externModel::radar {
 
@@ -38,7 +38,7 @@ namespace externModel::radar {
 
 	bool Radar::InitValue(const std::string& name, void* value)
 	{
-		//�״�λ�á��ٶȡ�Ƶ�ʺʹ���
+		
 		if ("RPos" == name) {
 			ENURadarState.rPos = *(Vector3*)value;
 		}
@@ -56,7 +56,7 @@ namespace externModel::radar {
 
 	bool Radar::SetInput(const std::unordered_map<std::string, std::any>& value)
 	{
-		//���ô�̽��Ŀ���λ�á��ٶ�
+		
 		try {
 			auto param = value.find("Target_Position");
 			if (param != value.end()) {
@@ -75,7 +75,7 @@ namespace externModel::radar {
 	}
 
 	void Radar::update() {
-		//Set_radar_state();
+		
 		auto range = (ENUTargetState.tPos - ENURadarState.rPos).magnitude();
 		if (range > MaxDetectRange) {
 			ENUTargetState.detected = false;
@@ -96,24 +96,24 @@ namespace externModel::radar {
 
 				double C1, C2, C3, C4;
 				if (m_Switch.RD_HasClutter)
-					C2 = 0;//pow(10.0, m_Clutter.CPower(NEDRadarState, NEDTargetState, NUERadarState, NUETargetState) / 10.0);					//��/���Ӳ����Ź��ʡ���
+					C2 = 0;
 				else
 					C2 = 0;
-				C3 = pow(10.0, m_Receiver.CalNPower() / 10.0);					//�״�ϵͳ���������ʡ���
+				C3 = pow(10.0, m_Receiver.CalNPower() / 10.0);					
 				if (m_Switch.RD_HasJam)
-					C4 = CJam; //���Ż�����;��λ����
+					C4 = CJam; 
 				else
 					C4 = 0;
-				if (ENUTargetState.tPos.z > ENURadarState.rPos.z)   //�����أ�zΪ��ֱ����
-					C1 = 10.0 * log10(C2 + C3 + C4);        //ȫ���������ʡ�DB
+				if (ENUTargetState.tPos.z > ENURadarState.rPos.z)   
+					C1 = 10.0 * log10(C2 + C3 + C4);        
 				else
 					C1 = m_Receiver.CalNPower();
 
 				double DetectRange;
 				DetectRange = pow(10, (A1 - B1 - C1 - 10 * log10(SNRThreshold)) /
-					40);	//�ܹ�̽�����
+					40);	
 
-  //�����ۻ�������ΪR���������ΪSNR2,���ָ���ΪPd2
+  
 				double SNR2 = pow(10, (A1 - B1 - C1 - 10 * log10(pow(range, 4))) / 10);
 				double bSNR2 = (pow(10, SNR2 / 10.)) / 1.7;
 				double Pd2 = 0.0;
@@ -122,9 +122,9 @@ namespace externModel::radar {
 				else
 					Pd2 = exp(bSNR2) / (1. + exp(bSNR2));
 
-				//std::cout << Pd2 << std::endl;
+				
 
-				//�����뿼�Ǹ��ʣ�ֱ������Pd2 = 1;
+				
 				srand(time(NULL));
 				double randnum = ((double)rand()) / ((double)RAND_MAX);
 				if (randnum <= Pd2 && range <= DetectRange)
@@ -144,8 +144,8 @@ namespace externModel::radar {
 	void Radar::Set_radar_state(Vector3& Pos, Vector3& Vel) {
 		ENURadarState.rVel = Vel;
 		ENURadarState.rPos = Pos;
-		//ENURadarState.fre_center = 9.8e9;
-		//ENURadarState.fre_band = 0.2e9;
+		
+		
 	}
 
 	string Radar::Get_detect_result()

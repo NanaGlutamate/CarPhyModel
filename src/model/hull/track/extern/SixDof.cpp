@@ -1,4 +1,4 @@
-#include "SixDof.h"
+﻿#include "SixDof.h"
 #include "Turning.h"
 #include "StraightAhead.h"
 #include "TurningSixDof.h"
@@ -77,7 +77,7 @@ Sim_Vector SixDof::getTraction(DataStore param) {
         }
     }
     
-    F[2] = power;//���ص�ǰ����
+    F[2] = power;
     return F;
 }
 std::tuple<SixDof::Vector3, SixDof::Vector3, SixDof::Vector3, SixDof::Vector3, double> SixDof::carMoveSimplify(DataStore param , const SixDof& sh) {

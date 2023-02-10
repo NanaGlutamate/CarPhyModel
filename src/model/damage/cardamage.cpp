@@ -9,12 +9,14 @@ void DamageSystem::tick(double dt, Components& c){
 
     for(auto&& fireEvent : c.getSpecificSingletonComponent<HitEventQueue>().value()){
         auto ammunitionModel = AmmunitionDamageFactory::getProduct(fireEvent.weaponName).lock();
-        auto local_p = baseCoordinate.positionWorldToBody(fireEvent.position);
-        auto local_d = baseCoordinate.directionWorldToBody(fireEvent.direction);
-        auto local_v = baseCoordinate.directionWorldToBody(fireEvent.velocity);
+        // TODO: denifition of FireEvent modified
+        auto localP = baseCoordinate.positionWorldToBody(fireEvent.position);
+        auto localD = baseCoordinate.directionWorldToBody(fireEvent.velocity);
+        // auto local_v = local_d;
 
-        for(auto&& [id, _damage_model, _size, _coordinate] : c.getNormalComponents<DamageModel, Block, Coordinate>()){
-            ammunitionModel->updateDamage(_damage_model, _size, _coordinate, local_p, local_d, local_v, fireEvent.range);
+        for(auto&& [id, _damageModel, _size, _coordinate] : c.getNormalComponents<DamageModel, Block, Coordinate>()){
+            auto damageBefore = _damageModel.damageLevel;
+            ammunitionModel->updateDamage(_damageModel, _size, _coordinate, localP, localD, localD, fireEvent.range);
         }
     }
     c.getSpecificSingletonComponent<HitEventQueue>().value().clear();

@@ -18,28 +18,28 @@ using namespace std;
 
         double AntennaBWR, Anti, Antj, Antk, RRes, RUnamb;
         double RangeDoppler[100][128];
-        double Lambda;	//����
-        double DAZ;	//��λ�ǲ���
-        double Gama;	//����ɢ��ϵ��
-        double Sig0;	//����ɢ��ϵ��
-        double FilterBW;	//�������˲�������
-        double GMax;	//�������������
+        double Lambda;	
+        double DAZ;	
+        double Gama;	
+        double Sig0;	
+        double FilterBW;	
+        double GMax;	
 
-        double Range, AZ;	//����ѭ�������ľ��롢��λ��
-        int M;	//�����ź�
-        int N;	//�������˲�����
-        double EL;	//���ؽ�
-        double CEL;	//���ؽ�����
-        double Inti, Intj, Intk;	//�Ӳ���Ԫ��Ӧ�ķ�������
+        double Range, AZ;	
+        int M;	
+        int N;	
+        double EL;	
+        double CEL;	
+        double Inti, Intj, Intk;	
 
-        double DEL;	//�����˥��
-        double GANT; //�����Ӳ���Ԫ��������
-        double SigC;	//�Ӳ���Ԫ��RCS
-        double m_Clutter;	//��Ԫ�Ӳ�
-        double RK;	//���㳣��
+        double DEL;	
+        double GANT; 
+        double SigC;	
+        double m_Clutter;	
+        double RK;	
 
-        double Doppler;	//�Ӳ���Ԫ�Ķ�����Ƶ��
-        double Lsys;	//ϵͳ��� dB
+        double Doppler;	
+        double Lsys;	
 
         RadarTransmitter m_Trans;
         Antenna m_Ant;
@@ -49,13 +49,13 @@ using namespace std;
 
         void Init(RadarParams p_Params);
 
-        //Ԥ����
+        
         void PreProcess();
-        //����
-    //	double AMOD(double A,double B);
-        //�������������ļн�ΪDEL�����������������
+        
+    
+        
         double Gain(double DEL, double AntennaBWR);
-        //����M1-N1��Ԫ���Ӳ�����
+        
         double CalClutterPower(int M1, int N1);
 
         double CPower(RADARSTATE p_RdState, TARGETSTATE p_TarState,

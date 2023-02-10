@@ -61,13 +61,13 @@ struct DamageModel{
 };
 
 struct FireEvent{
-    constexpr static const char* token_list[] = {"weaponName", "position", "direction", "velocity", "range"};
+    constexpr static const char* token_list[] = {"weaponName", "target", "position", "velocity", "range"};
     std::string weaponName;
-    // 命中点的世界坐标
+    // 目标点的世界坐标
+    Vector3 target;
+    // 炮弹位置的世界坐标
     Vector3 position;
-    // 射击方向（开火方指向被命中方）的世界坐标
-    Vector3 direction;
-    // 终点速度矢量的世界坐标
+    // 当前速度矢量的世界坐标
     Vector3 velocity;
     // 发射者和命中点的直线距离
     double range;
@@ -122,7 +122,7 @@ struct SensorData{
 };
 
 // vehicle ID
-using VID = std::size_t;
+using VID = uint64_t;
 // side ID
 using SID = uint16_t;
 
@@ -139,13 +139,13 @@ struct EntityInfo{
     Vector3 position;
     Vector3 velocity;
     BaseInfo baseInfo;
-    double lastScanned;
+    // double lastScanned;
 };
 
 // component ID
 using CID = size_t;
 
-struct ScannedMemory : public std::map<VID, EntityInfo>{};
+struct ScannedMemory : public std::map<VID, std::tuple<double, EntityInfo>>{};
 
 struct WheelMotionParamList{
     constexpr static const char* token_list[] = {
@@ -180,9 +180,7 @@ struct HitEventQueue : public std::vector<FireEvent>{};
 
 struct FireEventQueue : public std::vector<FireEvent>{};
 
-struct InputBuffer{
-    const std::unordered_map<std::string, std::any>* p;
-};
+struct InputBuffer : public std::unordered_map<std::string, std::any>{};
 
 struct OutputBuffer : public std::unordered_map<std::string, std::any>{};
 

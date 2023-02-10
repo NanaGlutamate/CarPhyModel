@@ -8,7 +8,7 @@ namespace carphymodel{
 class FireUnitSystem : public System{
 public:
     FireUnitSystem() = default;
-    virtual void tick(double dt, Components& c) override;
+    virtual void tick(double dt, Components& c) override{};
     virtual ~FireUnitSystem() = default;
 };
 

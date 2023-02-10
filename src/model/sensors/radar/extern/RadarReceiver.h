@@ -12,13 +12,13 @@ namespace externModel::radar {
 
 		void Init(RadarParams p_Params);
 
-		double B; //�첨ǰ����ϵͳ���������� Hz
-		double Nf; //ϵͳ����ϵ�� dB
-		double T0; //���ջ������¶� K
+		double B; 
+		double Nf; 
+		double T0; 
 
 		RadarTransmitter m_Trans;
 
-		double CalNPower();	//������ջ���������
+		double CalNPower();	
 	};
 
 }

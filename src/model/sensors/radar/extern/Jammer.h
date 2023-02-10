@@ -1,8 +1,8 @@
 #pragma once
 #include "dataType.hpp"
 #include "Antenna.h"
-// #include"tinystr.h"
-// #include"tinyxml.h"
+
+
 #include <string>
 #include <any>
 #include <map>
@@ -17,32 +17,32 @@ namespace externModel::radar {
 		~Jammer();
 
 	private:
-		double Frequency;	//���Ż�Ƶ��
-		double FreqRange;	 //Ƶ�ʷ�Χ
-		double EffRadarPower;	//��Ч���书��
-		double BeamAzSweep;	//������λ����
-		double BeamElSweep;	//������������
-		double BeamAzCenter;	//������λ���Ľ�
-		double BeamElCenter;	//�����������Ľ�
-		double BeamSweepSync; //�԰��ƽ
+		double Frequency;	
+		double FreqRange;	 
+		double EffRadarPower;	
+		double BeamAzSweep;	
+		double BeamElSweep;	
+		double BeamAzCenter;	
+		double BeamElCenter;	
+		double BeamSweepSync; 
 
-		//���β���
+		
 		Vector3 JPos;
 		Vector3 JVel;
-		//double Lx;	//X����
-		//double Ly;	//Y����
-		//double Lz;	//Z����
-		//double Vx;	//X�����ٶ�
-		//double Vy;	//Y�����ٶ�
-		//double Vz;	//Z�����ٶ�
+		
+		
+		
+		
+		
+		
 
-		double P_j;		//Ϊ���Ż���Ч���书��
-		double Gt_sita;	//Ϊ�״������ڸ��ŷ��������
-		double Lamda;   //�״ﲨ��
-		double Gama_j;	//Ϊ�����ź����״��źŵļ���ʧ����ʧϵ��
-		double R_j;		//Ϊ�״������Դ�ľ���
-		double LL;		//Ϊ��Ų����������������ص���ʧϵ��
-		bool sign;      //�Ƿ���ŵ�
+		double P_j;		
+		double Gt_sita;	
+		double Lamda;   
+		double Gama_j;	
+		double R_j;		
+		double LL;		
+		bool sign;      
 
 		Antenna m_Ant;
 		RadarParams p_Params;

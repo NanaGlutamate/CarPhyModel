@@ -111,12 +111,12 @@ constexpr double tolerance = 1.e-12;
 
 }
 
-struct UniversalPositionRepresentation{};
+// struct UniversalPositionRepresentation{};
 
-template<typename Output, typename Input, typename ...Info>
-Output Transform(Input&& i, Info&&... info){
-    UniversalPositionRepresentation tmp{std::forward<Input>(i)};
-    return tmp.trans<Output>(std::forward<Info>(info)...);
-}
+// template<typename Output, typename Input, typename ...Info>
+// Output Transform(Input&& i, Info&&... info){
+//     UniversalPositionRepresentation tmp{std::forward<Input>(i)};
+//     return tmp.trans<Output>(std::forward<Info>(info)...);
+// }
 
 }

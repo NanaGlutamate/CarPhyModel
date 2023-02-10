@@ -19,7 +19,7 @@ double collision(
         if(pos_local[i] > size[i] / 2.)r2 += pow(pos_local[i] - size[i] / 2., 2);
     }
     return sqrt(r2);
-};
+}
 
 }
 

@@ -28,5 +28,9 @@ int main(){
     std::erase_if(tmp, [](double x){
         return x>=2.5 && x<=3.5;
     });
+
+    // struct{int a; float b;} a;
+    // auto [i, j] = a;
+
     return 0;
 };
