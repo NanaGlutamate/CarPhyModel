@@ -7,6 +7,7 @@
 #include <array>
 #include <unordered_map>
 #include <any>
+#include <variant>
 #include "vector3.hpp"
 #include "coordinate.hpp"
 #include "../framework/componentmanager.hpp"
@@ -73,24 +74,6 @@ struct FireEvent{
     double range;
 };
 
-// carfireunit
-enum class FIRE_UNIT_STATE{
-    LOCK,
-    LOCK_INVALID,
-    FREE,
-    SINGLE_SHOOT,
-    ALWAYS_SHOOT,
-    DESTORY,
-};
-
-struct Weapon{
-    constexpr static const char* token_list[] = {"ammoType", "ammoRemain", "reloadingTime", "reloadingState"};
-    std::string ammoType;
-    int ammoRemain;
-    double reloadingTime;
-    double reloadingState;
-};
-
 struct AngleZone{
     constexpr static const char* token_list[] = {"yawLeft", "yawRight", "pitchUp", "pitchDown"};
     double yawLeft, yawRight, pitchUp, pitchDown;
@@ -105,12 +88,35 @@ struct Direction{
     const double& operator[](size_t index) const {return (&yaw)[index];};
 };
 
+// carfireunit
+enum class FIRE_UNIT_STATE{
+    LOCK_TARGET,
+    LOCK_DIRECTION,
+    FREE,
+    SINGLE_SHOOT,
+    MULTI_SHOOT,
+};
+
+struct Weapon{
+    constexpr static const char* token_list[] = {"ammoType", "ammoRemain", "reloadingTime", "reloadingState"};
+    std::string ammoType;
+    int ammoRemain;
+    double reloadingTime;
+    double reloadingState;
+};
+
+// vehicle ID
+using VID = uint64_t;
+// side ID
+using SID = uint16_t;
+
 struct FireUnit{
-    constexpr static const char* token_list[] = {"state", "fireZone", "rotateZone", "presentDirection", "rotateSpeed", "weapon"};
+    constexpr static const char* token_list[] = {"state", "!data", "fireZone", "rotateZone", "directionNow", "rotateSpeed", "weapon"};
     FIRE_UNIT_STATE state;
+    std::variant<VID, Direction> data;
     AngleZone fireZone; //[yawLeft, yawRight, pitchUp, pitchDown]
     AngleZone rotateZone; //[yawLeft, yawRight, pitchUp, pitchDown]
-    Direction presentDirection; //[yaw, pitch]
+    Direction directionNow; //[yaw, pitch]
     Direction rotateSpeed; //[yaw, pitch]
     Weapon weapon;
 };
@@ -121,12 +127,8 @@ struct SensorData{
     std::string type;
 };
 
-// vehicle ID
-using VID = uint64_t;
-// side ID
-using SID = uint16_t;
-
 struct BaseInfo{
+    constexpr static const char* token_list[] = {"type", "id", "side"};
     enum class ENTITY_TYPE{
         CAR,
         UNKNOWN,
@@ -136,6 +138,7 @@ struct BaseInfo{
 };
 
 struct EntityInfo{
+    constexpr static const char* token_list[] = {"position", "velocity", "baseInfo"};
     Vector3 position;
     Vector3 velocity;
     BaseInfo baseInfo;

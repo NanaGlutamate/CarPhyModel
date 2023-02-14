@@ -34,14 +34,18 @@ template<typename RETURN_TYPE> inline RETURN_TYPE componentDeserialize(rapidxml:
 template<typename T, size_t Index>
 inline void emplace(T& tar, rapidxml::xml_node<char>* node) {
     if constexpr (Index < pfr::tuple_size_v<T>) {
-        auto tmp = node->first_node(T::token_list[Index]);
-        if (tmp != 0) {
-            pfr::get<Index>(tar) = componentDeserialize<std::remove_reference_t<decltype(pfr::get<Index>(tar))>>(tmp);
+        if constexpr (T::token_list[Index][0] == '!'){
+            return;
+        }else{
+            auto tmp = node->first_node(T::token_list[Index]);
+            if (tmp != 0) {
+                pfr::get<Index>(tar) = componentDeserialize<std::remove_reference_t<decltype(pfr::get<Index>(tar))>>(tmp);
+            }
+            else {
+                pfr::get<Index>(tar) = {};
+            }
+            emplace<T, Index + 1>(tar, node);
         }
-        else {
-            pfr::get<Index>(tar) = {};
-        }
-        emplace<T, Index + 1>(tar, node);
     }
 }
 

@@ -12,8 +12,7 @@ struct SystemRestriction{
 
 class System{
 public:
-    // virtual std::string_view getTag(){return std::string_view();};
-    // virtual SystemRestriction& getConstraint(){static SystemConstraint sc; return sc;};
+    //! @param dt frame time, second
     virtual void tick(double dt, Components& c)=0;
     virtual ~System() = default;
 };

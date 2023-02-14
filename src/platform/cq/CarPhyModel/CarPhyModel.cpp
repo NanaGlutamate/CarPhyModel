@@ -4,15 +4,9 @@
 namespace {
 
 using namespace std;
-using namespace carphymodel;
 
 string getLibDir() {
     string library_dir_;
-    // library_dir_ = 模型动态库(dll/so)的绝对路径
-    // 所有模型依赖项都从library_dir_下访问
-    // 例如 模型依赖项包括了A.json以及B/C.csv (B为文件夹)
-    // 则 A.json文件路径为library_dir_ + "A.json"
-    // C.csv文件路径为library_dir_ + "B/C.csv"
 #ifdef _WIN32
     HMODULE module_instance = _AtlBaseModule.GetModuleInstance();
     char dll_path[MAX_PATH] = {0};
@@ -35,23 +29,40 @@ string getLibDir() {
     return library_dir_;
 }
 
+enum class COMMAND_TYPE{
+    FORWARD,
+    ACCELERATE,
+    DECELERATE,
+    BACKWARD,
+    STOP,
+    TURN,
+    ACCELERATE_TURN,
+    DECELERATE_TURN,
+    BACK_TURN,
+    SHOOT,
+    FREE_SHOOT,
+    HOLD_SHOOT,
+    AIM,
+    LOCK,
+    UNLOCK,
+    RADAR_SWITCH,
+};
+
 } // namespace
 
 bool CarPhyModel::Init(const std::unordered_map<std::string, std::any> &value) {
-    library_dir_ = getLibDir();
-
     if (auto it = value.find("filePath"); it != value.end()) {
-        CarBuilder::buildFromFile(any_cast<string>(it->second), model);
+        carphymodel::CarBuilder::buildFromFile(any_cast<string>(it->second), model);
     } else {
-        CarBuilder::buildFromFile("exampleCarV2.xml", model);
+        carphymodel::CarBuilder::buildFromFile(getLibDir() + "car.xml", model);
     }
-
     state_ = CSInstanceState::IS_INITIALIZED;
     WriteLog("CarPhyModel model Init", 1);
     return true;
 }
 
 bool CarPhyModel::Tick(double time) {
+    // TODO: time的单位?
     model.tick(time);
 
     // 此处填写模型单步运算逻辑
@@ -72,12 +83,25 @@ bool CarPhyModel::Tick(double time) {
 
 bool CarPhyModel::SetInput(
     const std::unordered_map<std::string, std::any> &value) {
-    auto it = any_cast<VID>(value.find("ID")->second);
+    auto ID = any_cast<carphymodel::VID>(value.find("ID")->second);
     for (auto &&[k, v] : value) {
-        // TODO:
         if (k == "EntityInfo") {
-            // components.getSpecificSingletonComponent<ScannedMemory>()->find()
-            // = value;
+            EntityInfo tmp;
+            tmp.FromValueMap(any_cast<CSValueMap>(v));
+            get<1>((*(model.components.getSpecificSingletonComponent<carphymodel::ScannedMemory>()))[ID]) = tmp;
+        }else if(k == "FireData"){
+            FireEvent tmp;
+            tmp.FromValueMap(any_cast<CSValueMap>(v));
+            model.components.getSpecificSingletonComponent<carphymodel::FireEventQueue>()->push_back(tmp);
+        }else if(k == "Command"){
+            auto Command = std::any_cast<uint64_t>(v);
+            vector<double> Params;
+            auto t_Params = std::any_cast<std::vector<std::any>>(value.find("Params")->second);
+            for (auto p : t_Params) {
+                auto pp = std::any_cast<double>(p);
+                Params.push_back(pp);
+            }
+            //TODO:
         }
     }
     // if (auto it = value.find("EntityInfo"); it != value.end()) {

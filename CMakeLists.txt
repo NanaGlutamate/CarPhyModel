@@ -13,6 +13,12 @@ include_directories(/)
 include_directories(src/extern/)
 include_directories(src/extern/SP++3.0/)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+set(CMAKE_RELEASE_POSTFIX _release)
+set(CMAKE_DEBUG_POSTFIX _debug)
+
 # set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 # set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 

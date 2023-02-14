@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Types>
+	<Type name="CSMapPath">
+		<Params>
+			<Param name="id" type="uint64"/>
+			<Param name="points" type="CSVector4D[]"/>
+		</Params>
+	</Type>
+	<Type name="BaseInfo">
+		<Params>
+			<Param name="id" type="uint64" unit=""/>
+			<Param name="side" type="uint16" unit=""/>
+			<Param name="type" type="uint64" unit=""/>
+		</Params>
+	</Type>
+	<Type name="EntityInfo">
+		<Params>
+			<Param name="baseInfo" type="BaseInfo" unit=""/>
+			<Param name="velocity" type="Vector3" unit=""/>
+			<Param name="position" type="Vector3" unit=""/>
+		</Params>
+	</Type>
+	<Type name="CSMapPoint">
+		<Params>
+			<Param name="id" type="uint64"/>
+			<Param name="point" type="CSVector4D"/>
+		</Params>
+	</Type>
+	<Type name="CSMapRegion">
+		<Params>
+			<Param name="id" type="uint64"/>
+			<Param name="points" type="CSVector4D[]"/>
+		</Params>
+	</Type>
+	<Type name="Vector3">
+		<Params>
+			<Param name="x" type="float64" unit=""/>
+			<Param name="y" type="float64" unit=""/>
+			<Param name="z" type="float64" unit=""/>
+		</Params>
+	</Type>
+	<Type name="FireEvent">
+		<Params>
+			<Param name="weaponName" type="string" unit=""/>
+			<Param name="velocity" type="Vector3" unit=""/>
+			<Param name="range" type="float64" unit=""/>
+			<Param name="position" type="Vector3" unit=""/>
+			<Param name="target" type="Vector3" unit=""/>
+		</Params>
+	</Type>
+	<Type name="CSVector2D">
+		<Params>
+			<Param name="x" type="float64"/>
+			<Param name="y" type="float64"/>
+		</Params>
+	</Type>
+	<Type name="CSVector3D">
+		<Params>
+			<Param name="x" type="float64"/>
+			<Param name="y" type="float64"/>
+			<Param name="z" type="float64"/>
+		</Params>
+	</Type>
+	<Type name="CSVector4D">
+		<Params>
+			<Param name="x" type="float64"/>
+			<Param name="y" type="float64"/>
+			<Param name="z" type="float64"/>
+			<Param name="w" type="float64"/>
+		</Params>
+	</Type>
+</Types>
+
