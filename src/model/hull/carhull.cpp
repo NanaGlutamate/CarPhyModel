@@ -29,26 +29,34 @@ void HullSystem::tick(double dt, Components &c) {
     auto &optParam = c.getSpecificSingleton<WheelMotionParamList>();
     if (!optParam.has_value())
         return;
+        // TODO: track
     auto &param = optParam.value();
 
     // TODO: check
     auto coordinate = c.getSpecificSingleton<Coordinate>().value();
-    auto attitude = Quaternion::FromCompressedQuaternion(coordinate.altitude).getEuler();
-    double direction = attitude.z;
+    double direction = Quaternion::fromCompressedQuaternion(coordinate.attitude).getEuler().z;
     double speed = c.getSpecificSingleton<Hull>()->velocity.norm();
     for (auto &&[k, v] : c.getSpecificSingleton<InputBuffer>().value()) {
-        if (!validMovingCommand.contains(k)) {
-            continue;
-        }
-        auto [param0, param1] = any_cast<tuple<double, double>>(v);
+        // if (!validMovingCommand.contains(k)) {
+        //     continue;
+        // }
+        auto [param1, param2] = any_cast<tuple<double, double>>(v);
         if (k == COMMAND_TYPE::STOP) {
             speed = 0.;
-        } else if (k == COMMAND_TYPE::TURN){} // TODO:
+        } else if (k == COMMAND_TYPE::TURN) {
+            direction = param1;
+        } else if (k == COMMAND_TYPE::ACCELERATE || k == COMMAND_TYPE::DECELERATE ||
+                   k == COMMAND_TYPE::BACKWARD) {
+            speed = param1;
+        } else if (k == COMMAND_TYPE::ACCELERATE_TURN || k == COMMAND_TYPE::DECELERATE_TURN ||
+                   k == COMMAND_TYPE::BACK_TURN) {
+            speed = param1;
+            direction = param2;
+        }
+        // TODO:
     }
-
     WheelMoveSystem::tick(dt, c.getSpecificSingleton<Coordinate>().value(),
-                          c.getSpecificSingleton<Hull>().value(),
-                          Quaternion(attitude.x, attitude.y, direction), speed, param);
+                          c.getSpecificSingleton<Hull>().value(), direction, speed, param);
 };
 
 } // namespace carphymodel

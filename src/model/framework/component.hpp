@@ -90,14 +90,14 @@ template<> inline Vector3 componentDeserialize<Vector3>(rapidxml::xml_node<char>
             std::stof(node->first_node("roll")->value()),
             std::stof(node->first_node("pitch")->value()),
             std::stof(node->first_node("yaw")->value()));
-        return (Vector3)q;
+        return q.toCompressedQuaternion();
     }
 }
 
 template<> inline Coordinate componentDeserialize<Coordinate>(rapidxml::xml_node<char>* node){
     return Coordinate{
         componentDeserialize<Vector3>(node->first_node("position")),
-        componentDeserialize<Vector3>(node->first_node("altitude"))
+        componentDeserialize<Vector3>(node->first_node("attitude"))
     };
 }
 

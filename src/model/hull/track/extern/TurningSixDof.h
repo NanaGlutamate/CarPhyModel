@@ -14,7 +14,7 @@ public:
         Coordinate co;
         Quaternion qu(param.cureuler_[2], -param.cureuler_[0], param.cureuler_[1]);
         co.position = { 0.0,0.0,0.0 };
-        co.altitude = { qu.x, qu.y, qu.z };
+        co.attitude = { qu.x, qu.y, qu.z };
         Vector33 Flocal = { force[0], force[1], force[2] };
         Vector33 Fglobal = co.positionBodyToWorld(Flocal);
         this->force += co.positionBodyToWorld(Flocal);

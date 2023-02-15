@@ -60,17 +60,10 @@ namespace carphymodel {
 // 控制方法：符合上述约束的条件下尽可能快速地向目标调整
 // TODO：倒车
 void WheelMoveSystem::tick(double dt, Coordinate &baseCoordinate, Hull &hull,
-                           const Vector3 &exp_direction, double exp_speed,
+                           double yaw_exp, double exp_speed,
                            WheelMotionParamList &params) {
 
-    double yaw_now =
-        Quaternion::FromCompressedQuaternion(baseCoordinate.altitude).getEuler().z;
-    double yaw_exp = atan2(exp_direction.y, exp_direction.x);
     Vector3 front_direction = baseCoordinate.directionBodyToWorld(Vector3(1., 0., 0.));
-    // TODO: check
-    // const Vector3 local_exp_direction = baseCoordinate.directionWorldToBody(exp_direction);
-    double speed = hull.velocity.norm();
-
     // 获得当前坡度，得到局部的一维运动环境参数
     double slope = env.getSlope(baseCoordinate.position, front_direction);
 
@@ -84,12 +77,15 @@ void WheelMoveSystem::tick(double dt, Coordinate &baseCoordinate, Hull &hull,
                                                  params.LENGTH / fabs(tan(params.radius))));
     // 最大直线速度、最大侧向加速度约束下的期望速度
     double aviliable_exp_speed = clamp(exp_speed, max_speed);
+    double speed = hull.velocity.norm();
     // 期望速度与当前速度的差，目标偏快为正
-    double speed_diff = aviliable_exp_speed - speed;
+    double speed_diff = aviliable_exp_speed - hull.velocity.norm();
     // 速度变化量
     double dv = clamp(speed_diff, (gravity_acceleration - params.MAX_BRAKE_ACCELERATION) * dt,
                       (gravity_acceleration + params.MAX_FRONT_ACCELERATION) * dt);
 
+    double yaw_now =
+        Quaternion::fromCompressedQuaternion(baseCoordinate.attitude).getEuler().z;
     // 目标偏航角与当前偏航角的差，目标偏右为正
     double exp_yaw_diff = angleDiff(yaw_exp, yaw_now);// atan2(local_exp_direction.y, local_exp_direction.x);
     // 矫正目标车轮朝向，避免转弯加速度过大
@@ -133,7 +129,7 @@ void WheelMoveSystem::tick(double dt, Coordinate &baseCoordinate, Hull &hull,
 
     // 更新坐标系
     baseCoordinate.position = new_position;
-    baseCoordinate.altitude = {new_altitude.x, new_altitude.y, new_altitude.z};
+    baseCoordinate.attitude = {new_altitude.x, new_altitude.y, new_altitude.z};
 
     // 更新速度和角速度
     hull.velocity = baseCoordinate.directionBodyToWorld(Vector3(new_speed, 0., 0.));

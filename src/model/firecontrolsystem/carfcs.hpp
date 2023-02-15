@@ -5,9 +5,9 @@
 #include <set>
 #include <tuple>
 
-#include "../tools/myassert.hpp"
 #include "../framework/system.hpp"
 #include "../tools/datastructure.hpp"
+#include "../tools/myassert.hpp"
 
 namespace carphymodel {
 
@@ -38,34 +38,24 @@ class FireControlSystem : public System {
                 break;
             }
         }
-        for (auto &&[_id, _fireUnit] : c.getNormal<FireUnit>()) {
+        const auto selfPosition = c.getSpecificSingleton<Coordinate>()->position;
+        for (auto &&[_id, _damageModel, _fireUnit] : c.getNormal<DamageModel, FireUnit>()) {
+            if (_damageModel.damageLevel != DAMAGE_LEVEL::N ||
+                _damageModel.damageLevel != DAMAGE_LEVEL::M)
+                continue;
             auto &&info = c.getSpecificSingleton<ScannedMemory>().value();
-            _fireUnit.weapon.reloadingState -= dt;
-            if (_fireUnit.weapon.reloadingState <= 0.) {
-                _fireUnit.weapon.reloadingState = 0;
-            }
-            // TODO: rotate speed
-            if ((_fireUnit.state == FIRE_UNIT_STATE::MULTI_SHOOT ||
-                 _fireUnit.state == FIRE_UNIT_STATE::SINGLE_SHOOT) &&
-                _fireUnit.weapon.reloadingState == 0. && _fireUnit.weapon.ammoRemain != 0 &&
-                targetAvailable(static_cast<size_t>(_fireUnit.data), info)) {
-                const auto targetPosition = get<1>(info.find(static_cast<size_t>(_fireUnit.data))->second).position;
-                const auto selfPosition = c.getSpecificSingleton<Coordinate>()->position;
-                _fireUnit.weapon.ammoRemain -= 1;
+            updateWeaponReloading(_fireUnit, dt);
+            // TODO: MULTI_SHOOT with no target avaliable
+            if (isWeaponFireable(_fireUnit) &&
+                isTargetAvailable(_fireUnit, info, selfPosition)) {
+                const auto targetPosition =
+                    get<1>(info.find(static_cast<size_t>(_fireUnit.data))->second).position;
                 c.getSpecificSingleton<OutputBuffer>()->emplace(
-                    "FireDataOut", FireEvent{
-                                       .weaponName = _fireUnit.weapon.ammoType,
-                                       .target = targetPosition,
-                                       .position = selfPosition,
-                                       .velocity = _fireUnit.weapon.speed * (targetPosition - selfPosition).normalize(),
-                                       .range = (targetPosition - selfPosition).norm(),
-                                   });
-                if (_fireUnit.state == FIRE_UNIT_STATE::SINGLE_SHOOT) {
-                    _fireUnit.state = FIRE_UNIT_STATE::FREE;
-                }
+                    "FireDataOut", weaponShoot(_fireUnit, selfPosition, targetPosition));
             } else if (_fireUnit.state == FIRE_UNIT_STATE::FREE) {
                 continue;
             }
+            // TODO: rotate and lock
         }
     };
     virtual ~FireControlSystem() = default;
@@ -81,11 +71,40 @@ class FireControlSystem : public System {
         }
         my_assert(false, "Invalid Weapon Index " + std::to_string(n));
         return get<1>(*c.getNormal<FireUnit>().begin());
-    };
-    bool targetAvailable(size_t targetID, carphymodel::ScannedMemory &info) {
+    }
+    bool isTargetAvailable(carphymodel::FireUnit &_fireUnit, carphymodel::ScannedMemory &info,
+                           const Vector3 &selfPosition) {
+        auto targetID = static_cast<size_t>(_fireUnit.data);
         auto it = info.find(targetID);
         return it != info.end() && get<0>(it->second) == 0. &&
-               get<1>(it->second).baseInfo.damageLevel != DAMAGE_LEVEL::KK;
+               get<1>(it->second).baseInfo.damageLevel != DAMAGE_LEVEL::KK &&
+               (get<1>(it->second).position - selfPosition).norm() < _fireUnit.weapon.range;
+    }
+    bool isWeaponFireable(carphymodel::FireUnit &_fireUnit) {
+        return (_fireUnit.state == FIRE_UNIT_STATE::MULTI_SHOOT ||
+                _fireUnit.state == FIRE_UNIT_STATE::SINGLE_SHOOT) &&
+               _fireUnit.weapon.reloadingState == 0. && _fireUnit.weapon.ammoRemain != 0;
+    }
+    void updateWeaponReloading(carphymodel::FireUnit &_fireUnit, double dt) {
+        _fireUnit.weapon.reloadingState -= dt;
+        if (_fireUnit.weapon.reloadingState <= 0.) {
+            _fireUnit.weapon.reloadingState = 0;
+        }
+    }
+    FireEvent weaponShoot(carphymodel::FireUnit &_fireUnit,
+                          const carphymodel::Vector3 &selfPosition,
+                          const carphymodel::Vector3 &targetPosition) {
+        _fireUnit.weapon.ammoRemain -= 1;
+        if (_fireUnit.state == FIRE_UNIT_STATE::SINGLE_SHOOT) {
+            _fireUnit.state = FIRE_UNIT_STATE::FREE;
+        }
+        return FireEvent{
+            .weaponName = _fireUnit.weapon.ammoType,
+            .target = targetPosition,
+            .position = selfPosition,
+            .velocity = _fireUnit.weapon.speed * (targetPosition - selfPosition).normalize(),
+            .range = (targetPosition - selfPosition).norm(),
+        };
     }
     // void shoot(FireUnit& f, Components& c){}
 };

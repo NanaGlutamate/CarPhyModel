@@ -76,9 +76,7 @@ struct Block{
     };
     constexpr double operator[](size_t i) const {return (&length)[i];};
     double& operator[](size_t i){return (&length)[i];};
-    double length;
-    double width;
-    double height;
+    double length, width, height;
 };
 
 struct Sphere{
@@ -151,7 +149,7 @@ enum class FIRE_UNIT_STATE{
 };
 
 struct Weapon{
-    constexpr static const char* token_list[] = {"ammoType", "ammoRemain", "reloadingTime", "reloadingState", "range", "speed"};
+    constexpr static const char* token_list[] = {"ammoType", "ammoRemain", "reloadingTime", "-reloadingState", "range", "speed"};
     std::string ammoType;
     int ammoRemain;
     double reloadingTime;

@@ -95,7 +95,9 @@ struct /* alignas(sizeof(double) * 4) */ Quaternion {
     Quaternion() = default;
     Quaternion(element x, element y, element z, element w):x(x), y(y), z(z), w(w) {};
     Quaternion(const Quaternion& q):x(q.x), y(q.y), z(q.z), w(q.w) {};
-    operator Vector3() const { return Vector3{x, y, z};}
+    [[deprecated("unsafe")]]operator Vector3() const { return Vector3{x, y, z};}
+
+    Vector3 toCompressedQuaternion() const { return Vector3{x, y, z};}
 
     // yaw -> pitch -> roll, right handed
     // 
@@ -132,7 +134,7 @@ struct /* alignas(sizeof(double) * 4) */ Quaternion {
         w=isCompressedQuaternion?sqrt(1.-x*x-y*y-z*z):0.;
     };
 
-    static Quaternion FromCompressedQuaternion(const Vector3& v){
+    static Quaternion fromCompressedQuaternion(const Vector3& v){
         return Quaternion{
             v.x,
             v.y,
@@ -141,7 +143,7 @@ struct /* alignas(sizeof(double) * 4) */ Quaternion {
         };
     }
 
-    static Quaternion FromVector(const Vector3& v){
+    static Quaternion fromVector(const Vector3& v){
         return Quaternion{
             v.x,
             v.y,
@@ -208,8 +210,8 @@ inline Quaternion::Quaternion(const Vector3& axis, element angle){
 };
 
 inline Vector3 Vector3::rotate(const Vector3& p) const{
-    Quaternion q = Quaternion::FromCompressedQuaternion(*this);
-    Quaternion pq = Quaternion::FromVector(p);
+    Quaternion q = Quaternion::fromCompressedQuaternion(*this);
+    Quaternion pq = Quaternion::fromVector(p);
     Quaternion r = q.rotate(pq);
     return Vector3(r.x, r.y, r.z);
 };

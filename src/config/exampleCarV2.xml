@@ -12,7 +12,49 @@
         <MAX_LATERAL_ACCELERATION>0.49</MAX_LATERAL_ACCELERATION>
     </WheelMotionParamList>
     <entity>
-        <Block/>
+        <Block>
+            <length>1.3</length>
+            <width>1.3</width>
+            <height>0.5</height>
+        </Block>
+        <DamageModel/>
+        <FireUnit>
+            <fireZone>
+                <yawLeft></yawLeft>
+                <yawRight></yawRight>
+                <pitchUp></pitchUp>
+                <pitchDown></pitchDown>
+            </fireZone>
+            <rotateZone>
+                <yawLeft></yawLeft>
+                <yawRight></yawRight>
+                <pitchUp></pitchUp>
+                <pitchDown></pitchDown>
+            </rotateZone>
+            <rotateSpeed>
+                <yaw></yaw>
+                <pitch></pitch>
+            </rotateSpeed>
+            <Weapon>
+                <ammoType>125mmHE</ammoType>
+                <ammoRemain>30</ammoRemain>
+                <reloadingTime>8</reloadingTime>
+                <range>3000000</range>
+                <speed>1300</speed>
+            </Weapon>
+        </FireUnit>
+        <Coordinate>
+            <position>
+                <x>0</x>
+                <y>0</y>
+                <z>3</z>
+            </position>
+            <attitude>
+                <roll>0</roll>
+                <yaw>0</yaw>
+                <pitch>0</pitch>
+            </attitude>
+        </Coordinate>
         <!-- base -->
     </entity>
 </car>

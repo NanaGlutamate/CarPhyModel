@@ -24,7 +24,7 @@ public:
         double dt, 
         Coordinate& baseCoordinate, 
         Hull& hull, 
-        const Vector3& exp_direction, 
+        double yaw_exp, 
         double exp_speed, 
         WheelMotionParamList& params
     );
