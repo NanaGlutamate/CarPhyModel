@@ -41,7 +41,10 @@ int sign(double value) {
 }
 
 double angleDiff(double angleExpect, double angleNow) {
-    // TODO:
+    double tmp = angleExpect - angleNow;
+    if(tmp > PI)tmp -= 2 * PI;
+    if(tmp < PI)tmp += 2 * PI;
+    return tmp;
 }
 
 }; // namespace
@@ -60,13 +63,13 @@ void WheelMoveSystem::tick(double dt, Coordinate &baseCoordinate, Hull &hull,
                            const Vector3 &exp_direction, double exp_speed,
                            WheelMotionParamList &params) {
 
-    // double yaw_now =
-    //     Quaternion::FromCompressedQuaternion(baseCoordinate.altitude).getEuler().z;
-    // double yaw_exp = atan2(exp_direction.y, exp_direction.x);
+    double yaw_now =
+        Quaternion::FromCompressedQuaternion(baseCoordinate.altitude).getEuler().z;
+    double yaw_exp = atan2(exp_direction.y, exp_direction.x);
     Vector3 front_direction = baseCoordinate.directionBodyToWorld(Vector3(1., 0., 0.));
     // TODO: check
-    const Vector3 local_exp_direction = baseCoordinate.directionWorldToBody(exp_direction);
-    double speed = hull.velocity.dot(front_direction);
+    // const Vector3 local_exp_direction = baseCoordinate.directionWorldToBody(exp_direction);
+    double speed = hull.velocity.norm();
 
     // 获得当前坡度，得到局部的一维运动环境参数
     double slope = env.getSlope(baseCoordinate.position, front_direction);
@@ -88,7 +91,7 @@ void WheelMoveSystem::tick(double dt, Coordinate &baseCoordinate, Hull &hull,
                       (gravity_acceleration + params.MAX_FRONT_ACCELERATION) * dt);
 
     // 目标偏航角与当前偏航角的差，目标偏右为正
-    double exp_yaw_diff = atan2(local_exp_direction.y, local_exp_direction.x);
+    double exp_yaw_diff = angleDiff(yaw_exp, yaw_now);// atan2(local_exp_direction.y, local_exp_direction.x);
     // 矫正目标车轮朝向，避免转弯加速度过大
     double aviliable_angle =
         (fabs(speed) < INF_SMALL)
