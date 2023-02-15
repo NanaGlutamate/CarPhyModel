@@ -10,6 +10,7 @@
 #include "protection/carprotection.h"
 #include "damage/cardamage.h"
 #include "sensors/carsensor.h"
+#include "firecontrolsystem/carfcs.hpp"
 #include "toolsystem/hitsystem.hpp"
 #include "toolsystem/ballisticsystem.hpp"
 
@@ -92,6 +93,7 @@ void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model){
         model.systems.push_back(std::make_unique<PrepareSystem>());
 
         model.systems.push_back(std::make_unique<SensorSystem>());
+        model.systems.push_back(std::make_unique<FireControlSystem>());
 
         model.systems.push_back(std::make_unique<BallisticSystem>());
         model.systems.push_back(std::make_unique<HitSystem>());

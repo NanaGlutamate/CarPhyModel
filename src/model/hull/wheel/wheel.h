@@ -9,10 +9,10 @@ namespace carphymodel{
 // 轮式车辆运动系统
 class WheelMoveSystem{
 private:
-    EnvironmentInfoAgent env;
+    inline static EnvironmentInfoAgent env{};
     // void updateState(double dt, Coordinate& baseCoordinate, Hull& hull, WheelMotionParamList& params);
 public:
-    WheelMoveSystem():env(){};
+    WheelMoveSystem() = default;
 
     //! @param dt: 上一次调用后的时间
     //! @param baseCoordinate: 车辆随体坐标系
@@ -20,7 +20,7 @@ public:
     //! @param exp_direction: 期望方向
     //! @param exp_speed: 期望速度
     //! @param params: 车辆运动参数
-    void tick(
+    static void tick(
         double dt, 
         Coordinate& baseCoordinate, 
         Hull& hull, 
@@ -40,4 +40,4 @@ public:
     // );
 };
 
-};
+}

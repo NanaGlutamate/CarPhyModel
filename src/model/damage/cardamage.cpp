@@ -24,16 +24,16 @@ size_t argmaxRight(Ty list){
 namespace carphymodel{
 
 void DamageSystem::tick(double dt, Components& c){
-    auto&& baseCoordinate = c.getSpecificSingletonComponent<Coordinate>().value();
+    auto&& baseCoordinate = c.getSpecificSingleton<Coordinate>().value();
 
     std::array<int, static_cast<std::underlying_type_t<DAMAGE_LEVEL>>(DAMAGE_LEVEL::KK) + 1> damageLevelCounter = {}; 
 
-    for(auto&& fireEvent : c.getSpecificSingletonComponent<HitEventQueue>().value()){
+    for(auto&& fireEvent : c.getSpecificSingleton<HitEventQueue>().value()){
         auto ammunitionModel = AmmunitionDamageFactory::getProduct(fireEvent.weaponName).lock();
         auto localP = baseCoordinate.positionWorldToBody(fireEvent.position);
         auto localD = baseCoordinate.directionWorldToBody(fireEvent.velocity);
 
-        for(auto&& [id, _damageModel, _size, _coordinate] : c.getNormalComponents<DamageModel, Block, Coordinate>()){
+        for(auto&& [id, _damageModel, _size, _coordinate] : c.getNormal<DamageModel, Block, Coordinate>()){
             auto damageBefore = _damageModel.damageLevel;
             if(damageBefore != DAMAGE_LEVEL::KK){
                 ammunitionModel->updateDamage(_damageModel, _size, _coordinate, localP, localD, localD, fireEvent.range);
@@ -42,9 +42,9 @@ void DamageSystem::tick(double dt, Components& c){
         }
     }
 
-    c.getSpecificSingletonComponent<DamageModel>()->damageLevel = static_cast<DAMAGE_LEVEL>(argmaxRight(damageLevelCounter));
+    c.getSpecificSingleton<DamageModel>()->damageLevel = static_cast<DAMAGE_LEVEL>(argmaxRight(damageLevelCounter));
 
-    c.getSpecificSingletonComponent<HitEventQueue>().value().clear();
+    c.getSpecificSingleton<HitEventQueue>().value().clear();
     return;
 }
 

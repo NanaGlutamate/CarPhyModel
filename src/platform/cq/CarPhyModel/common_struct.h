@@ -12,6 +12,7 @@ class BaseInfo {
         value.emplace("id", id);
         value.emplace("side", side);
         value.emplace("type", type);
+        value.emplace("damageLevel", damageLevel);
         return value;
     }
 
@@ -22,7 +23,9 @@ class BaseInfo {
             if (it.first == "side")
                 side = std::any_cast<uint16_t>(it.second);
             if (it.first == "type")
-                type = std::any_cast<uint64_t>(it.second);
+                type = std::any_cast<uint16_t>(it.second);
+            if (it.first == "damageLevel")
+                type = std::any_cast<uint16_t>(it.second);
         }
     }
 
@@ -31,6 +34,7 @@ class BaseInfo {
             .type = static_cast<carphymodel::BaseInfo::ENTITY_TYPE>(type),
             .id = id,
             .side = side,
+            .damageLevel = static_cast<carphymodel::DAMAGE_LEVEL>(damageLevel),
         };
     }
 
@@ -40,7 +44,8 @@ class BaseInfo {
     // side
     uint16_t side;
     // type
-    uint64_t type;
+    uint16_t type;
+    uint16_t damageLevel;
 };
 
 // Vector3
@@ -55,6 +60,8 @@ class Vector3 {
         return value;
     }
 
+    Vector3() = default;
+
     void FromValueMap(const CSValueMap &value) {
         for (auto &it : value) {
             if (it.first == "x")
@@ -64,6 +71,12 @@ class Vector3 {
             if (it.first == "z")
                 z = std::any_cast<double>(it.second);
         }
+    }
+
+    Vector3(const carphymodel::Vector3& v){
+        x = v.x;
+        y = v.y;
+        z = v.z;
     }
 
     operator carphymodel::Vector3() const { return carphymodel::Vector3(x, y, z); }
@@ -158,12 +171,22 @@ class FireEvent {
         }
     }
 
+    FireEvent() = default;    
+
+    FireEvent(const carphymodel::FireEvent& f) {
+        weaponName = f.weaponName;
+        target = f.target;
+        position = f.position;
+        velocity = f.velocity;
+        range = f.range;
+    }
+
     operator carphymodel::FireEvent () const {
         return carphymodel::FireEvent{
             .weaponName = weaponName,
-            .target = carphymodel::Vector3(target),
-            .position = (carphymodel::Vector3)position,
-            .velocity = carphymodel::Vector3(velocity),
+            .target = target,
+            .position = position,
+            .velocity = velocity,
             .range = range,
         };
     }

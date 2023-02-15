@@ -63,6 +63,10 @@ struct /* alignas(sizeof(double) * 4) */ Vector3{
         return sqrt(x * x + y * y + z * z);
     };
 
+    [[nodiscard("this function will not modify original vector")]] Vector3 normalize() && {
+        return *this / norm();
+    };
+
     //! act as a rotation quaternion (x, y, z, w=sqrt(1-x^2-y^2-z^2))
     //! @param p original position
     //! @return position after rotation

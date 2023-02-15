@@ -9,7 +9,7 @@ class PrepareSystem : public System{
 public:
     PrepareSystem() = default;
     virtual void tick(double dt, Components& c) override {
-        c.getSpecificSingletonComponent<OutputBuffer>().value().clear();
+        c.getSpecificSingleton<OutputBuffer>().value().clear();
     };
     virtual ~PrepareSystem() = default;
 };
@@ -18,7 +18,7 @@ class OutputSystem : public System{
 public:
     OutputSystem() = default;
     virtual void tick(double dt, Components& c) override {
-        c.getSpecificSingletonComponent<InputBuffer>().value().clear();
+        c.getSpecificSingleton<InputBuffer>().value().clear();
     };
     virtual ~OutputSystem() = default;
 };

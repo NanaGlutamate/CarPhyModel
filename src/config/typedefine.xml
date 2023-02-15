@@ -10,7 +10,8 @@
 		<Params>
 			<Param name="id" type="uint64" unit=""/>
 			<Param name="side" type="uint16" unit=""/>
-			<Param name="type" type="uint64" unit=""/>
+			<Param name="type" type="uint16" unit=""/>
+			<Param name="damageLevel" type="uint16" unit=""/>
 		</Params>
 	</Type>
 	<Type name="EntityInfo">
@@ -70,4 +71,3 @@
 		</Params>
 	</Type>
 </Types>
-

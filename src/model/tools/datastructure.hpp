@@ -7,12 +7,67 @@
 #include <array>
 #include <unordered_map>
 #include <any>
+#include <set>
 #include <variant>
+
 #include "vector3.hpp"
 #include "coordinate.hpp"
 #include "../framework/componentmanager.hpp"
 
 namespace carphymodel{
+
+namespace command{
+
+enum class COMMAND_TYPE{
+    FORWARD,
+    ACCELERATE,
+    DECELERATE,
+    BACKWARD,
+    STOP,
+    TURN,
+    ACCELERATE_TURN,
+    DECELERATE_TURN,
+    BACK_TURN,
+    SHOOT,
+    FREE_SHOOT,
+    STOP_SHOOT,
+    LOCK_DIRECTION,
+    LOCK_TARGET,
+    UNLOCK,
+    RADAR_SWITCH,
+};
+
+inline std::set<COMMAND_TYPE> NoParam{
+    COMMAND_TYPE::FORWARD,
+    COMMAND_TYPE::STOP,
+    COMMAND_TYPE::FREE_SHOOT,
+    COMMAND_TYPE::STOP_SHOOT,
+};
+
+inline std::set<COMMAND_TYPE> SingleParam{
+    COMMAND_TYPE::ACCELERATE,
+    COMMAND_TYPE::DECELERATE,
+    COMMAND_TYPE::BACKWARD,
+    COMMAND_TYPE::TURN,
+    COMMAND_TYPE::UNLOCK,
+};
+
+inline std::set<COMMAND_TYPE> DoubleParam{
+    COMMAND_TYPE::ACCELERATE_TURN,
+    COMMAND_TYPE::DECELERATE_TURN,
+    COMMAND_TYPE::BACK_TURN,
+    COMMAND_TYPE::SHOOT,
+    COMMAND_TYPE::LOCK_DIRECTION,
+    COMMAND_TYPE::LOCK_TARGET,
+    COMMAND_TYPE::RADAR_SWITCH,
+};
+
+}
+
+// vehicle ID
+using VID = uint64_t;
+// side ID
+using SID = uint16_t;
 
 struct Block{
     constexpr static const char* token_list[] = {"length", "width", "height"};
@@ -43,8 +98,6 @@ struct ProtectionModel{
 struct Hull{
     Vector3 velocity;
     Vector3 palstance;
-    // double mass;
-    // Vector3 I;
 };
 
 // cardamage，越小越正常
@@ -56,7 +109,7 @@ enum class DAMAGE_LEVEL{
 };
 
 struct DamageModel{
-    constexpr static const char* token_list[] = {"damageLevel"};//, "size"};
+    constexpr static const char* token_list[] = {"-damageLevel"};//, "size"};
     DAMAGE_LEVEL damageLevel;
     // Block size;
 };
@@ -90,30 +143,27 @@ struct Direction{
 
 // carfireunit
 enum class FIRE_UNIT_STATE{
+    FREE,
     LOCK_TARGET,
     LOCK_DIRECTION,
-    FREE,
     SINGLE_SHOOT,
     MULTI_SHOOT,
 };
 
 struct Weapon{
-    constexpr static const char* token_list[] = {"ammoType", "ammoRemain", "reloadingTime", "reloadingState"};
+    constexpr static const char* token_list[] = {"ammoType", "ammoRemain", "reloadingTime", "reloadingState", "range", "speed"};
     std::string ammoType;
     int ammoRemain;
     double reloadingTime;
     double reloadingState;
+    double range;
+    double speed;
 };
 
-// vehicle ID
-using VID = uint64_t;
-// side ID
-using SID = uint16_t;
-
 struct FireUnit{
-    constexpr static const char* token_list[] = {"state", "!data", "fireZone", "rotateZone", "directionNow", "rotateSpeed", "weapon"};
+    constexpr static const char* token_list[] = {"-state", "!data", "fireZone", "rotateZone", "-directionNow", "rotateSpeed", "weapon"};
     FIRE_UNIT_STATE state;
-    std::variant<VID, Direction> data;
+    double data;
     AngleZone fireZone; //[yawLeft, yawRight, pitchUp, pitchDown]
     AngleZone rotateZone; //[yawLeft, yawRight, pitchUp, pitchDown]
     Direction directionNow; //[yaw, pitch]
@@ -128,13 +178,14 @@ struct SensorData{
 };
 
 struct BaseInfo{
-    constexpr static const char* token_list[] = {"type", "id", "side"};
+    constexpr static const char* token_list[] = {"type", "id", "side", "damageLevel"};
     enum class ENTITY_TYPE{
         CAR,
         UNKNOWN,
     } type;
     VID id;
     SID side;
+    DAMAGE_LEVEL damageLevel;
 };
 
 struct EntityInfo{
@@ -152,7 +203,7 @@ struct ScannedMemory : public std::map<VID, std::tuple<double, EntityInfo>>{};
 
 struct WheelMotionParamList{
     constexpr static const char* token_list[] = {
-        "radius",
+        "-radius",
         "LENGTH",
         "MAX_ANGLE",
         "ROTATE_SPEED",
@@ -183,16 +234,16 @@ struct HitEventQueue : public std::vector<FireEvent>{};
 
 struct FireEventQueue : public std::vector<FireEvent>{};
 
-struct InputBuffer : public std::unordered_map<std::string, std::any>{};
+struct InputBuffer : public std::map<command::COMMAND_TYPE, std::any>{};
 
 struct OutputBuffer : public std::unordered_map<std::string, std::any>{};
 
 using Components = ComponentManager<
     SingletonComponent<
-        InputBuffer,
-        OutputBuffer,
         Coordinate,
         DamageModel,
+        InputBuffer,
+        OutputBuffer,
         HitEventQueue,
         FireEventQueue,
         WheelMotionParamList,

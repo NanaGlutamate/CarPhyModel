@@ -146,7 +146,7 @@ public:
     Modifier getModifier(){return Modifier(*this);};
 
     template <typename ...ComponentTypes>
-    decltype(auto) getNormalComponents(){
+    decltype(auto) getNormal(){
         // TODO: multithreading?
         my_assert(!lock, "Component Manager Locked");
         static_assert((... && type_list_contains_v<ComponentTypes, Normals...>),
@@ -155,7 +155,7 @@ public:
     };
     
     template <typename ComponentType>
-    std::optional<std::reference_wrapper<ComponentType>> getSpecificNormalComponent(size_t ID){
+    std::optional<std::reference_wrapper<ComponentType>> getSpecificNormal(size_t ID){
         my_assert(!lock, "Component Manager Locked");
         static_assert(type_list_contains_v<ComponentType, Normals...>,
             "component manager doesnot contain normal component of that type");
@@ -165,7 +165,7 @@ public:
     };
     
     template <typename ...ComponentTypes>
-    decltype(auto) getSingletonComponents(){
+    decltype(auto) getSingleton(){
         static_assert((... && type_list_contains_v<ComponentTypes, Singletons...>),
             "component manager doesnot contain singleton component of that type");
         return std::tuple<std::optional<ComponentTypes>&...>{
@@ -176,7 +176,7 @@ public:
     };
     
     template <typename ComponentType>
-    decltype(auto) getSpecificSingletonComponent(){
+    decltype(auto) getSpecificSingleton(){
         static_assert(type_list_contains_v<ComponentType, Singletons...>,
             "component manager doesnot contain singleton component of that type");
         return std::get<type_list_index<ComponentType, Singletons...>::value>(singletonComponents);

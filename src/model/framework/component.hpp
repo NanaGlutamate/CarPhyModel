@@ -37,6 +37,9 @@ inline void emplace(T& tar, rapidxml::xml_node<char>* node) {
         if constexpr (T::token_list[Index][0] == '!'){
             return;
         }else{
+            if constexpr(T::token_list[Index][0] == '-'){
+                pfr::get<Index>(tar) = {};
+            }
             auto tmp = node->first_node(T::token_list[Index]);
             if (tmp != 0) {
                 pfr::get<Index>(tar) = componentDeserialize<std::remove_reference_t<decltype(pfr::get<Index>(tar))>>(tmp);

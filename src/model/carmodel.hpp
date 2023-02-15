@@ -16,13 +16,13 @@ public:
     CarModel() = default;
     using CSValueMap = std::unordered_map<std::string, std::any>;
     void tick(double dt){
-        components.getSpecificSingletonComponent<OutputBuffer>()->clear();
+        components.getSpecificSingleton<OutputBuffer>()->clear();
         for(auto&& sys : systems){
             sys->tick(dt, components);
         }
     }
     CSValueMap* getOutput(){
-        return &(components.getSpecificSingletonComponent<OutputBuffer>().value());
+        return &(components.getSpecificSingleton<OutputBuffer>().value());
     }
     Components components;
 private:

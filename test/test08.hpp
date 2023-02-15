@@ -26,16 +26,16 @@ namespace test08{
         }
 
 
-        for(auto&& [i, f, s] : manager.getNormalComponents<float, short>()){
+        for(auto&& [i, f, s] : manager.getNormal<float, short>()){
             f+=1.;
             s+=1;
         }
 
-        for(auto&& [i, f, c, s] : manager.getNormalComponents<float, char, short>()){
+        for(auto&& [i, f, c, s] : manager.getNormal<float, char, short>()){
             c = char(f+s);
         }
 
-        for(auto&& s : manager.getNormalComponents<int, float, short, char>()){
+        for(auto&& s : manager.getNormal<int, float, short, char>()){
             // do nothing
             assert(false);
         }

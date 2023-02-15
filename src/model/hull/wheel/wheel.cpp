@@ -13,6 +13,7 @@ double clamp(double value, double min, double max){
 };
 
 double clamp(double value, double bound){
+    if(bound < 0) bound = -bound;
     if(value < -bound) value = -bound;
     if(value > bound) value = bound;
     return value;
@@ -59,7 +60,7 @@ void WheelMoveSystem::tick(double dt, Coordinate& baseCoordinate, Hull& hull, co
 
     const Vector3 front_direction = baseCoordinate.directionBodyToWorld(Vector3(1., 0., 0.));
     const Vector3 local_exp_direction = baseCoordinate.directionWorldToBody(exp_direction);
-    val speed = hull.velocity.norm();
+    val speed = hull.velocity.dot(front_direction);
     
     // 获得当前坡度，得到局部的一维运动环境参数
     val slope = env.getSlope(baseCoordinate.position, front_direction);
@@ -79,7 +80,7 @@ void WheelMoveSystem::tick(double dt, Coordinate& baseCoordinate, Hull& hull, co
     // 目标偏航角与当前偏航角的差，目标偏右为正
     val exp_yaw_diff = atan2(local_exp_direction.y, local_exp_direction.x);
     // 矫正目标车轮朝向，避免转弯加速度过大
-    val aviliable_angle = (speed < INF_SMALL)?PI/2:atan(params.MAX_LATERAL_ACCELERATION * params.LENGTH / (speed * speed));
+    val aviliable_angle = (fabs(speed) < INF_SMALL)?PI/2:atan(params.MAX_LATERAL_ACCELERATION * params.LENGTH / (speed * speed));
     // 最大转角与最大侧向加速度约束下目标转角
     val exp_radius = clamp(params.radius + exp_yaw_diff, fmin(params.MAX_ANGLE, aviliable_angle));
     // 转动速度约束下可行转动量
