@@ -16,8 +16,8 @@ struct Coordinate{
     //! @param p 基坐标系中的坐标
     //! @return 基坐标系中的坐标表示的点在本坐标系中的坐标
     Vector3 positionWorldToBody(const Vector3& p) const{
-        auto inverse = Quaternion(altitude, true).inverse();
-        auto p1 = inverse.rotate(Quaternion(p - position, false));
+        auto inverse = Quaternion::FromCompressedQuaternion(altitude).inverse();
+        auto p1 = inverse.rotate(Quaternion::FromVector(p - position));
         return Vector3(p1.x, p1.y, p1.z);
     };
 
@@ -34,8 +34,8 @@ struct Coordinate{
     //! @param dir 基坐标系中的方向向量坐标
     //! @return 基坐标系中的方向向量坐标表示的点在本坐标系中的坐标
     Vector3 directionWorldToBody(const Vector3& dir) const{
-        auto inverse = Quaternion(altitude, true).inverse();
-        auto dir1 = inverse.rotate(Quaternion(dir, false));
+        auto inverse = Quaternion::FromCompressedQuaternion(altitude).inverse();
+        auto dir1 = inverse.rotate(Quaternion::FromVector(dir));
         return Vector3(dir1.x, dir1.y, dir1.z);
     };
 

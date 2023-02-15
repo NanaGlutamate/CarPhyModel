@@ -125,15 +125,33 @@ struct /* alignas(sizeof(double) * 4) */ Quaternion {
     //! 将坐标或压缩四元数扩展为四元数
     //! @param v 坐标或压缩四元数
     //! @param isCompressedQuaternion 是否为压缩四元数，如果是，则将w扩展为sqrt(1-x^2-y^2-z^2)，否则w为0
-    explicit Quaternion(const Vector3& v, bool isCompressedQuaternion){
+    [[deprecated("unsafe")]]explicit Quaternion(const Vector3& v, bool isCompressedQuaternion){
         x=v.x;
         y=v.y;
         z=v.z;
         w=isCompressedQuaternion?sqrt(1.-x*x-y*y-z*z):0.;
     };
 
+    static Quaternion FromCompressedQuaternion(const Vector3& v){
+        return Quaternion{
+            v.x,
+            v.y,
+            v.z,
+            sqrt(1.-v.x*v.x-v.y*v.y-v.z*v.z)
+        };
+    }
+
+    static Quaternion FromVector(const Vector3& v){
+        return Quaternion{
+            v.x,
+            v.y,
+            v.z,
+            0.,
+        };
+    }
+
     //! 将四元数转为欧拉角
-    //! @return Vector3: x=roll, y=pitch, z=yaw; xyz euler angles
+    //! @return Vector3: x=roll, y=pitch, z=yaw; zyx euler angles
     inline Vector3 getEuler() const{
         using std::asin;
         using std::atan2;
@@ -190,8 +208,8 @@ inline Quaternion::Quaternion(const Vector3& axis, element angle){
 };
 
 inline Vector3 Vector3::rotate(const Vector3& p) const{
-    Quaternion q(*this, true);
-    Quaternion pq(p, false);
+    Quaternion q = Quaternion::FromCompressedQuaternion(*this);
+    Quaternion pq = Quaternion::FromVector(p);
     Quaternion r = q.rotate(pq);
     return Vector3(r.x, r.y, r.z);
 };
