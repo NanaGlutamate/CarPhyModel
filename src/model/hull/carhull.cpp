@@ -10,15 +10,17 @@ namespace {
 
 using namespace carphymodel::command;
 
-const std::set<COMMAND_TYPE> validMovingCommand{// COMMAND_TYPE::FORWARD,
-                                                COMMAND_TYPE::ACCELERATE,
-                                                COMMAND_TYPE::DECELERATE,
-                                                COMMAND_TYPE::BACKWARD,
-                                                COMMAND_TYPE::STOP,
-                                                COMMAND_TYPE::TURN,
-                                                COMMAND_TYPE::ACCELERATE_TURN,
-                                                COMMAND_TYPE::DECELERATE_TURN,
-                                                COMMAND_TYPE::BACK_TURN};
+const std::set<COMMAND_TYPE> validMovingCommand{
+    // COMMAND_TYPE::FORWARD,
+    COMMAND_TYPE::ACCELERATE,
+    COMMAND_TYPE::DECELERATE,
+    COMMAND_TYPE::BACKWARD,
+    COMMAND_TYPE::STOP,
+    COMMAND_TYPE::TURN,
+    COMMAND_TYPE::ACCELERATE_TURN,
+    COMMAND_TYPE::DECELERATE_TURN,
+    COMMAND_TYPE::BACK_TURN,
+};
 
 }; // namespace
 
@@ -29,7 +31,7 @@ void HullSystem::tick(double dt, Components &c) {
     auto &optParam = c.getSpecificSingleton<WheelMotionParamList>();
     if (!optParam.has_value())
         return;
-        // TODO: track
+    // TODO: track
     auto &param = optParam.value();
 
     // TODO: check
@@ -41,6 +43,11 @@ void HullSystem::tick(double dt, Components &c) {
         //     continue;
         // }
         auto [param1, param2] = any_cast<tuple<double, double>>(v);
+        if (k == COMMAND_TYPE::ACCELERATE_TURN || k == COMMAND_TYPE::ACCELERATE){
+            param1 = max(param1, speed);
+        }else if (k == COMMAND_TYPE::DECELERATE_TURN || k == COMMAND_TYPE::DECELERATE){
+            param1 = min(param1, speed);
+        }
         if (k == COMMAND_TYPE::STOP) {
             speed = 0.;
         } else if (k == COMMAND_TYPE::TURN) {

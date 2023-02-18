@@ -201,7 +201,7 @@ struct ScannedMemory : public std::map<VID, std::tuple<double, EntityInfo>>{};
 
 struct WheelMotionParamList{
     constexpr static const char* token_list[] = {
-        "-radius",
+        "-angle",
         "LENGTH",
         "MAX_ANGLE",
         "ROTATE_SPEED",
@@ -211,7 +211,7 @@ struct WheelMotionParamList{
         "MAX_LATERAL_ACCELERATION"
     };
     // 车轮转角，右为正
-    double radius;
+    double angle;
     // 前后轴距
     double LENGTH;
     // 前轮最大转角约束

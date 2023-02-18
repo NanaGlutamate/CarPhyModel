@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <cmath>
-#include <iostream>
+// #include <iostream>
 
 namespace carphymodel{
 
@@ -63,7 +63,7 @@ struct /* alignas(sizeof(double) * 4) */ Vector3{
         return sqrt(x * x + y * y + z * z);
     };
 
-    [[nodiscard("this function will not modify original vector")]] Vector3 normalize() && {
+    [[nodiscard("this function will not modify original vector")]] Vector3 normalize(){
         return *this / norm();
     };
 
@@ -83,9 +83,9 @@ struct /* alignas(sizeof(double) * 4) */ Vector3{
         //     case 2: [[fallthrough]]; default: return z;
         // };
     }
-    friend std::ostream& operator<<(std::ostream o, Vector3& v) {
-        return (o << "(" << v.x << ", " << v.y << ", " << v.z << ")");
-    };
+    // friend std::ostream& operator<<(const std::ostream& o, Vector3& v) {
+    //     return (o << "(" << v.x << ", " << v.y << ", " << v.z << ")");
+    // };
 };
 
 //四元数
@@ -98,6 +98,9 @@ struct /* alignas(sizeof(double) * 4) */ Quaternion {
     [[deprecated("unsafe")]]operator Vector3() const { return Vector3{x, y, z};}
 
     Vector3 toCompressedQuaternion() const { return Vector3{x, y, z};}
+
+    // assert(w==0);
+    Vector3 toVector() const { return Vector3{x, y, z};}
 
     // yaw -> pitch -> roll, right handed
     // 

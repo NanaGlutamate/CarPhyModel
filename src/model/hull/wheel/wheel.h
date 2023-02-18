@@ -29,15 +29,14 @@ public:
         WheelMotionParamList& params
     );
 
-    // // TODO: 最小运动限制下的tick
-    // void unconstrainedTick(
-    //     double dt, 
-    //     Coordinate& baseCoordinate, 
-    //     Hull& hull, 
-    //     double wheel_angle, 
-    //     double acceleration, 
-    //     WheelMotionParamList& params
-    // );
+    static void directTick(
+        double dt, 
+        Coordinate& baseCoordinate, 
+        Hull& hull, 
+        double exp_angle, 
+        double exp_speed, 
+        WheelMotionParamList& params
+    ){};
 };
 
 }
