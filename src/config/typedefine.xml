@@ -70,4 +70,11 @@
 			<Param name="w" type="float64"/>
 		</Params>
 	</Type>
+	<Type name="Location">
+		<Params>
+			<Param name="longitude" type="float64"/>
+			<Param name="latitude" type="float64"/>
+			<Param name="altitude" type="float64"/>
+		</Params>
+	</Type>
 </Types>

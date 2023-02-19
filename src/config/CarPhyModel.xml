@@ -14,5 +14,16 @@
 		<Parameter name="Command" type="uint64" displayName="动作号" usage="input" value="0" unit=""/>
 		<Parameter name="Param1" type="float64" displayName="动作参数1" usage="input" value="0" unit=""/>
 		<Parameter name="Param2" type="float64" displayName="动作参数2" usage="input" value="0" unit=""/>
+		<Parameter name="longitude" type="float64" displayName="经度" usage="init,output" value="0" unit=""/>
+		<Parameter name="latitude" type="float64" displayName="纬度" usage="init,output" value="0" unit=""/>
+		<Parameter name="altitude" type="float64" displayName="高度" usage="init,output" value="0" unit=""/>
+		<Parameter name="baseLongitude" type="float64" displayName="原点经度" usage="init" value="0" unit=""/>
+		<Parameter name="baseLatitude" type="float64" displayName="原点纬度" usage="init" value="0" unit=""/>
+		<Parameter name="baseAltitude" type="float64" displayName="原点高度" usage="init" value="0" unit=""/>
+		<Parameter name="roll" type="float64" displayName="滚转" usage="output" value="0" unit=""/>
+		<Parameter name="pitch" type="float64" displayName="俯仰" usage="output" value="0" unit=""/>
+		<Parameter name="yaw" type="float64" displayName="偏航" usage="output" value="0" unit=""/>
+		<Parameter name="velocity_x" type="float64" displayName="速度x" usage="output" value="0" unit=""/>
+		<Parameter name="velocity_y" type="float64" displayName="速度y" usage="output" value="0" unit=""/>
 	</Parameters>
 </ModelInfo>

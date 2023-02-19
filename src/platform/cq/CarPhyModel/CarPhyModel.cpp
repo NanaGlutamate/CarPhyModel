@@ -1,10 +1,32 @@
 #include "CarPhyModel.h"
 #include "src/model/carbuilder.h"
+#include "src/model/tools/constant.hpp"
 
 namespace {
 
 using namespace std;
 using namespace carphymodel::command;
+
+constexpr inline double rate = 111000.;
+
+carphymodel::Vector3 locationTrans(const CarPhyModel::Location &base,
+                                   const CarPhyModel::Location &location) {
+    return {
+        rate * (location.latitude - base.latitude),
+        rate * (location.longitude - base.longitude) *
+            cos(carphymodel::DEG2RAD(base.latitude)),
+        base.altitude - location.altitude,
+    };
+}
+CarPhyModel::Location positionTrans(const CarPhyModel::Location &base,
+                                    const carphymodel::Vector3 &position) {
+    return {
+        .longitude =
+            position.y / (rate * cos(carphymodel::DEG2RAD(base.latitude))) + base.longitude,
+        .latitude = position.x / rate + base.latitude,
+        .altitude = base.altitude - position.z,
+    };
+}
 
 string getLibDir() {
     string library_dir_;
@@ -38,6 +60,19 @@ bool CarPhyModel::Init(const std::unordered_map<std::string, std::any> &value) {
     } else {
         carphymodel::CarBuilder::buildFromFile(getLibDir() + "car.xml", model);
     }
+    if (auto it = value.find("baseLongitude"); it != value.end()) {
+        location.longitude = std::any_cast<double>(it->second);
+        location.latitude = std::any_cast<double>(value.find("baseLatitude")->second);
+        location.altitude = std::any_cast<double>(value.find("baseAltitude")->second);
+    }
+    Location tmp{0, 0, 0};
+    if (auto it = value.find("longitude"); it != value.end()) {
+        tmp.longitude = std::any_cast<double>(it->second);
+        tmp.latitude = std::any_cast<double>(value.find("latitude")->second);
+        tmp.altitude = std::any_cast<double>(value.find("altitude")->second);
+    }
+    model.components.getSpecificSingleton<carphymodel::Coordinate>().value().position =
+        locationTrans(location, tmp);
     state_ = CSInstanceState::IS_INITIALIZED;
     WriteLog("CarPhyModel model Init", 1);
     return true;
@@ -46,9 +81,6 @@ bool CarPhyModel::Init(const std::unordered_map<std::string, std::any> &value) {
 bool CarPhyModel::Tick(double time) {
     // TODO: time的单位?
     model.tick(time);
-    // 此处填写模型单步运算逻辑
-    // 需输出的参数应通过emplace方法写入params_
-    // 等候GetOutput接口被调用时参数对外部输出
     auto &buffer = model.components.getSpecificSingleton<carphymodel::OutputBuffer>();
     buffer->emplace("ForceSideID", GetForceSideID());
     buffer->emplace("ModelID", GetModelID());
@@ -59,6 +91,8 @@ bool CarPhyModel::Tick(double time) {
         FireEvent tmp = any_cast<carphymodel::FireEvent>(it->second);
         it->second = tmp.ToValueMap();
     }
+    carphymodel::Vector3 tmp =
+        model.components.getSpecificSingleton<carphymodel::Coordinate>().value().position;
     EntityInfo info{
         .baseInfo =
             BaseInfo{
@@ -68,13 +102,30 @@ bool CarPhyModel::Tick(double time) {
                 .damageLevel = static_cast<uint16_t>(
                     model.components.getSpecificSingleton<carphymodel::DamageModel>()
                         ->damageLevel),
-            }, 
+            },
         .position =
             model.components.getSpecificSingleton<carphymodel::Coordinate>()->position,
         .velocity = model.components.getSpecificSingleton<carphymodel::Hull>()->velocity,
     };
     buffer->emplace("EntityInfoOut", info.ToValueMap());
-
+    Location tmpl = positionTrans(
+        location,
+        model.components.getSpecificSingleton<carphymodel::Coordinate>().value().position);
+    // deg
+    buffer->emplace("longitude", tmpl.longitude);
+    buffer->emplace("altitude", tmpl.altitude);
+    buffer->emplace("latitude", tmpl.latitude);
+    auto attitude =
+        carphymodel::Quaternion::fromCompressedQuaternion(
+            model.components.getSpecificSingleton<carphymodel::Coordinate>().value().attitude)
+            .getEuler();
+    // deg
+    buffer->emplace("roll", carphymodel::RAD2DEG(attitude.x));
+    buffer->emplace("pitch", carphymodel::RAD2DEG(attitude.y));
+    buffer->emplace("yaw", carphymodel::RAD2DEG(attitude.z));
+    auto velocity = model.components.getSpecificSingleton<carphymodel::Hull>().value().velocity;
+    buffer->emplace("velocity_x", velocity.x);
+    buffer->emplace("velocity_y", velocity.y);
     WriteLog("CarPhyModel model Tick", 1);
     return true;
 }
@@ -97,34 +148,16 @@ bool CarPhyModel::SetInput(const std::unordered_map<std::string, std::any> &valu
             auto command = static_cast<COMMAND_TYPE>(std::any_cast<uint64_t>(v));
             auto &buffer = model.components.getSpecificSingleton<carphymodel::InputBuffer>();
             double param1 = 0., param2 = 0.;
-            if (!NoParam.contains(command)) {
-                param1 = std::any_cast<double>(value.find("Param1")->second);
+            if (auto it = value.find("Param1"); it != value.end()) {
+                param1 = std::any_cast<double>(it->second);
             }
-            if (DoubleParam.contains(command)) {
-                param2 = std::any_cast<double>(value.find("Param2")->second);
+            if (auto it = value.find("Param2"); it != value.end()) {
+                param2 = std::any_cast<double>(it->second);
             }
             buffer->emplace(command, make_tuple(param1, param2));
             // TODO:
         }
     }
-    // if (auto it = value.find("EntityInfo"); it != value.end()) {
-    //     auto t_EntityInfo = std::any_cast<CSValueMap>(it->second);
-    //     EntityInfo_.FromValueMap(t_EntityInfo);
-    // }
-    // if (auto it = value.find("FireData"); it != value.end()) {
-    //     auto t_FireData = std::any_cast<CSValueMap>(it->second);
-    //     FireData_.FromValueMap(t_FireData);
-    // }
-    // if (auto it = value.find("Command"); it != value.end()) {
-    //     command = std::any_cast<uint64_t>(it->second);
-    // }
-    // if (auto it = value.find("Params"); it != value.end()) {
-    //     auto t_Params = std::any_cast<std::vector<std::any>>(it->second);
-    //     for (auto p : t_Params) {
-    //         auto pp = std::any_cast<double>(p);
-    //         Params_.push_back(pp);
-    //     }
-    // }
     WriteLog("CarPhyModel model SetInput", 1);
     return true;
 }
