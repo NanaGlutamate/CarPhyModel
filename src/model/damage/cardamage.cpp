@@ -29,7 +29,7 @@ void DamageSystem::tick(double dt, Components& c){
     std::array<int, static_cast<std::underlying_type_t<DAMAGE_LEVEL>>(DAMAGE_LEVEL::KK) + 1> damageLevelCounter = {}; 
 
     for(auto&& fireEvent : c.getSpecificSingleton<HitEventQueue>().value()){
-        auto ammunitionModel = AmmunitionDamageFactory::getProduct(fireEvent.weaponName).lock();
+        auto ammunitionModel = AmmunitionDamageFactory::getProduct(fireEvent.weaponName);
         auto localP = baseCoordinate.positionWorldToBody(fireEvent.position);
         auto localD = baseCoordinate.directionWorldToBody(fireEvent.velocity);
 

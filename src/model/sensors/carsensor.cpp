@@ -23,7 +23,7 @@ void SensorSystem::tick(double dt, Components& c)
                 continue;
             }
         }
-        auto sensor = SensorFactory::getProduct(_sensor.type).lock();
+        auto sensor = SensorFactory::getProduct(_sensor.type);
         auto& baseCoordinate = c.getSpecificSingleton<Coordinate>().value();
         auto& hull = c.getSpecificSingleton<Hull>().value();
         for(auto&& [vid, _entityInfo] : c.getSpecificSingleton<ScannedMemory>().value()){

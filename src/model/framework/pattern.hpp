@@ -22,9 +22,9 @@ public:
     static void emplaceProduct(std::string_view name, std::shared_ptr<T> value){
         Fac::look_up_table.emplace(name, value);
     };
-    static std::weak_ptr<T> getProduct(std::string_view name){
+    static T* getProduct(std::string_view name){
         auto it = Fac::look_up_table.find(name);
-        return it->second;
+        return it->second.get();
     };
 private:
     Factory() = delete;
