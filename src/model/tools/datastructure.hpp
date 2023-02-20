@@ -1,24 +1,24 @@
 ﻿#pragma once
 
-#include <vector>
-#include <string>
-#include <map>
-#include <tuple>
-#include <array>
-#include <unordered_map>
 #include <any>
+#include <array>
+#include <map>
 #include <set>
+#include <string>
+#include <tuple>
+#include <unordered_map>
 #include <variant>
+#include <vector>
 
-#include "vector3.hpp"
-#include "coordinate.hpp"
 #include "../framework/componentmanager.hpp"
+#include "coordinate.hpp"
+#include "vector3.hpp"
 
-namespace carphymodel{
+namespace carphymodel {
 
-namespace command{
+namespace command {
 
-enum class COMMAND_TYPE{
+enum class COMMAND_TYPE {
     FORWARD,
     ACCELERATE,
     DECELERATE,
@@ -45,75 +45,75 @@ inline std::set<COMMAND_TYPE> NoParam{
 };
 
 inline std::set<COMMAND_TYPE> SingleParam{
-    COMMAND_TYPE::ACCELERATE,
-    COMMAND_TYPE::DECELERATE,
-    COMMAND_TYPE::BACKWARD,
-    COMMAND_TYPE::TURN,
-    COMMAND_TYPE::UNLOCK,
+    COMMAND_TYPE::ACCELERATE, COMMAND_TYPE::DECELERATE, COMMAND_TYPE::BACKWARD,
+    COMMAND_TYPE::TURN,       COMMAND_TYPE::UNLOCK,
 };
 
 inline std::set<COMMAND_TYPE> DoubleParam{
-    COMMAND_TYPE::ACCELERATE_TURN,
-    COMMAND_TYPE::DECELERATE_TURN,
-    COMMAND_TYPE::BACK_TURN,
-    COMMAND_TYPE::SHOOT,
-    COMMAND_TYPE::LOCK_DIRECTION,
-    COMMAND_TYPE::LOCK_TARGET,
+    COMMAND_TYPE::ACCELERATE_TURN, COMMAND_TYPE::DECELERATE_TURN, COMMAND_TYPE::BACK_TURN,
+    COMMAND_TYPE::SHOOT,           COMMAND_TYPE::LOCK_DIRECTION,  COMMAND_TYPE::LOCK_TARGET,
     COMMAND_TYPE::RADAR_SWITCH,
 };
 
-}
+} // namespace command
 
 // vehicle ID
 using VID = uint64_t;
 // side ID
 using SID = uint16_t;
 
-struct Block{
-    constexpr static const char* token_list[] = {"length", "width", "height"};
-    constexpr operator Vector3() const{
-        return Vector3{length, width, height};
-    };
-    constexpr double operator[](size_t i) const {return (&length)[i];};
-    double& operator[](size_t i){return (&length)[i];};
+struct Block {
+    constexpr static const char *token_list[] = {"length", "width", "height"};
+    constexpr operator Vector3() const { return Vector3{length, width, height}; };
+    constexpr double operator[](size_t i) const { return (&length)[i]; };
+    double &operator[](size_t i) { return (&length)[i]; };
     double length, width, height;
 };
 
-struct Sphere{
+struct Sphere {
     double r;
 };
 
 // carprotection
-struct ProtectionModel{
-    constexpr static const char* token_list[] = {"armor", "activeProtectionAmmo", "reactiveArmor"};//, "protectZone"};
-    double armor;
+struct ProtectionModel {
+    constexpr static const char *token_list[] = {
+        "armor_top",    "armor_back",           "armor_side",
+        "armor_bottom", "activeProtectionAmmo", "reactiveArmor"};
+    double armor_top;
+    double armor_back;
+    double armor_side;
+    double armor_bottom;
     int activeProtectionAmmo;
     int reactiveArmor;
     // Block protectZone;
 };
 
 // carhull
-struct Hull{
+struct Hull {
     Vector3 velocity;
     Vector3 palstance;
 };
 
 // cardamage，越小越正常
-enum class DAMAGE_LEVEL{
-    N, //正常
-    M, //中度毁伤
-    K, //失去功能
-    KK, //失去结构
+enum class DAMAGE_LEVEL {
+    N,  // 正常
+    M,  // 中度毁伤
+    K,  // 失去功能
+    KK, // 失去结构
 };
 
-struct DamageModel{
-    constexpr static const char* token_list[] = {"-damageLevel"};//, "size"};
+struct DamageModel {
+    constexpr static const char *token_list[] = {"-damageLevel", "functionalWeight",
+                                                 "structualWeight"};
     DAMAGE_LEVEL damageLevel;
-    // Block size;
+    int functionalWeight;
+    int structualWeight;
 };
 
-struct FireEvent{
-    constexpr static const char* token_list[] = {"weaponName", "target", "position", "velocity", "range"};
+// TODO: index to prevent redundant processing?
+struct FireEvent {
+    constexpr static const char *token_list[] = {"weaponName", "target", "position",
+                                                 "velocity", "range"};
     std::string weaponName;
     // 目标点的世界坐标
     Vector3 target;
@@ -125,22 +125,23 @@ struct FireEvent{
     double range;
 };
 
-struct AngleZone{
-    constexpr static const char* token_list[] = {"yawLeft", "yawRight", "pitchUp", "pitchDown"};
+struct AngleZone {
+    constexpr static const char *token_list[] = {"yawLeft", "yawRight", "pitchUp",
+                                                 "pitchDown"};
     double yawLeft, yawRight, pitchUp, pitchDown;
-    double& operator[](size_t index){return (&yawLeft)[index];};
-    const double& operator[](size_t index) const {return (&yawLeft)[index];};
+    double &operator[](size_t index) { return (&yawLeft)[index]; };
+    const double &operator[](size_t index) const { return (&yawLeft)[index]; };
 };
 
-struct Direction{
-    constexpr static const char* token_list[] = {"yaw", "pitch"};
+struct Direction {
+    constexpr static const char *token_list[] = {"yaw", "pitch"};
     double yaw, pitch;
-    double& operator[](size_t index){return (&yaw)[index];};
-    const double& operator[](size_t index) const {return (&yaw)[index];};
+    double &operator[](size_t index) { return (&yaw)[index]; };
+    const double &operator[](size_t index) const { return (&yaw)[index]; };
 };
 
 // carfireunit
-enum class FIRE_UNIT_STATE{
+enum class FIRE_UNIT_STATE {
     FREE,
     LOCK_TARGET,
     LOCK_DIRECTION,
@@ -148,8 +149,9 @@ enum class FIRE_UNIT_STATE{
     MULTI_SHOOT,
 };
 
-struct Weapon{
-    constexpr static const char* token_list[] = {"ammoType", "ammoRemain", "reloadingTime", "-reloadingState", "range", "speed"};
+struct Weapon {
+    constexpr static const char *token_list[] = {
+        "ammoType", "ammoRemain", "reloadingTime", "-reloadingState", "range", "speed"};
     std::string ammoType;
     int ammoRemain;
     double reloadingTime;
@@ -158,26 +160,28 @@ struct Weapon{
     double speed;
 };
 
-struct FireUnit{
-    constexpr static const char* token_list[] = {"-state", "!data", "fireZone", "rotateZone", "-directionNow", "rotateSpeed", "weapon"};
+struct FireUnit {
+    constexpr static const char *token_list[] = {"-state",     "-data",         "fireZone",
+                                                 "rotateZone", "-directionNow", "rotateSpeed",
+                                                 "weapon"};
     FIRE_UNIT_STATE state;
     double data;
-    AngleZone fireZone; //[yawLeft, yawRight, pitchUp, pitchDown]
-    AngleZone rotateZone; //[yawLeft, yawRight, pitchUp, pitchDown]
+    AngleZone fireZone;     //[yawLeft, yawRight, pitchUp, pitchDown]
+    AngleZone rotateZone;   //[yawLeft, yawRight, pitchUp, pitchDown]
     Direction directionNow; //[yaw, pitch]
-    Direction rotateSpeed; //[yaw, pitch]
+    Direction rotateSpeed;  //[yaw, pitch]
     Weapon weapon;
 };
 
 // carsensor
-struct SensorData{
-    constexpr static const char* token_list[] = {"type"};
+struct SensorData {
+    constexpr static const char *token_list[] = {"type"};
     std::string type;
 };
 
-struct BaseInfo{
-    constexpr static const char* token_list[] = {"type", "id", "side", "damageLevel"};
-    enum class ENTITY_TYPE{
+struct BaseInfo {
+    constexpr static const char *token_list[] = {"type", "id", "side", "damageLevel"};
+    enum class ENTITY_TYPE {
         CAR,
         UNKNOWN,
     } type;
@@ -186,8 +190,8 @@ struct BaseInfo{
     DAMAGE_LEVEL damageLevel;
 };
 
-struct EntityInfo{
-    constexpr static const char* token_list[] = {"position", "velocity", "baseInfo"};
+struct EntityInfo {
+    constexpr static const char *token_list[] = {"position", "velocity", "baseInfo"};
     Vector3 position;
     Vector3 velocity;
     BaseInfo baseInfo;
@@ -197,19 +201,17 @@ struct EntityInfo{
 // component ID
 using CID = size_t;
 
-struct ScannedMemory : public std::map<VID, std::tuple<double, EntityInfo>>{};
+struct ScannedMemory : public std::map<VID, std::tuple<double, EntityInfo>> {};
 
-struct WheelMotionParamList{
-    constexpr static const char* token_list[] = {
-        "-angle",
-        "LENGTH",
-        "MAX_ANGLE",
-        "ROTATE_SPEED",
-        "MAX_LINEAR_SPEED",
-        "MAX_FRONT_ACCELERATION",
-        "MAX_BRAKE_ACCELERATION",
-        "MAX_LATERAL_ACCELERATION"
-    };
+struct WheelMotionParamList {
+    constexpr static const char *token_list[] = {"-angle",
+                                                 "LENGTH",
+                                                 "MAX_ANGLE",
+                                                 "ROTATE_SPEED",
+                                                 "MAX_LINEAR_SPEED",
+                                                 "MAX_FRONT_ACCELERATION",
+                                                 "MAX_BRAKE_ACCELERATION",
+                                                 "MAX_LATERAL_ACCELERATION"};
     // 车轮转角，右为正
     double angle;
     // 前后轴距
@@ -228,33 +230,17 @@ struct WheelMotionParamList{
     double MAX_LATERAL_ACCELERATION;
 };
 
-struct HitEventQueue : public std::vector<FireEvent>{};
+struct HitEventQueue : public std::vector<FireEvent> {};
 
-struct FireEventQueue : public std::vector<FireEvent>{};
+struct FireEventQueue : public std::vector<FireEvent> {};
 
-struct InputBuffer : public std::map<command::COMMAND_TYPE, std::any>{};
+struct CommandBuffer : public std::map<command::COMMAND_TYPE, std::any> {};
 
-struct OutputBuffer : public std::unordered_map<std::string, std::any>{};
+struct EventBuffer : public std::unordered_map<std::string, std::any> {};
 
 using Components = ComponentManager<
-    SingletonComponent<
-        Coordinate,
-        DamageModel,
-        InputBuffer,
-        OutputBuffer,
-        HitEventQueue,
-        FireEventQueue,
-        WheelMotionParamList,
-        ScannedMemory,
-        Sphere,
-        Hull
-    >, NormalComponent<
-        Coordinate,
-        DamageModel,
-        Block,
-        ProtectionModel,
-        FireUnit,
-        SensorData
-    >>;
+    SingletonComponent<Coordinate, DamageModel, CommandBuffer, EventBuffer, HitEventQueue,
+                       FireEventQueue, WheelMotionParamList, ScannedMemory, Sphere, Hull>,
+    NormalComponent<Coordinate, DamageModel, Block, ProtectionModel, FireUnit, SensorData>>;
 
-};
+}; // namespace carphymodel

@@ -17,7 +17,7 @@ std::tuple<double, bool> collision(
     using std::fmin;
     const Vector3 dir_local = coordinate.directionWorldToBody(dir);
     const Vector3 pos_local = coordinate.positionWorldToBody(pos);
-    double depth_min = -INF_BIG, depth_max = INF_BIG;
+    double depth_min = 0, depth_max = INF_BIG;
     for(size_t i=0; i<3; ++i){
         if(fabs(dir_local[i]) < INF_SMALL){
             if(pos_local[i] < -size[i] / 2. || pos_local[i] > size[i] / 2.){return std::make_tuple(0., false);}

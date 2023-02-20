@@ -6,15 +6,15 @@
 
 namespace carphymodel {
 
-class Environment{
+class Environment {
 private:
     friend class EnvironmentInfoAgent;
     Environment(){}
     Environment(const Environment&) = delete;
     Environment& operator=(const Environment&) = delete;
-    double getAltitude(const Vector3& pos) const { return 0.; }
-    double getSlope(const Vector3& pos, const Vector3& dir) const { return 0.; }
-    bool getIntervisibility(const Vector3& pos1, const Vector3& pos2) const { return pos1.z >= 0. && pos2.z >= 0.; }
+    virtual double getAltitude(const Vector3& pos) const { return 0.; }
+    virtual double getSlope(const Vector3& pos, const Vector3& dir) const { return 0.; }
+    virtual bool getIntervisibility(const Vector3& pos1, const Vector3& pos2) const { return pos1.z >= 0. && pos2.z >= 0.; }
 };
 
 class EnvironmentInfoAgent {
@@ -40,7 +40,7 @@ public:
     //! @return 是否可见
     bool getIntervisibility(const Vector3& pos1, const Vector3& pos2) const { return env->getIntervisibility(pos1, pos2); }
 private:
-    inline static std::unique_ptr<Environment> env = std::unique_ptr<Environment>(new Environment());
+    inline static std::unique_ptr<Environment> env = std::make_unique<Environment>();
 };
 
 }

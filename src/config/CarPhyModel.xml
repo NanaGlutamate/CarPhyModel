@@ -7,9 +7,9 @@
 		<Parameter name="ModelID" type="string" displayName="模型类型ID" usage="init,output" value="" unit=""/>
 		<Parameter name="KeyMessages" type="string[]" displayName="关键信息" usage="output" value="" unit=""/>
 		<Parameter name="ID" type="uint64" displayName="ID" usage="init,output" value="" unit=""/>
-		<Parameter name="EntityInfoOut" type="EntityInfo" displayName="本车信息" usage="output" value="" unit=""/>
 		<Parameter name="State" type="uint16" displayName="模型状态" usage="output" value="" unit=""/>
 		<Parameter name="FireData" type="FireEvent" displayName="开火事件" usage="input" value="" unit=""/>
+		<Parameter name="EntityInfoOut" type="EntityInfo" displayName="本车信息" usage="output" value="" unit=""/>
 		<Parameter name="FireDataOut" type="FireEvent" displayName="本车开火事件" usage="output" value="" unit=""/>
 		<Parameter name="Command" type="uint64" displayName="动作号" usage="input" value="0" unit=""/>
 		<Parameter name="Param1" type="float64" displayName="动作参数1" usage="input" value="0" unit=""/>

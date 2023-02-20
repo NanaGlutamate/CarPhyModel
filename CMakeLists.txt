@@ -25,7 +25,7 @@ set(CMAKE_MINSIZEREL_POSTFIX _minsizerel)
 # set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
 if(MSVC)
-  string(APPEND CMAKE_CXX_FLAGS " /permissive- /Zc:__cplusplus")
+  string(APPEND CMAKE_CXX_FLAGS " /permissive- /Zc:__cplusplus /PROFILE")
 endif()
 
 add_subdirectory(lib)

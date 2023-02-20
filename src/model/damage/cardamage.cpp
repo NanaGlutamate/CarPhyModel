@@ -26,7 +26,8 @@ namespace carphymodel{
 void DamageSystem::tick(double dt, Components& c){
     auto&& baseCoordinate = c.getSpecificSingleton<Coordinate>().value();
 
-    std::array<int, static_cast<std::underlying_type_t<DAMAGE_LEVEL>>(DAMAGE_LEVEL::KK) + 1> damageLevelCounter = {}; 
+    int loseFunction = 0, loseStructure = 0;
+    int totalFunction = 0, totalStructure = 0; 
 
     for(auto&& fireEvent : c.getSpecificSingleton<HitEventQueue>().value()){
         auto ammunitionModel = AmmunitionDamageFactory::getProduct(fireEvent.weaponName);
@@ -38,11 +39,25 @@ void DamageSystem::tick(double dt, Components& c){
             if(damageBefore != DAMAGE_LEVEL::KK){
                 ammunitionModel->updateDamage(_damageModel, _size, _coordinate, localP, localD, localD, fireEvent.range);
             }
-            damageLevelCounter[static_cast<std::underlying_type_t<DAMAGE_LEVEL>>(_damageModel.damageLevel)]++;
+            totalFunction += _damageModel.functionalWeight;
+            totalStructure += _damageModel.structualWeight;
+            if(_damageModel.damageLevel == DAMAGE_LEVEL::M){
+                loseFunction += _damageModel.functionalWeight / 2;
+            }else if(_damageModel.damageLevel == DAMAGE_LEVEL::K){
+                loseFunction += _damageModel.functionalWeight;
+            }else if(_damageModel.damageLevel == DAMAGE_LEVEL::KK){
+                loseFunction += _damageModel.functionalWeight;
+                loseStructure += _damageModel.structualWeight;
+            }
         }
     }
 
-    c.getSpecificSingleton<DamageModel>()->damageLevel = static_cast<DAMAGE_LEVEL>(argmaxRight(damageLevelCounter));
+    DAMAGE_LEVEL tmp = DAMAGE_LEVEL::N;
+    if(totalFunction != 0 && double(loseFunction) / totalFunction >= 0.4)tmp = DAMAGE_LEVEL::M;
+    if(totalFunction != 0 && double(loseFunction) / totalFunction >= 0.7)tmp = DAMAGE_LEVEL::K;
+    if(totalStructure != 0 && double(loseStructure) / totalStructure >= 0.8)tmp = DAMAGE_LEVEL::KK;
+
+    c.getSpecificSingleton<DamageModel>()->damageLevel = tmp;
 
     c.getSpecificSingleton<HitEventQueue>().value().clear();
     return;

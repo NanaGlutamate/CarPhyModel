@@ -81,7 +81,7 @@ bool CarPhyModel::Init(const std::unordered_map<std::string, std::any> &value) {
 bool CarPhyModel::Tick(double time) {
     // TODO: time的单位?
     model.tick(time);
-    auto &buffer = model.components.getSpecificSingleton<carphymodel::OutputBuffer>();
+    auto &buffer = model.components.getSpecificSingleton<carphymodel::EventBuffer>();
     buffer->emplace("ForceSideID", GetForceSideID());
     buffer->emplace("ModelID", GetModelID());
     buffer->emplace("InstanceName", GetInstanceName());
@@ -146,7 +146,7 @@ bool CarPhyModel::SetInput(const std::unordered_map<std::string, std::any> &valu
                 tmp);
         } else if (k == "Command") {
             auto command = static_cast<COMMAND_TYPE>(std::any_cast<uint64_t>(v));
-            auto &buffer = model.components.getSpecificSingleton<carphymodel::InputBuffer>();
+            auto &buffer = model.components.getSpecificSingleton<carphymodel::CommandBuffer>();
             double param1 = 0., param2 = 0.;
             if (auto it = value.find("Param1"); it != value.end()) {
                 param1 = std::any_cast<double>(it->second);

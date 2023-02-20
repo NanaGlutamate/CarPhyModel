@@ -114,8 +114,8 @@ void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model){
     
     if(auto handle = model.components.getModifier()){
         handle.addSingletonComponents<
-            InputBuffer,
-            OutputBuffer,
+            CommandBuffer,
+            EventBuffer,
             DamageModel,
             Coordinate,
             HitEventQueue,

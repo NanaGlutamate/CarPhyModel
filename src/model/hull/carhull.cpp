@@ -38,7 +38,7 @@ void HullSystem::tick(double dt, Components &c) {
     auto coordinate = c.getSpecificSingleton<Coordinate>().value();
     double direction = Quaternion::fromCompressedQuaternion(coordinate.attitude).getEuler().z;
     double speed = c.getSpecificSingleton<Hull>()->velocity.norm();
-    for (auto &&[k, v] : c.getSpecificSingleton<InputBuffer>().value()) {
+    for (auto &&[k, v] : c.getSpecificSingleton<CommandBuffer>().value()) {
         // if (!validMovingCommand.contains(k)) {
         //     continue;
         // }

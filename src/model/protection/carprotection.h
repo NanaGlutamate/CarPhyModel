@@ -8,7 +8,7 @@ namespace carphymodel{
 class ProtectionSystem : public System{
 public:
     ProtectionSystem() = default;
-    virtual void tick(double dt, Components& c){};
+    virtual void tick(double dt, Components& c);
     virtual ~ProtectionSystem() = default;
 };
 

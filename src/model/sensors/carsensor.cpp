@@ -16,12 +16,9 @@ void SensorSystem::tick(double dt, Components& c)
     for(auto& x : c.getSpecificSingleton<ScannedMemory>().value()){
         std::get<0>(x.second) += dt;
     }
-    for(auto&& [id, _sensor] : c.getNormal<SensorData>()){
-        if(auto _damage = c.getSpecificNormal<DamageModel>(id); _damage.has_value()){
-            DamageModel& damage = _damage.value();
-            if(damage.damageLevel == DAMAGE_LEVEL::K || damage.damageLevel == DAMAGE_LEVEL::KK){
-                continue;
-            }
+    for(auto&& [id, _sensor, _damage] : c.getNormal<SensorData, DamageModel>()){
+        if(_damage.damageLevel == DAMAGE_LEVEL::K || _damage.damageLevel == DAMAGE_LEVEL::KK){
+            continue;
         }
         auto sensor = SensorFactory::getProduct(_sensor.type);
         auto& baseCoordinate = c.getSpecificSingleton<Coordinate>().value();

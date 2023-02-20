@@ -4,7 +4,7 @@
 #include "ammunition.hpp"
 #include "AP.h"
 #include "HE.h"
-#include "HEAT.h"
+#include "HEAT.hpp"
 #include "../framework/pattern.hpp"
 
 namespace carphymodel{

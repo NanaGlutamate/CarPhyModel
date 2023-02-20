@@ -31,6 +31,8 @@ namespace carphymodel::component{
 
 template<typename RETURN_TYPE> inline RETURN_TYPE componentDeserialize(rapidxml::xml_node<char>* node);
 
+// token starts with '!' : no deserialize
+// token starts with '-' : default deserialize
 template<typename T, size_t Index>
 inline void emplace(T& tar, rapidxml::xml_node<char>* node) {
     if constexpr (Index < pfr::tuple_size_v<T>) {

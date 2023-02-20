@@ -10,8 +10,6 @@ double collision(
     const Vector3& pos, 
     const Block& size, 
     const Coordinate& coordinate){
-    using std::pow;
-    using std::sqrt;
     const Vector3 pos_local = coordinate.positionWorldToBody(pos);
     double r2 = 0.;
     for(size_t i=0; i<3; ++i){

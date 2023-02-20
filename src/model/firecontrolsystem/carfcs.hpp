@@ -23,7 +23,7 @@ class FireControlSystem : public System {
             {COMMAND_TYPE::LOCK_TARGET, FIRE_UNIT_STATE::LOCK_TARGET},
             {COMMAND_TYPE::UNLOCK, FIRE_UNIT_STATE::FREE},
         };
-        for (auto &&[k, v] : c.getSpecificSingleton<InputBuffer>().value()) {
+        for (auto &&[k, v] : c.getSpecificSingleton<CommandBuffer>().value()) {
             if (commands.contains(k)) {
                 auto [index, param] = any_cast<tuple<double, double>>(v);
                 auto &tmp = getNthFireUnit((size_t)index, c);
@@ -50,7 +50,7 @@ class FireControlSystem : public System {
                 isTargetAvailable(_fireUnit, info, selfPosition)) {
                 const auto targetPosition =
                     get<1>(info.find(static_cast<size_t>(_fireUnit.data))->second).position;
-                c.getSpecificSingleton<OutputBuffer>()->emplace(
+                c.getSpecificSingleton<EventBuffer>()->emplace(
                     "FireDataOut", weaponShoot(_fireUnit, selfPosition, targetPosition));
             } else if (_fireUnit.state == FIRE_UNIT_STATE::FREE) {
                 continue;
@@ -106,7 +106,6 @@ class FireControlSystem : public System {
             .range = (targetPosition - selfPosition).norm(),
         };
     }
-    // void shoot(FireUnit& f, Components& c){}
 };
 
 } // namespace carphymodel

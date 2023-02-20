@@ -39,7 +39,7 @@
                 <ammoType>125mmHE</ammoType>
                 <ammoRemain>30</ammoRemain>
                 <reloadingTime>8</reloadingTime>
-                <range>3000000</range>
+                <range>3000</range>
                 <speed>1300</speed>
             </Weapon>
         </FireUnit>
