@@ -3,8 +3,8 @@
 #include <any>
 #include <sstream>
 
-#include "model_struct.h"
-#include "type_define_info.h"
+#include "../csmodel_base/model_struct.h"
+#include "../csconfig/type_define_info.h"
 
 // 本文件定义复杂数据结构的参数打印方法
 

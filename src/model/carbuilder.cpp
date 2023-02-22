@@ -51,7 +51,7 @@ struct loadComponent<NormalComponent<Ty...>>{
             return false;
         }());
         my_assert(match, "Invalid Component Named "s + component->name());
-    }
+    } 
 };
 
 template<typename ...Ty>
@@ -119,9 +119,10 @@ void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model){
             DamageModel,
             Coordinate,
             HitEventQueue,
+            FireEventQueue,
             ScannedMemory,
             Hull
-        >({}, {}, {}, {}, {}, {}, {});
+        >({}, {}, {}, {}, {}, {}, {}, {});
 
         loadComponent<SingletonComponent<
             WheelMotionParamList

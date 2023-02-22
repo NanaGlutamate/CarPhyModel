@@ -20,20 +20,20 @@
         <DamageModel/>
         <FireUnit>
             <fireZone>
-                <yawLeft></yawLeft>
-                <yawRight></yawRight>
-                <pitchUp></pitchUp>
-                <pitchDown></pitchDown>
+                <yawLeft>3.14159265</yawLeft>
+                <yawRight>3.14159265</yawRight>
+                <pitchUp>0.34906585</pitchUp>
+                <pitchDown>0.174532925</pitchDown>
             </fireZone>
             <rotateZone>
-                <yawLeft></yawLeft>
-                <yawRight></yawRight>
-                <pitchUp></pitchUp>
-                <pitchDown></pitchDown>
+                <yawLeft>0</yawLeft>
+                <yawRight>0</yawRight>
+                <pitchUp>0</pitchUp>
+                <pitchDown>0</pitchDown>
             </rotateZone>
             <rotateSpeed>
-                <yaw></yaw>
-                <pitch></pitch>
+                <yaw>0.34906585</yaw>
+                <pitch>0.174532925</pitch>
             </rotateSpeed>
             <Weapon>
                 <ammoType>125mmHE</ammoType>

@@ -7,11 +7,12 @@
 namespace carphymodel {
 
 class Environment {
-private:
+public:
     friend class EnvironmentInfoAgent;
     Environment(){}
     Environment(const Environment&) = delete;
     Environment& operator=(const Environment&) = delete;
+private:
     virtual double getAltitude(const Vector3& pos) const { return 0.; }
     virtual double getSlope(const Vector3& pos, const Vector3& dir) const { return 0.; }
     virtual bool getIntervisibility(const Vector3& pos1, const Vector3& pos2) const { return pos1.z >= 0. && pos2.z >= 0.; }

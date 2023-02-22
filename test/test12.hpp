@@ -80,6 +80,7 @@ int test_main() {
                     speed = -5;
                     direction = atan2(target.velocity.y, target.velocity.x);
                 }
+                
                 if (tick == 2000) {
                     break;
                 }

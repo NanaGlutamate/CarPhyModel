@@ -79,8 +79,8 @@ bool CarPhyModel::Init(const std::unordered_map<std::string, std::any> &value) {
 }
 
 bool CarPhyModel::Tick(double time) {
-    // TODO: time的单位?
-    model.tick(time);
+    // time: ms -> s
+    model.tick(time / 1000);
     auto &buffer = model.components.getSpecificSingleton<carphymodel::EventBuffer>();
     buffer->emplace("ForceSideID", GetForceSideID());
     buffer->emplace("ModelID", GetModelID());
@@ -123,7 +123,8 @@ bool CarPhyModel::Tick(double time) {
     buffer->emplace("roll", carphymodel::RAD2DEG(attitude.x));
     buffer->emplace("pitch", carphymodel::RAD2DEG(attitude.y));
     buffer->emplace("yaw", carphymodel::RAD2DEG(attitude.z));
-    auto velocity = model.components.getSpecificSingleton<carphymodel::Hull>().value().velocity;
+    auto velocity =
+        model.components.getSpecificSingleton<carphymodel::Hull>().value().velocity;
     buffer->emplace("velocity_x", velocity.x);
     buffer->emplace("velocity_y", velocity.y);
     WriteLog("CarPhyModel model Tick", 1);
@@ -131,9 +132,10 @@ bool CarPhyModel::Tick(double time) {
 }
 
 bool CarPhyModel::SetInput(const std::unordered_map<std::string, std::any> &value) {
-    auto ID = any_cast<carphymodel::VID>(value.find("ID")->second);
+    carphymodel::VID ID;
     for (auto &&[k, v] : value) {
         if (k == "EntityInfo") {
+            ID = any_cast<carphymodel::VID>(value.find("ID")->second);
             EntityInfo tmp;
             tmp.FromValueMap(any_cast<CSValueMap>(v));
             get<1>((
@@ -146,7 +148,8 @@ bool CarPhyModel::SetInput(const std::unordered_map<std::string, std::any> &valu
                 tmp);
         } else if (k == "Command") {
             auto command = static_cast<COMMAND_TYPE>(std::any_cast<uint64_t>(v));
-            auto &buffer = model.components.getSpecificSingleton<carphymodel::CommandBuffer>();
+            auto &buffer =
+                model.components.getSpecificSingleton<carphymodel::CommandBuffer>();
             double param1 = 0., param2 = 0.;
             if (auto it = value.find("Param1"); it != value.end()) {
                 param1 = std::any_cast<double>(it->second);
