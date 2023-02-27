@@ -127,8 +127,8 @@ int main(int argc, char *argv[]) {
     // #else
     //   std::string lib_path_ = exe_dir_ + "/models/test-model-id/" + lib_name_;
     // #endif
-    std::string lib_path_ = "D:/Desktop/FinalProj/Code/CarPhyModel/bin/RelWithDebInfo/"
-                            "CarPhyModel_relwithdebinfo.dll";
+    std::string lib_path_ = "D:/Desktop/FinalProj/Code/CarPhyModel/bin/Debug/"
+                            "CarPhyModel_debug.dll";
 
 #ifdef _WIN32
     auto hmodule = LoadLibraryExA(lib_path_.c_str(), NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
@@ -271,7 +271,7 @@ bool SetInitParamsToModel(CSModelObject *model_obj_) {
 
     // 初始化参数
     std::unordered_map<std::string, std::any> init_params_{
-        {"filePath", "D:/Desktop/FinalProj/Code/CarPhyModel/src/config/car.xml"}
+        {"filePath", std::string("D:/Desktop/FinalProj/Code/CarPhyModel/src/config/car.xml")}
     };
 
     // TODO! (需根据模型进行更新) 设置模型初始化参数
@@ -289,66 +289,60 @@ bool SetInitParamsToModel(CSModelObject *model_obj_) {
 
 // TODO! (需根据模型进行更新) 设置模型输入参数
 bool SetInputParamsToModel(CSModelObject *model_obj_, uint64_t current_ticks) {
-    try {
-        std::unordered_map<std::string, std::any> input_params{
-            {"Command", (uint64_t)1},
-            {"Param1", (double)10.},
-            {"Param2", (double)10.}
-        };
-        if (!model_obj_->SetInput(input_params)) {
-            std::cerr << "设置模型输入参数失败" << std::endl;
-            return false;
-        }
-        // 例1:
-        // 在第3帧向模型传递一组输入参数
-        // 假设模型接收MissileID和TargetPos输入参数
-        // 其中TargetPos是一个包含三个float64型参数的结构体
-        //
-        // if (3 == current_ticks) {
-        //   std::unordered_map<std::string, std::any> input_params_;
-        //
-        //   uint64_t missile_id = 1001;
-        //   input_params_.emplace("MissileID", missile_id);
-        //
-        //   std::unordered_map<std::string, std::any> target_pos_ = {
-        //     {"longitude", 110.0},
-        //     {"latitude", 80.0},
-        //     {"altitude", 0.0}
-        //   };
-        //   input_params_.emplace("TargetPos", target_pos_);
-        //
-        //   if (!model_obj_->SetInput(input_params_)) {
-        //     std::cerr << "设置模型输入参数失败" << std::endl;
-        //     return false;
-        //   }
-        //
-        //   input_params_.clear();
-        // }
-
-        // 例2:
-        // 在第10~20帧中每帧向模型传递两组输入参数
-        // 输入参数为一个int64数组型参数
-        //
-        // if (10 <= current_ticks && 20 >= current_ticks) {
-        //   std::unordered_map<std::string, std::any> input_params_;
-        //
-        //   std::vector<std::any> target_id_list_ = {
-        //     (int64_t)2001, (int64_t)2002, (int64_t)2003
-        //   };
-        //   input_params_.emplace("TargetIdList", target_id_list_);
-        //
-        //   if (!model_obj_->SetInput(input_params_)) {
-        //     std::cerr << "设置模型输入参数失败" << std::endl;
-        //     return false;
-        //   }
-        //
-        //   input_params_.clear();
-        // }
-
-    } catch (const std::exception &e) {
-        std::cerr << "发生异常: " << e.what() << std::endl;
+    std::unordered_map<std::string, std::any> input_params{
+        {"Command", (uint64_t)1},
+        {"Param1", (double)10.},
+        {"Param2", (double)10.}
+    };
+    if (!model_obj_->SetInput(input_params)) {
+        std::cerr << "设置模型输入参数失败" << std::endl;
         return false;
     }
+    // 例1:
+    // 在第3帧向模型传递一组输入参数
+    // 假设模型接收MissileID和TargetPos输入参数
+    // 其中TargetPos是一个包含三个float64型参数的结构体
+    //
+    // if (3 == current_ticks) {
+    //   std::unordered_map<std::string, std::any> input_params_;
+    //
+    //   uint64_t missile_id = 1001;
+    //   input_params_.emplace("MissileID", missile_id);
+    //
+    //   std::unordered_map<std::string, std::any> target_pos_ = {
+    //     {"longitude", 110.0},
+    //     {"latitude", 80.0},
+    //     {"altitude", 0.0}
+    //   };
+    //   input_params_.emplace("TargetPos", target_pos_);
+    //
+    //   if (!model_obj_->SetInput(input_params_)) {
+    //     std::cerr << "设置模型输入参数失败" << std::endl;
+    //     return false;
+    //   }
+    //
+    //   input_params_.clear();
+    // }
+
+    // 例2:
+    // 在第10~20帧中每帧向模型传递两组输入参数
+    // 输入参数为一个int64数组型参数
+    //
+    // if (10 <= current_ticks && 20 >= current_ticks) {
+    //   std::unordered_map<std::string, std::any> input_params_;
+    //
+    //   std::vector<std::any> target_id_list_ = {
+    //     (int64_t)2001, (int64_t)2002, (int64_t)2003
+    //   };
+    //   input_params_.emplace("TargetIdList", target_id_list_);
+    //
+    //   if (!model_obj_->SetInput(input_params_)) {
+    //     std::cerr << "设置模型输入参数失败" << std::endl;
+    //     return false;
+    //   }
+    //
+    //   input_params_.clear();
+    // }
 
     return true;
 }

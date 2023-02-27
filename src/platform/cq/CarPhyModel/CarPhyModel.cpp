@@ -1,3 +1,6 @@
+#include <string>
+#include <format>
+
 #include "CarPhyModel.h"
 #include "src/model/carbuilder.h"
 #include "src/model/tools/constant.hpp"
@@ -56,7 +59,7 @@ string getLibDir() {
 
 bool CarPhyModel::Init(const std::unordered_map<std::string, std::any> &value) {
     if (auto it = value.find("filePath"); it != value.end()) {
-        carphymodel::CarBuilder::buildFromFile(any_cast<string>(it->second), model);
+        carphymodel::CarBuilder::buildFromFile(any_cast<std::string>(it->second), model);
     } else {
         carphymodel::CarBuilder::buildFromFile(getLibDir() + "car.xml", model);
     }
@@ -157,6 +160,7 @@ bool CarPhyModel::SetInput(const std::unordered_map<std::string, std::any> &valu
             if (auto it = value.find("Param2"); it != value.end()) {
                 param2 = std::any_cast<double>(it->second);
             }
+            WriteLog(std::format("CarPhyModel model receive command {}({},{})", (uint64_t)command, param1, param2), 1);
             buffer->emplace(command, make_tuple(param1, param2));
             // TODO:
         }
