@@ -37,23 +37,22 @@ enum class COMMAND_TYPE {
     RADAR_SWITCH,
 };
 
-inline std::set<COMMAND_TYPE> NoParam{
-    COMMAND_TYPE::FORWARD,
-    COMMAND_TYPE::STOP,
-    COMMAND_TYPE::FREE_SHOOT,
-    COMMAND_TYPE::STOP_SHOOT,
-};
+inline size_t NoParamMask =
+    size_t(1) << static_cast<int>(COMMAND_TYPE::FORWARD) | size_t(1) << static_cast<int>(COMMAND_TYPE::STOP) |
+    size_t(1) << static_cast<int>(COMMAND_TYPE::FREE_SHOOT) | size_t(1) << static_cast<int>(COMMAND_TYPE::STOP_SHOOT);
 
-inline std::set<COMMAND_TYPE> SingleParam{
-    COMMAND_TYPE::ACCELERATE, COMMAND_TYPE::DECELERATE, COMMAND_TYPE::BACKWARD,
-    COMMAND_TYPE::TURN,       COMMAND_TYPE::UNLOCK,
-};
+inline size_t SingleParamMask =
+    size_t(1) << static_cast<int>(COMMAND_TYPE::ACCELERATE) | size_t(1) << static_cast<int>(COMMAND_TYPE::DECELERATE) |
+    size_t(1) << static_cast<int>(COMMAND_TYPE::BACKWARD) | size_t(1) << static_cast<int>(COMMAND_TYPE::TURN) |
+    size_t(1) << static_cast<int>(COMMAND_TYPE::UNLOCK);
 
-inline std::set<COMMAND_TYPE> DoubleParam{
-    COMMAND_TYPE::ACCELERATE_TURN, COMMAND_TYPE::DECELERATE_TURN, COMMAND_TYPE::BACK_TURN,
-    COMMAND_TYPE::SHOOT,           COMMAND_TYPE::LOCK_DIRECTION,  COMMAND_TYPE::LOCK_TARGET,
-    COMMAND_TYPE::RADAR_SWITCH,
-};
+inline size_t DoubleParamMask = size_t(1) << static_cast<int>(COMMAND_TYPE::ACCELERATE_TURN) |
+                                size_t(1) << static_cast<int>(COMMAND_TYPE::DECELERATE_TURN) |
+                                size_t(1) << static_cast<int>(COMMAND_TYPE::BACK_TURN) |
+                                size_t(1) << static_cast<int>(COMMAND_TYPE::SHOOT) |
+                                size_t(1) << static_cast<int>(COMMAND_TYPE::LOCK_DIRECTION) |
+                                size_t(1) << static_cast<int>(COMMAND_TYPE::LOCK_TARGET) |
+                                size_t(1) << static_cast<int>(COMMAND_TYPE::RADAR_SWITCH);
 
 } // namespace command
 
@@ -76,9 +75,8 @@ struct Sphere {
 
 // carprotection
 struct ProtectionModel {
-    constexpr static const char *token_list[] = {
-        "armor_top",    "armor_back",           "armor_side",
-        "armor_bottom", "activeProtectionAmmo", "reactiveArmor"};
+    constexpr static const char *token_list[] = {"armor_top",    "armor_back",           "armor_side",
+                                                 "armor_bottom", "activeProtectionAmmo", "reactiveArmor"};
     double armor_top;
     double armor_back;
     double armor_side;
@@ -103,8 +101,7 @@ enum class DAMAGE_LEVEL {
 };
 
 struct DamageModel {
-    constexpr static const char *token_list[] = {"-damageLevel", "functionalWeight",
-                                                 "structualWeight"};
+    constexpr static const char *token_list[] = {"-damageLevel", "functionalWeight", "structualWeight"};
     DAMAGE_LEVEL damageLevel;
     int functionalWeight;
     int structualWeight;
@@ -112,8 +109,7 @@ struct DamageModel {
 
 // TODO: index to prevent redundant processing?
 struct FireEvent {
-    constexpr static const char *token_list[] = {"weaponName", "target", "position",
-                                                 "velocity", "range"};
+    constexpr static const char *token_list[] = {"weaponName", "target", "position", "velocity", "range"};
     std::string weaponName;
     // 目标点的世界坐标
     Vector3 target;
@@ -126,8 +122,7 @@ struct FireEvent {
 };
 
 struct AngleZone {
-    constexpr static const char *token_list[] = {"yawLeft", "yawRight", "pitchUp",
-                                                 "pitchDown"};
+    constexpr static const char *token_list[] = {"yawLeft", "yawRight", "pitchUp", "pitchDown"};
     double yawLeft, yawRight, pitchUp, pitchDown;
     double &operator[](size_t index) { return (&yawLeft)[index]; };
     const double &operator[](size_t index) const { return (&yawLeft)[index]; };
@@ -150,8 +145,8 @@ enum class FIRE_UNIT_STATE {
 };
 
 struct Weapon {
-    constexpr static const char *token_list[] = {
-        "ammoType", "ammoRemain", "reloadingTime", "-reloadingState", "range", "speed"};
+    constexpr static const char *token_list[] = {"ammoType",        "ammoRemain", "reloadingTime",
+                                                 "-reloadingState", "range",      "speed"};
     std::string ammoType;
     int ammoRemain;
     double reloadingTime;
@@ -161,9 +156,8 @@ struct Weapon {
 };
 
 struct FireUnit {
-    constexpr static const char *token_list[] = {"-state",     "-data",         "fireZone",
-                                                 "rotateZone", "-directionNow", "rotateSpeed",
-                                                 "weapon"};
+    constexpr static const char *token_list[] = {"-state",        "-data",       "fireZone", "rotateZone",
+                                                 "-directionNow", "rotateSpeed", "weapon"};
     FIRE_UNIT_STATE state;
     double data;
     AngleZone fireZone;     //[yawLeft, yawRight, pitchUp, pitchDown]
@@ -238,9 +232,9 @@ struct CommandBuffer : public std::map<command::COMMAND_TYPE, std::any> {};
 
 struct EventBuffer : public std::unordered_map<std::string, std::any> {};
 
-using Components = ComponentManager<
-    SingletonComponent<Coordinate, DamageModel, CommandBuffer, EventBuffer, HitEventQueue,
-                       FireEventQueue, WheelMotionParamList, ScannedMemory, Sphere, Hull>,
-    NormalComponent<Coordinate, DamageModel, Block, ProtectionModel, FireUnit, SensorData>>;
+using Components =
+    ComponentManager<SingletonComponent<Coordinate, DamageModel, CommandBuffer, EventBuffer, HitEventQueue,
+                                        FireEventQueue, WheelMotionParamList, ScannedMemory, Sphere, Hull>,
+                     NormalComponent<Coordinate, DamageModel, Block, ProtectionModel, FireUnit, SensorData>>;
 
 }; // namespace carphymodel
