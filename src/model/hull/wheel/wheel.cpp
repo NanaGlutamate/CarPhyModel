@@ -28,9 +28,7 @@ double clamp(double value, double bound) {
     return value;
 }
 
-double softClamp(double value, double bound) {
-    return atan(value * (PI / 2.) / bound) / (PI / 2.) * bound;
-}
+double softClamp(double value, double bound) { return atan(value * (PI / 2.) / bound) / (PI / 2.) * bound; }
 
 double softClamp(double value, double min, double max) {
     double mid = (min + max) / 2;
@@ -75,15 +73,13 @@ namespace carphymodel {
 // 由于前轮转向需要时间，故速度也需要受最大侧向加速度约束
 // 控制方法：符合上述约束的条件下尽可能快速地向目标调整
 // TODO：倒车
-void WheelMoveSystem::tick(double dt, Coordinate &baseCoordinate, Hull &hull, double yaw_exp,
-                           double exp_speed, WheelMotionParamList &params) {
+void WheelMoveSystem::tick(double dt, Coordinate &baseCoordinate, Hull &hull, double yaw_exp, double exp_speed,
+                           WheelMotionParamList &params) {
     // 参数计算
     double speed = baseCoordinate.directionWorldToBody(hull.velocity).x;
-    double yaw_now =
-        Quaternion::fromCompressedQuaternion(baseCoordinate.attitude).getEuler().z;
+    double yaw_now = Quaternion::fromCompressedQuaternion(baseCoordinate.attitude).getEuler().z;
     // 目标偏航角与当前偏航角的差，目标偏右为正
-    double exp_yaw_diff =
-        angleDiff(yaw_exp, yaw_now); // atan2(local_exp_direction.y, local_exp_direction.x);
+    double exp_yaw_diff = angleDiff(yaw_exp, yaw_now); // atan2(local_exp_direction.y, local_exp_direction.x);
     // 倒车
     if (speed < 0)
         exp_yaw_diff = -exp_yaw_diff;
@@ -98,9 +94,7 @@ void WheelMoveSystem::tick(double dt, Coordinate &baseCoordinate, Hull &hull, do
     double angle_restriction = params.MAX_ANGLE;
     // 转弯加速度约束
     double acceleration_restriction_on_angle =
-        (fabs(speed) < INF_SMALL)
-            ? PI / 2
-            : atan(params.MAX_LATERAL_ACCELERATION * params.LENGTH / (speed * speed));
+        (fabs(speed) < INF_SMALL) ? PI / 2 : atan(params.MAX_LATERAL_ACCELERATION * params.LENGTH / (speed * speed));
     angle_restriction = fmin(angle_restriction, acceleration_restriction_on_angle);
     // 剩余回正时间约束
     double angular_speed = hull.palstance.norm() * sign(hull.palstance.z);
@@ -124,16 +118,14 @@ void WheelMoveSystem::tick(double dt, Coordinate &baseCoordinate, Hull &hull, do
 
     // 转弯速度太快，减速
     double restriction_rate = 1.;
-    if (equal(params.angle, rotate_restriction_on_angle) ||
-        equal(params.angle, acceleration_restriction_on_angle))
+    if (equal(params.angle, rotate_restriction_on_angle) || equal(params.angle, acceleration_restriction_on_angle))
         restriction_rate = 0.95;
     double speed_restriction = params.MAX_LINEAR_SPEED;
     // 最大侧向加速度约束下的最大速度
     double acceleration_restriction_on_speed =
         (fabs(params.angle) < INF_SMALL)
             ? params.MAX_LINEAR_SPEED
-            : restriction_rate * sqrt(params.MAX_LATERAL_ACCELERATION * params.LENGTH /
-                                      fabs(tan(params.angle)));
+            : restriction_rate * sqrt(params.MAX_LATERAL_ACCELERATION * params.LENGTH / fabs(tan(params.angle)));
     speed_restriction = fmin(speed_restriction, acceleration_restriction_on_speed);
     // TODO: 回正速度(time_last * params.ROTATE_SPEED >= params.MAX_ANGLE && aviliable_angle
     // >= params.MAX_ANGLE)
@@ -155,12 +147,10 @@ void WheelMoveSystem::tick(double dt, Coordinate &baseCoordinate, Hull &hull, do
     // 速度变化量
     double delta_speed;
     if (speed >= 0.) {
-        delta_speed = clamp(exp_speed - speed,
-                            (gravity_acceleration - params.MAX_BRAKE_ACCELERATION) * dt,
+        delta_speed = clamp(exp_speed - speed, (gravity_acceleration - params.MAX_BRAKE_ACCELERATION) * dt,
                             (gravity_acceleration + params.MAX_FRONT_ACCELERATION) * dt);
     } else {
-        delta_speed = clamp(exp_speed - speed,
-                            (gravity_acceleration - params.MAX_FRONT_ACCELERATION / 2) * dt,
+        delta_speed = clamp(exp_speed - speed, (gravity_acceleration - params.MAX_FRONT_ACCELERATION / 2) * dt,
                             (gravity_acceleration + params.MAX_BRAKE_ACCELERATION) * dt);
     }
     // 计算新速度和角速度
@@ -172,8 +162,7 @@ void WheelMoveSystem::tick(double dt, Coordinate &baseCoordinate, Hull &hull, do
     double new_angular_speed = new_speed * angularLinearRatio(params.angle, params.LENGTH);
     // 计算新朝向
     double dyaw = angular_speed * dt;
-    const Vector3 new_front_direction =
-        baseCoordinate.directionBodyToWorld(Vector3(cos(dyaw), sin(dyaw), 0.));
+    const Vector3 new_front_direction = baseCoordinate.directionBodyToWorld(Vector3(cos(dyaw), sin(dyaw), 0.));
     // 计算新位置
     const Vector3 new_position_unlanded = baseCoordinate.position + hull.velocity * dt;
     // 投影到地面
@@ -182,8 +171,7 @@ void WheelMoveSystem::tick(double dt, Coordinate &baseCoordinate, Hull &hull, do
     // 计算新随体坐标系姿态四元数
     double new_yaw = atan2(new_front_direction.y, new_front_direction.x);
     double new_pitch = atan(env.getSlope(new_position, new_front_direction));
-    double new_roll =
-        atan(env.getSlope(new_position, new_front_direction.out({0., 0., -1.})));
+    double new_roll = atan(env.getSlope(new_position, new_front_direction.out({0., 0., -1.})));
     const Quaternion new_altitude(new_roll, new_pitch, new_yaw);
     // 更新坐标系
     baseCoordinate.position = new_position;

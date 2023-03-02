@@ -75,12 +75,14 @@ struct Sphere {
 
 // carprotection
 struct ProtectionModel {
-    constexpr static const char *token_list[] = {"armor_top",    "armor_back",           "armor_side",
-                                                 "armor_bottom", "activeProtectionAmmo", "reactiveArmor"};
-    double armor_top;
+    constexpr static const char *token_list[] = {
+        "armor_front", "armor_back", "armor_side", "armor_bottom", "armor_top", "activeProtectionAmmo", "reactiveArmor",
+    };
+    double armor_front;
     double armor_back;
     double armor_side;
     double armor_bottom;
+    double armor_top;
     int activeProtectionAmmo;
     int reactiveArmor;
     // Block protectZone;
@@ -177,7 +179,7 @@ struct BaseInfo {
     constexpr static const char *token_list[] = {"type", "id", "side", "damageLevel"};
     enum class ENTITY_TYPE {
         CAR,
-        UNKNOWN,
+        UNKNOWN = -1,
     } type;
     VID id;
     SID side;
@@ -198,14 +200,16 @@ using CID = size_t;
 struct ScannedMemory : public std::map<VID, std::tuple<double, EntityInfo>> {};
 
 struct WheelMotionParamList {
-    constexpr static const char *token_list[] = {"-angle",
-                                                 "LENGTH",
-                                                 "MAX_ANGLE",
-                                                 "ROTATE_SPEED",
-                                                 "MAX_LINEAR_SPEED",
-                                                 "MAX_FRONT_ACCELERATION",
-                                                 "MAX_BRAKE_ACCELERATION",
-                                                 "MAX_LATERAL_ACCELERATION"};
+    constexpr static const char *token_list[] = {
+        "-angle",
+        "LENGTH",
+        "MAX_ANGLE",
+        "ROTATE_SPEED",
+        "MAX_LINEAR_SPEED",
+        "MAX_FRONT_ACCELERATION",
+        "MAX_BRAKE_ACCELERATION",
+        "MAX_LATERAL_ACCELERATION",
+    };
     // 车轮转角，右为正
     double angle;
     // 前后轴距

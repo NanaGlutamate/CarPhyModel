@@ -119,6 +119,7 @@ public:
                 ),
                 0
             )...};
+            // TODO: remove cache?
             int tmp2[sizeof...(Normals)] = {[&](){
                 constexpr size_t CURRENT_TYPE = type_list_index<Normals, Normals...>::value;
                 componentManager.entityComponentCache[CURRENT_TYPE].clear();
@@ -135,7 +136,7 @@ public:
         friend class ComponentManager;
         ComponentManager& componentManager;
         Modifier(ComponentManager& componentManager): componentManager(componentManager){
-            // TODO: multi-threading?
+            // TODO: multi-threading(mutex)?
             my_assert(!componentManager.lock, "Component Manager Locked");
             componentManager.lock = true;
         }

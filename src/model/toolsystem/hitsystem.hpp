@@ -25,8 +25,8 @@ public:
             auto& carPosition = c.getSpecificSingleton<Coordinate>()->position;
             auto direction = _fireEvent.target - _fireEvent.position;
             auto distance = carPosition - _fireEvent.position;
-            // 自己发的弹
-            if(distance.norm() <= 0.5)continue;
+            // // 自己发的弹
+            // if(distance.norm() <= 0.5)continue;
             if(((distance).out(direction)).norm() / direction.norm() < hitbox.r){
                 c.getSpecificSingleton<HitEventQueue>()->push_back(std::move(_fireEvent));
             }
