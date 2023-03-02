@@ -7,6 +7,17 @@
 #include "../tools/datastructure.hpp"
 
 namespace carphymodel::component{
+
+#if __cplusplus < 202002L
+
+template<typename Ty>
+using remove_cvref = typename std::remove_cv<typename std::remove_reference<Ty>::type>::type;
+
+#else
+
+using std::remove_cvref;
+
+#endif
     
 // #if __cplusplus >= 202002L
 
@@ -36,28 +47,39 @@ template<typename RETURN_TYPE> inline RETURN_TYPE componentDeserialize(rapidxml:
 template<typename T, size_t Index>
 inline void emplace(T& tar, rapidxml::xml_node<char>* node) {
     if constexpr (Index < pfr::tuple_size_v<T>) {
-        if constexpr (T::token_list[Index][0] == '!'){
-            return;
-        }else{
+        if constexpr (T::token_list[Index][0] != '!'){
             if constexpr(T::token_list[Index][0] == '-'){
                 pfr::get<Index>(tar) = {};
+            }else{
+                auto tmp = node->first_node(T::token_list[Index]);
+                if (tmp != 0) {
+                    pfr::get<Index>(tar) = componentDeserialize<typename remove_cvref<decltype(pfr::get<Index>(tar))>::type>(tmp);
+                }
+                else {
+                    pfr::get<Index>(tar) = {};
+                }
+                emplace<T, Index + 1>(tar, node);
             }
-            auto tmp = node->first_node(T::token_list[Index]);
-            if (tmp != 0) {
-                pfr::get<Index>(tar) = componentDeserialize<std::remove_reference_t<decltype(pfr::get<Index>(tar))>>(tmp);
-            }
-            else {
-                pfr::get<Index>(tar) = {};
-            }
-            emplace<T, Index + 1>(tar, node);
         }
     }
 }
+
+template<typename Ty> inline constexpr bool is_vector_v = false;
+template<typename T, typename A> inline constexpr bool is_vector_v<std::vector<T, A>> = true;
 
 template<typename RETURN_TYPE>
 inline RETURN_TYPE componentDeserialize(rapidxml::xml_node<char>* node){
     if constexpr (std::is_enum_v<RETURN_TYPE>){
         return (RETURN_TYPE)componentDeserialize<int>(node);
+    }else if constexpr (is_vector_v<RETURN_TYPE>){
+        RETURN_TYPE l;
+        decltype(RETURN_TYPE{}[0]) tmp;
+        auto name = node->name();
+        for(; node; node = node->next_sibling(name)){
+            emplace<typename remove_cvref<decltype(RETURN_TYPE{}[0])>::type, 0>(tmp, node);
+            l.push_back(tmp);
+        }
+        return l;
     }else{
         RETURN_TYPE tmp;
         emplace<RETURN_TYPE, 0>(tmp, node);
