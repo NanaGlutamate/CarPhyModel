@@ -20,8 +20,8 @@
         <DamageModel/>
         <FireUnit>
             <fireZone>
-                <yawLeft>3.14159265</yawLeft>
-                <yawRight>3.14159265</yawRight>
+                <yawLeft>4</yawLeft>
+                <yawRight>4</yawRight>
                 <pitchUp>0.34906585</pitchUp>
                 <pitchDown>0.174532925</pitchDown>
             </fireZone>
