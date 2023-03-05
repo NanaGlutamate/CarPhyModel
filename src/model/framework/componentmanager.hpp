@@ -76,7 +76,7 @@ public:
     using SingletonComponentTypes = SingletonComponent<Singletons...>;
     using NormalComponentTypes = NormalComponent<Normals...>;
 
-    ComponentManager(): lock(false), entityCounter(0), normalComponents(), singletonComponents(), entityGroupCache(), entityComponentCache(){};
+    ComponentManager(): lock(false), entityCounter(0), normalComponents(), singletonComponents(), entityGroupCache()/*, entityComponentCache()*/{};
 
     class Modifier{
     public:
@@ -120,15 +120,15 @@ public:
                 0
             )...};
             // TODO: remove cache?
-            int tmp2[sizeof...(Normals)] = {[&](){
-                constexpr size_t CURRENT_TYPE = type_list_index<Normals, Normals...>::value;
-                componentManager.entityComponentCache[CURRENT_TYPE].clear();
-                auto& v = std::get<CURRENT_TYPE>(componentManager.normalComponents);
-                for(size_t i = 0; i < v.size(); ++i){
-                    componentManager.entityComponentCache[CURRENT_TYPE].emplace(v[i].first, i);
-                }
-                return 0;
-            }()...};
+            // int tmp2[sizeof...(Normals)] = {[&](){
+            //     constexpr size_t CURRENT_TYPE = type_list_index<Normals, Normals...>::value;
+            //     componentManager.entityComponentCache[CURRENT_TYPE].clear();
+            //     auto& v = std::get<CURRENT_TYPE>(componentManager.normalComponents);
+            //     for(size_t i = 0; i < v.size(); ++i){
+            //         componentManager.entityComponentCache[CURRENT_TYPE].emplace(v[i].first, i);
+            //     }
+            //     return 0;
+            // }()...};
             componentManager.entityGroupCache.clear();
             componentManager.lock = false;
         };
@@ -160,9 +160,14 @@ public:
         my_assert(!lock, "Component Manager Locked");
         static_assert(type_list_contains_v<ComponentType, Normals...>,
             "component manager doesnot contain normal component of that type");
-        auto& cache = entityComponentCache[type_list_index<ComponentType, Normals...>::value];
-        if(auto it = cache.find(ID); it != cache.end()){return std::get<std::vector<std::pair<size_t, ComponentType>>>(normalComponents)[it->second].second;}
-        else{return std::nullopt;}
+        // auto& cache = entityComponentCache[type_list_index<ComponentType, Normals...>::value];
+        // if(auto it = cache.find(ID); it != cache.end()){return std::get<std::vector<std::pair<size_t, ComponentType>>>(normalComponents)[it->second].second;}
+        // else{return std::nullopt;}
+        using TargetType = std::vector<std::pair<size_t, ComponentType>>;
+        auto& specific = std::get<TargetType>(normalComponents);
+        if(auto it = std::find_if(specific.begin(), specific.end(), [](auto it){return it->first==ID;}); it!=specific.end()){
+            return it->second;
+        }else{return std::nullopt;}
     };
     
     template <typename ...ComponentTypes>
@@ -209,7 +214,7 @@ private:
     // entity group ID -> list of entity id which fits this group
     std::map<size_t, std::vector<size_t>> entityGroupCache;
     // ComponentType -> entity ID -> index of component belonging to this entity
-    std::array<std::map<size_t, size_t>, sizeof...(Normals)> entityComponentCache;
+    // std::array<std::map<size_t, size_t>, sizeof...(Normals)> entityComponentCache;
 
     // private function to build entity id cache for specific entity group
     template<typename ...Ty>
