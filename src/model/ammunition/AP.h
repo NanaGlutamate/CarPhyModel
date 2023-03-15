@@ -14,6 +14,7 @@ public:
     //! @param rangeSpeedTable: {{range, speed}}, unused
     APDamage(const std::array<double, 3>& damageTable, const std::vector<std::tuple<double, double>>& rangeSpeedTable={}): damageTable(damageTable), rangeSpeedTable(rangeSpeedTable){};
     virtual void updateDamage(DamageModel& pdm, const Block& size, const Coordinate& coordinate, const Vector3& pos, const Vector3& dir, const Vector3& vel, double range) const override;
+    virtual void updateDamage(const FireEvent& fireEvent, const Components& c) const override;
 };
 
 };

@@ -25,7 +25,7 @@ class FireControlSystem : public System {
             if (_damageModel.damageLevel != DAMAGE_LEVEL::N || _damageModel.damageLevel != DAMAGE_LEVEL::M)
                 continue;
             auto &&info = c.getSpecificSingleton<ScannedMemory>().value();
-            updateFireUnitRotate();
+            // updateFireUnitRotate(_fireUnit);
             updateWeaponReloading(_fireUnit, dt);
             // TODO: MULTI_SHOOT with no target avaliable
             // TODO: rotate and lock

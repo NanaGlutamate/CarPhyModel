@@ -24,9 +24,15 @@ namespace carphymodel {
 
 void HullSystem::tick(double dt, Components &c) {
     using namespace std;
-    auto &optParam = c.getSpecificSingleton<WheelMotionParamList>();
-    if (!optParam.has_value())
+    auto &damage = c.getSpecificSingleton<DamageModel>().value();
+    if (damage.damageLevel == DAMAGE_LEVEL::K || damage.damageLevel == DAMAGE_LEVEL::KK){
         return;
+    }
+
+    auto &optParam = c.getSpecificSingleton<WheelMotionParamList>();
+    if (!optParam.has_value()){
+        return;
+    }
     // TODO: track
     auto &param = optParam.value();
 
@@ -35,7 +41,7 @@ void HullSystem::tick(double dt, Components &c) {
     double direction = Quaternion::fromCompressedQuaternion(coordinate.attitude).getEuler().z;
     double speed = c.getSpecificSingleton<Hull>()->velocity.norm();
     for (auto &&[k, v] : c.getSpecificSingleton<CommandBuffer>().value()) {
-        if (validMovingCommandMask & size_t(1) << static_cast<int>(k) == 0) {
+        if ((validMovingCommandMask & size_t(1) << static_cast<int>(k)) == 0) {
             continue;
         }
         auto [param1, param2] = any_cast<tuple<double, double>>(v);

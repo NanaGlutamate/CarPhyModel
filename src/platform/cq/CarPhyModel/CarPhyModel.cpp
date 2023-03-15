@@ -135,16 +135,17 @@ bool CarPhyModel::Tick(double time) {
 }
 
 bool CarPhyModel::SetInput(const std::unordered_map<std::string, std::any> &value) {
-    carphymodel::VID ID;
     for (auto &&[k, v] : value) {
         if (k == "EntityInfo") {
-            ID = any_cast<carphymodel::VID>(value.find("ID")->second);
+            carphymodel::VID ID = any_cast<carphymodel::VID>(value.find("ID")->second);
             EntityInfo tmp;
             tmp.FromValueMap(any_cast<CSValueMap>(v));
             get<1>((
                 *(model.components.getSpecificSingleton<carphymodel::ScannedMemory>()))[ID]) =
                 tmp;
         } else if (k == "FireData") {
+            carphymodel::VID ID = any_cast<carphymodel::VID>(value.find("ID")->second);
+            if (ID == GetID()) { continue; }
             FireEvent tmp;
             tmp.FromValueMap(any_cast<CSValueMap>(v));
             model.components.getSpecificSingleton<carphymodel::FireEventQueue>()->push_back(

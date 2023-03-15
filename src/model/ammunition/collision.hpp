@@ -65,9 +65,9 @@ inline IntersectionInfo rayCollision(const Vector3 &dir, const Vector3 &pos, con
 inline IntersectionInfo segmentCollision(const Vector3 &pos1, const Vector3 &pos2, const Block &size,
                                          const Coordinate &coordinate) {
     auto dir = pos2 - pos1;
-    double l = dir.norm();
+    double length = dir.norm();
     auto tmp = lineCollision(dir, pos1, size, coordinate);
-    if (tmp.depthMin < 0 || tmp.depthMax > l) {
+    if (tmp.depthMin < 0 || tmp.depthMax > length) {
         return NotHitInfo;
     }
     return tmp;

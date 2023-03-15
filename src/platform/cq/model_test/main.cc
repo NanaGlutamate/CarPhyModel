@@ -127,8 +127,8 @@ int main(int argc, char *argv[]) {
     // #else
     //   std::string lib_path_ = exe_dir_ + "/models/test-model-id/" + lib_name_;
     // #endif
-    std::string lib_path_ = "D:/Desktop/FinalProj/Code/CarPhyModel/bin/Debug/"
-                            "CarPhyModel_debug.dll";
+    std::string lib_path_ = "D:/Desktop/FinalProj/Code/CarPhyModel/bin/";
+    lib_path_ += "CarPhyModel_debug.dll";
 
 #ifdef _WIN32
     auto hmodule = LoadLibraryExA(lib_path_.c_str(), NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
