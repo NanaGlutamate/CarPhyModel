@@ -1,44 +1,75 @@
 ﻿#include "HE.h"
 #include "../tools/constant.hpp"
+#include "collision.hpp"
 
-namespace{
-    
+namespace {
+
 using namespace carphymodel;
 
-// 计算毁伤碰撞盒与球距离
-double collision(
-    const Vector3& pos, 
-    const Block& size, 
-    const Coordinate& coordinate){
-    const Vector3 pos_local = coordinate.positionWorldToBody(pos);
-    double r2 = 0.;
-    for(size_t i=0; i<3; ++i){
-        if(pos_local[i] < -size[i] / 2.)r2 += pow(pos_local[i] + size[i] / 2., 2);
-        if(pos_local[i] > size[i] / 2.)r2 += pow(pos_local[i] - size[i] / 2., 2);
+inline void update(DAMAGE_LEVEL &tar, DAMAGE_LEVEL newDamage) {
+    if (newDamage > tar) {
+        tar = newDamage;
     }
-    return sqrt(r2);
 }
 
+} // namespace
+
+namespace carphymodel {
+
+// no damage if any armor between explosion point and damage model
+void HEDamage::updateDamage(const FireEvent &fireEvent, Components &c) const {
+
+    auto velocity = c.getSpecificSingleton<Coordinate>()->directionWorldToBody(fireEvent.velocity);
+    auto position = c.getSpecificSingleton<Coordinate>()->positionWorldToBody(fireEvent.position);
+
+    for (auto [id, protection] : c.getNormal<ProtectionModel>()) {
+        if (protection.activeProtectionAmmo) {
+            protection.activeProtectionAmmo--;
+            return;
+        }
+    }
+
+    // depth when projectile explode, which is the depth when meet first block
+    double depthExplode = -1.;
+    for (auto [id, block, coordinate] : c.getNormal<Block, Coordinate>()) {
+        auto inter = rayCollision(velocity, position, block, coordinate);
+        if (!inter.isCollision()) {
+            continue;
+        }
+        if (depthExplode == -1.) {
+            depthExplode = inter.depthMin;
+        } else {
+            depthExplode = fmin(depthExplode, inter.depthMin);
+        }
+    }
+    if (depthExplode == -1.) {
+        // not hit
+        return;
+    }
+    auto explosionPoint = position + velocity * depthExplode;
+
+    for (auto [id, damage, coordinate] : c.getNormal<DamageModel, Coordinate>()) {
+        if (damage.damageLevel == DAMAGE_LEVEL::KK) {
+            continue;
+        }
+        // use lambda to interupt damage calculation if protection available
+        [&]() {
+            for (auto [_id, _protection, _block, _coordinate] : c.getNormal<ProtectionModel, Block, Coordinate>()) {
+                auto inter = segmentCollision(position, coordinate.position, _block, _coordinate);
+                if (inter.isCollision()) {
+                    return;
+                }
+            }
+            auto radius = (explosionPoint - coordinate.position).norm();
+            if (radius <= damageTable[0]) {
+                damage.damageLevel = DAMAGE_LEVEL::KK;
+            } else if (radius <= damageTable[1]) {
+                update(damage.damageLevel, DAMAGE_LEVEL::K);
+            } else if (radius <= damageTable[2]) {
+                update(damage.damageLevel, DAMAGE_LEVEL::M);
+            }
+        }();
+    }
 }
 
-namespace carphymodel{
-
-void HEDamage::updateDamage(
-    DamageModel& pdm, 
-    const Block& size,
-    const Coordinate& coordinate, 
-    const Vector3& pos, 
-    const Vector3& dir, 
-    const Vector3& vel, 
-    double range) const{
-    auto radius = collision(pos, size, coordinate);
-    if(radius <= damageTable[0]){
-        pdm.damageLevel = DAMAGE_LEVEL::KK;
-    }else if(radius <= damageTable[1]){
-        if(pdm.damageLevel < DAMAGE_LEVEL::K)pdm.damageLevel = DAMAGE_LEVEL::K;
-    }else if(radius <= damageTable[2]){
-        if(pdm.damageLevel < DAMAGE_LEVEL::M)pdm.damageLevel = DAMAGE_LEVEL::M;
-    }
-};
-
-};
+} // namespace carphymodel

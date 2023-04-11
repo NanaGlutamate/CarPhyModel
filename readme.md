@@ -16,3 +16,8 @@
 2. 实体信息EntityInfo
 3. 毁伤等级DAMAGE_LEVEL
 4. 开火事件FireEvent
+
+### 组件约束
+
+1. Protection组件必须与Block和Coordinate一同出现
+2. Damage组件必须与Block和Coordinate一同出现

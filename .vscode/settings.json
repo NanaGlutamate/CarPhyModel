@@ -79,6 +79,8 @@
         "regex": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "set": "cpp"
+        "set": "cpp",
+        "ranges": "cpp",
+        "span": "cpp"
     }
 }

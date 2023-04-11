@@ -6,15 +6,15 @@
 namespace carphymodel{
 
 // AP
-class APDamage : public AmmunitionDamage{
-    std::array<double, 3> damageTable;
-    std::vector<std::tuple<double, double>> rangeSpeedTable;
+class APDamage final : public AmmunitionDamage{
 public:
-    //! @param damageTable: {KK range, K range, M range}
-    //! @param rangeSpeedTable: {{range, speed}}, unused
-    APDamage(const std::array<double, 3>& damageTable, const std::vector<std::tuple<double, double>>& rangeSpeedTable={}): damageTable(damageTable), rangeSpeedTable(rangeSpeedTable){};
-    virtual void updateDamage(DamageModel& pdm, const Block& size, const Coordinate& coordinate, const Vector3& pos, const Vector3& dir, const Vector3& vel, double range) const override;
-    virtual void updateDamage(const FireEvent& fireEvent, const Components& c) const override;
+    /// @brief damage table, {KK range, K range, M range}
+    std::array<double, 3> damageTable;
+    /// @brief piercing ability of current ammunition, meter
+    double piercingAbility;
+    
+    // virtual void updateDamage(DamageModel& pdm, const Block& size, const Coordinate& coordinate, const Vector3& pos, const Vector3& dir, const Vector3& vel, double range) const override;
+    virtual void updateDamage(const FireEvent& fireEvent, Components& c) const override;
 };
 
 };

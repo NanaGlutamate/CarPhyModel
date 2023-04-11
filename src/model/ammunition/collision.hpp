@@ -1,13 +1,17 @@
 #pragma once
 
-#include "../tools/constant.hpp"
-#include "../tools/datastructure.hpp"
+#include <array>
 #include <cmath>
 #include <tuple>
 
+#include "../tools/constant.hpp"
+#include "../tools/datastructure.hpp"
+
 namespace carphymodel {
 
+/// @brief collision result
 struct IntersectionInfo {
+    /// @brief depth range of collision, use dir.norm() as unit
     double depthMin, depthMax;
     enum class HIT_SURFACE {
         FRONT = 0,
@@ -21,11 +25,36 @@ struct IntersectionInfo {
     bool isCollision() { return hitSurface != HIT_SURFACE::NOT_HIT; }
 };
 
+/// @brief not hit info
 inline constexpr IntersectionInfo NotHitInfo{0, 0, IntersectionInfo::HIT_SURFACE::NOT_HIT};
 
+/**
+ * @brief get armor thickness of a block in 6 direction
+ * 
+ * @param pm armor block
+ * @return std::array<double, 6> 
+ */
+inline constexpr std::array<double, 6> getSideArmor(const ProtectionModel &pm) {
+    return std::array<double, 6>{pm.armor_front, pm.armor_back,   pm.armor_side,
+                                 pm.armor_side,  pm.armor_bottom, pm.armor_top};
+}
+
+/// @brief unit normal vector of 6 direction
+inline constexpr std::array<Vector3, 6> directionVector{
+    Vector3{1, 0, 0}, Vector3{-1, 0, 0}, Vector3{0, 1, 0}, Vector3{0, -1, 0}, Vector3{0, 0, 1}, Vector3{0, 0, -1},
+};
+
+/**
+ * @brief get collision result of a line with a block
+ * 
+ * @param dir direction of the line
+ * @param pos start position of the line
+ * @param size block size
+ * @param coordinate base coordinate of the block
+ * @return IntersectionInfo collision result
+ */
 inline IntersectionInfo lineCollision(const Vector3 &dir, const Vector3 &pos, const Block &size,
                                       const Coordinate &coordinate) {
-
     const Vector3 dir_local = coordinate.directionWorldToBody(dir);
     const Vector3 pos_local = coordinate.positionWorldToBody(pos);
     IntersectionInfo::HIT_SURFACE tmp = IntersectionInfo::HIT_SURFACE::NOT_HIT;
@@ -41,7 +70,7 @@ inline IntersectionInfo lineCollision(const Vector3 &dir, const Vector3 &pos, co
             const double d_min_tmp = fmin(d1, d2), d_max_tmp = fmax(d1, d2);
             if (d_min_tmp > depth_min) {
                 depth_min = d_min_tmp;
-                tmp = static_cast<IntersectionInfo::HIT_SURFACE>(i * 2 + (d1 > d2) ? 1 : 0);
+                tmp = static_cast<IntersectionInfo::HIT_SURFACE>(i * 2 + ((d1 > d2) ? 1 : 0));
             }
             depth_max = fmin(depth_max, d_max_tmp);
         }
@@ -53,27 +82,55 @@ inline IntersectionInfo lineCollision(const Vector3 &dir, const Vector3 &pos, co
     }
 }
 
+/**
+ * @brief get collision result of a ray with a block
+ * 
+ * @param dir direction of the ray
+ * @param pos start position of the ray
+ * @param size block size
+ * @param coordinate base coordinate of the block
+ * @return IntersectionInfo collision result
+ */
 inline IntersectionInfo rayCollision(const Vector3 &dir, const Vector3 &pos, const Block &size,
                                      const Coordinate &coordinate) {
     auto tmp = lineCollision(dir, pos, size, coordinate);
-    if (tmp.depthMin < 0) {
+    tmp.depthMin = fmax(tmp.depthMin, 0.);
+    if (tmp.depthMax < tmp.depthMin) {
         return NotHitInfo;
     }
     return tmp;
 }
 
+/**
+ * @brief get collision result of a segment with a block
+ * 
+ * @param pos1 start position of the segment
+ * @param pos2 end position of the segment
+ * @param size block size
+ * @param coordinate base coordinate of the block
+ * @return IntersectionInfo collision result, dir.norm() is 1
+ */
 inline IntersectionInfo segmentCollision(const Vector3 &pos1, const Vector3 &pos2, const Block &size,
                                          const Coordinate &coordinate) {
     auto dir = pos2 - pos1;
     double length = dir.norm();
-    auto tmp = lineCollision(dir, pos1, size, coordinate);
-    if (tmp.depthMin < 0 || tmp.depthMax > length) {
+    auto tmp = lineCollision(dir / length, pos1, size, coordinate);
+    tmp.depthMin = fmax(tmp.depthMin, 0.);
+    tmp.depthMax = fmin(tmp.depthMax, length);
+    if (tmp.depthMax < tmp.depthMin) {
         return NotHitInfo;
     }
     return tmp;
 }
 
-// distance between Vector3 and Block
+/**
+ * @brief get distance between point and Block
+ * 
+ * @param pos point
+ * @param size block size
+ * @param coordinate base coordinate of the block
+ * @return double distance
+ */
 inline double pointBlockDistance(const Vector3 &pos, const Block &size, const Coordinate &coordinate) {
     const Vector3 pos_local = coordinate.positionWorldToBody(pos);
     double r2 = 0.;

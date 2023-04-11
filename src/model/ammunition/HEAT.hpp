@@ -5,6 +5,6 @@
 namespace carphymodel{
 
 // HEAT
-class HEATDamage : public APDamage{};
+using HEATDamage = APDamage;
 
 };

@@ -1,60 +1,78 @@
-#include "AP.h"
+#include <algorithm>
+#include <cmath>
+#include <map>
+#include <ranges>
+#include <tuple>
+#include <vector>
+
 #include "../tools/constant.hpp"
-
-namespace {
-
-using namespace carphymodel;
-
-// array collision with AABB
-std::tuple<double, bool> collision(const Vector3 &dir, const Vector3 &pos, const Block &size,
-                                   const Coordinate &coordinate) {
-    using std::fabs;
-    using std::fmax;
-    using std::fmin;
-    const Vector3 dir_local = coordinate.directionWorldToBody(dir);
-    const Vector3 pos_local = coordinate.positionWorldToBody(pos);
-    double depth_min = 0, depth_max = INF_BIG;
-    for (size_t i = 0; i < 3; ++i) {
-        if (fabs(dir_local[i]) < INF_SMALL) {
-            if (pos_local[i] < -size[i] / 2. || pos_local[i] > size[i] / 2.) {
-                return std::make_tuple(0., false);
-            }
-        } else {
-            const double d1 = (size[i] / 2. - pos_local[i]) / dir_local[i];
-            const double d2 = (-size[i] / 2. - pos_local[i]) / dir_local[i];
-            depth_min = fmax(depth_min, fmin(d1, d2));
-            depth_max = fmin(depth_max, fmax(d1, d2));
-        }
-    }
-    return std::make_tuple(depth_min, depth_max > depth_min);
-}
-
-void updateDamage(DAMAGE_LEVEL) {}
-
-} // namespace
+#include "../tools/myrandom.hpp"
+#include "AP.h"
+#include "collision.hpp"
 
 namespace carphymodel {
 
-void APDamage::updateDamage(DamageModel &pdm, const Block &size, const Coordinate &coordinate, const Vector3 &pos,
-                            const Vector3 &dir, const Vector3 &vel, double range) const {
-    auto [depth, is_hit] = collision(vel, pos, size, coordinate);
-    if (is_hit) {
-        // TODO: calculate speed with look-up-table
-        const double speed = vel.norm();
-        // calculate damage with look-up-table
-        if (speed >= damageTable[0]) {
-            pdm.damageLevel = DAMAGE_LEVEL::KK;
-        } else if (speed >= damageTable[1]) {
-            if (pdm.damageLevel < DAMAGE_LEVEL::K)
-                pdm.damageLevel = DAMAGE_LEVEL::K;
-        } else if (speed >= damageTable[2]) {
-            if (pdm.damageLevel < DAMAGE_LEVEL::M)
-                pdm.damageLevel = DAMAGE_LEVEL::M;
+void APDamage::updateDamage(const FireEvent &fireEvent, Components &c) const {
+
+    auto velocity = c.getSpecificSingleton<Coordinate>()->directionWorldToBody(fireEvent.velocity);
+    auto position = c.getSpecificSingleton<Coordinate>()->positionWorldToBody(fireEvent.position);
+
+    // calculate all collision with protection model
+    std::vector<std::tuple<ProtectionModel &, IntersectionInfo>> collisionWithProtection;
+    for (auto [id, protection, block, coordinate] : c.getNormal<ProtectionModel, Block, Coordinate>()) {
+        auto inter = rayCollision(velocity, position, block, coordinate);
+        if (!inter.isCollision()) {
+            continue;
+        }
+        collisionWithProtection.emplace_back(protection, inter);
+    }
+    std::ranges::sort(collisionWithProtection, {}, [](auto &a) { return std::get<1>(a).depthMin; });
+
+    // max depth, after which the projectile will disarmed
+    double depthMax;
+    // // depth of first protection
+    // double depthMin;
+    double piercing = piercingAbility;
+
+    // process collision with protection model
+    for (auto &[protection, inter] : collisionWithProtection) {
+        // TODO: log?
+        if (protection.activeProtectionAmmo) {
+            protection.activeProtectionAmmo--;
+            depthMax = inter.depthMin;
+            break;
+        }
+        if (protection.reactiveArmor && rand() < protection.coverageRate) {
+            protection.reactiveArmor--;
+            depthMax = inter.depthMin;
+            protection.coverageRate *= protection.reactiveArmor / (protection.reactiveArmor + 1);
+            break;
+        }
+        double armor = getSideArmor(protection)[static_cast<unsigned int>(inter.hitSurface)];
+        // nega unit normal vector of each surface
+        auto direction = -1 * directionVector[static_cast<unsigned int>(inter.hitSurface)];
+        // armor / cos(theta)
+        piercing -= armor / ((velocity.dot(direction)) / velocity.norm());
+        if (piercing <= 0.) {
+            depthMax = inter.depthMin;
+            break;
         }
     }
-    return;
-}
 
-void APDamage::updateDamage(const FireEvent &fireEvent, const Components &c) const {}
+    for (auto [id, damage, block, coordinate] : c.getNormal<DamageModel, Block, Coordinate>()) {
+        if(damage.damageLevel == DAMAGE_LEVEL::KK){
+            continue;
+        }
+        auto inter = rayCollision(velocity, position, block, coordinate);
+        if (!inter.isCollision() || inter.depthMin >= depthMax) {
+            continue;
+        }
+        if (damage.damageLevel == DAMAGE_LEVEL::K){
+            damage.damageLevel = DAMAGE_LEVEL::KK;
+        }else{
+            damage.damageLevel = DAMAGE_LEVEL::K;
+        }
+    }
+}
 
 } // namespace carphymodel

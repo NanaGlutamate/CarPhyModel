@@ -73,19 +73,27 @@ struct Sphere {
     double r;
 };
 
-// carprotection
+/**
+ * @brief protection model, used in damage calculation of ammunition
+ *
+ */
 struct ProtectionModel {
     constexpr static const char *token_list[] = {
-        "armor_front", "armor_back", "armor_side", "armor_bottom", "armor_top", "activeProtectionAmmo", "reactiveArmor",
+        "armor_front", "armor_back",           "armor_side",    "armor_bottom",
+        "armor_top",   "activeProtectionAmmo", "reactiveArmor", "coverageRate",
     };
+    // armor thickness of each side
     double armor_front;
     double armor_back;
     double armor_side;
     double armor_bottom;
     double armor_top;
+    // counter of active protection ammo
     int activeProtectionAmmo;
+    // counter of reactive armor
     int reactiveArmor;
-    // Block protectZone;
+    // rate of surface area which covered by reactive armor
+    double coverageRate;
 };
 
 // carhull
