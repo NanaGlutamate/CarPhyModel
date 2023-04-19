@@ -84,12 +84,6 @@ int test_main() {
                 if (tick == 2000) {
                     break;
                 }
-                if(tick == 450){
-                    ;
-                }
-                if (coordinate.position.x > 10.) {
-                    ;
-                }
                 target.tick(dt);
                 WheelMoveSystem::tick(dt, coordinate, hull, direction, speed, param);
                 // std::cout << hull.velocity.norm() << ",";

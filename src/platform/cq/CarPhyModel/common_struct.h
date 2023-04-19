@@ -127,6 +127,17 @@ class EntityInfo {
         };
     }
 
+    EntityInfo() = default;
+
+    EntityInfo(const carphymodel::EntityInfo& e) {
+        baseInfo.damageLevel = static_cast<uint16_t>(e.baseInfo.damageLevel);
+        baseInfo.id = e.baseInfo.id;
+        baseInfo.side = e.baseInfo.side;
+        baseInfo.type = static_cast<uint16_t>(e.baseInfo.type);
+        position = e.position;
+        velocity = e.velocity;
+    }
+
   public:
     // baseInfo
     BaseInfo baseInfo;
@@ -202,4 +213,37 @@ class FireEvent {
     Vector3 velocity;
     // weaponName
     std::string weaponName;
+};
+
+// WeaponInfo
+struct WeaponInfo {
+    int32_t ammo;
+    double reloadingState;
+    double range;
+    // yaw, deg
+    double direction;
+    std::string weaponName;
+    CSValueMap ToValueMap() const {
+        CSValueMap value;
+        value.emplace("ammo", ammo);
+        value.emplace("reloadingState", reloadingState);
+        value.emplace("range", range);
+        value.emplace("direction", direction);
+        value.emplace("weaponName", weaponName);
+        return value;
+    }
+    void FromValueMap(const CSValueMap &value) {
+        for (auto &it : value) {
+            if (it.first == "ammo")
+                ammo = std::any_cast<int>(it.second);
+            if (it.first == "reloadingState")
+                reloadingState = std::any_cast<double>(it.second);
+            if (it.first == "range")
+                range = std::any_cast<double>(it.second);
+            if (it.first == "direction")
+                direction = std::any_cast<double>(it.second);
+            if (it.first == "weaponName")
+                weaponName = std::any_cast<std::string>(it.second);
+        }
+    }
 };

@@ -21,3 +21,4 @@
 
 1. Protection组件必须与Block和Coordinate一同出现
 2. Damage组件必须与Block和Coordinate一同出现
+3. Sensor组件必须与Damage一同出现

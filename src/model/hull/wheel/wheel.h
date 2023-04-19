@@ -17,15 +17,15 @@ public:
     //! @param dt: 上一次调用后的时间
     //! @param baseCoordinate: 车辆随体坐标系
     //! @param hull: 运动参数：速度、角速度、质量、转动惯量
-    //! @param exp_direction: 期望方向
-    //! @param exp_speed: 期望速度
+    //! @param expectYaw: 期望方向
+    //! @param expectSpeed: 期望速度
     //! @param params: 车辆运动参数
     static void tick(
         double dt, 
         Coordinate& baseCoordinate, 
         Hull& hull, 
-        double yaw_exp, 
-        double exp_speed, 
+        double expectYaw, 
+        double expectSpeed, 
         WheelMotionParamList& params
     );
 
@@ -33,8 +33,8 @@ public:
         double dt, 
         Coordinate& baseCoordinate, 
         Hull& hull, 
-        double exp_angle, 
-        double exp_speed, 
+        double expectYaw, 
+        double expectSpeed, 
         WheelMotionParamList& params
     ){};
 };

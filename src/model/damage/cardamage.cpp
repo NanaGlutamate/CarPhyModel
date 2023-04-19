@@ -4,22 +4,6 @@
 #include "../tools/constant.hpp"
 #include "cardamage.h"
 
-namespace {
-
-template <typename Ty> size_t argmaxRight(Ty list) {
-    size_t index = 0;
-    auto value = list[0];
-    for (size_t i = 1; i < list.size(); ++i) {
-        if (list[i] > value) {
-            value = list[i];
-            index = i;
-        }
-    }
-    return index;
-}
-
-} // namespace
-
 namespace carphymodel {
 
 void DamageSystem::tick(double dt, Components &c) {
@@ -49,12 +33,15 @@ void DamageSystem::tick(double dt, Components &c) {
     }
 
     DAMAGE_LEVEL tmp = DAMAGE_LEVEL::N;
-    if (totalFunction != 0 && double(loseFunction) / totalFunction >= 0.4)
+    if (totalFunction != 0 && double(loseFunction) / totalFunction >= 0.4) {
         tmp = DAMAGE_LEVEL::M;
-    if (totalFunction != 0 && double(loseFunction) / totalFunction >= 0.7)
+    }
+    if (totalFunction != 0 && double(loseFunction) / totalFunction >= 0.7) {
         tmp = DAMAGE_LEVEL::K;
-    if (totalStructure != 0 && double(loseStructure) / totalStructure >= 0.8)
+    }
+    if (totalStructure != 0 && double(loseStructure) / totalStructure >= 0.8) {
         tmp = DAMAGE_LEVEL::KK;
+    }
 
     auto &totalDamage = c.getSpecificSingleton<DamageModel>();
     if (!totalDamage.has_value()) {

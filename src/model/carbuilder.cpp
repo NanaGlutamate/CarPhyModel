@@ -98,7 +98,7 @@ void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model){
         model.systems.push_back(std::make_unique<BallisticSystem>());
         model.systems.push_back(std::make_unique<HitSystem>());
 
-        model.systems.push_back(std::make_unique<ProtectionSystem>());
+        // model.systems.push_back(std::make_unique<ProtectionSystem>());
         model.systems.push_back(std::make_unique<DamageSystem>());
 
         model.systems.push_back(std::make_unique<HullSystem>());

@@ -13,7 +13,10 @@ namespace carphymodel{
 
 void SensorSystem::tick(double dt, Components& c)
 {
-    for(auto& x : c.getSpecificSingleton<ScannedMemory>().value()){
+    auto& mem = c.getSpecificSingleton<ScannedMemory>().value();
+    auto& baseCoordinate = c.getSpecificSingleton<Coordinate>().value();
+    auto& hull = c.getSpecificSingleton<Hull>().value();
+    for(auto& x : mem){
         std::get<0>(x.second) += dt;
     }
     for(auto&& [id, _sensor, _damage] : c.getNormal<SensorData, DamageModel>()){
@@ -21,9 +24,7 @@ void SensorSystem::tick(double dt, Components& c)
             continue;
         }
         auto sensor = SensorFactory::getProduct(_sensor.type);
-        auto& baseCoordinate = c.getSpecificSingleton<Coordinate>().value();
-        auto& hull = c.getSpecificSingleton<Hull>().value();
-        for(auto&& [vid, _entityInfo] : c.getSpecificSingleton<ScannedMemory>().value()){
+        for(auto&& [vid, _entityInfo] : mem){
             if(std::get<0>(_entityInfo) != 0. && 
                 sensor->isDetectable(baseCoordinate, std::get<1>(_entityInfo), _sensor, hull))
             {

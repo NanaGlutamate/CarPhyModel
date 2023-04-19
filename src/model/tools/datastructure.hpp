@@ -148,10 +148,11 @@ struct Direction {
 // carfireunit
 enum class FIRE_UNIT_STATE {
     FREE,
-    LOCK_TARGET,
+    LOCK_TARGET, // must have target ID
     LOCK_DIRECTION,
-    SINGLE_SHOOT,
-    MULTI_SHOOT,
+    SINGLE_SHOOT, // must have target ID
+    MULTI_SHOOT,  // must have target ID
+    SEEK_TARGET,
 };
 
 struct Weapon {
@@ -160,20 +161,20 @@ struct Weapon {
     std::string ammoType;
     int ammoRemain;
     double reloadingTime;
-    double reloadingState;
+    double reloadingState; ///< current remain reloading time
     double range;
     double speed;
 };
 
 struct FireUnit {
-    constexpr static const char *token_list[] = {"-state",        "-data",       "fireZone", "rotateZone",
-                                                 "-directionNow", "rotateSpeed", "weapon"};
+    constexpr static const char *token_list[] = {"-state",      "-data", "fireZone", "rotateZone", "-presentDirection",
+                                                 "rotateSpeed", "weapon"};
     FIRE_UNIT_STATE state;
-    double data;
-    AngleZone fireZone;     //[yawLeft, yawRight, pitchUp, pitchDown]
-    AngleZone rotateZone;   //[yawLeft, yawRight, pitchUp, pitchDown]
-    Direction directionNow; //[yaw, pitch]
-    Direction rotateSpeed;  //[yaw, pitch]
+    double data;                ///< target ID or angle
+    AngleZone fireZone;         ///< [yawLeft, yawRight, pitchUp, pitchDown]
+    AngleZone rotateZone;       ///< [yawLeft, yawRight, pitchUp, pitchDown]
+    Direction presentDirection; ///< [yaw, pitch]
+    Direction rotateSpeed;      ///< [yaw, pitch]
     Weapon weapon;
 };
 

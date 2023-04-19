@@ -62,6 +62,9 @@ bool equal(double a, double b) { return fabs(a - b) < INF_SMALL; }
 
 namespace carphymodel {
 
+// 各种限制导致的速度减小不会小于该速度，避免停车
+constexpr inline double MIN_SPEED = 3.;
+
 // 采用前右下坐标系，速度和转角分别控制以支持原地转方向盘、缓慢转弯、行进中变向等操作
 // 由于动力学之上会采用控制器，无需考虑显式欧拉法的不稳定问题，出于简单考虑直接使用显式欧拉法
 
@@ -73,13 +76,13 @@ namespace carphymodel {
 // 由于前轮转向需要时间，故速度也需要受最大侧向加速度约束
 // 控制方法：符合上述约束的条件下尽可能快速地向目标调整
 // TODO：倒车
-void WheelMoveSystem::tick(double dt, Coordinate &baseCoordinate, Hull &hull, double yaw_exp, double exp_speed,
+void WheelMoveSystem::tick(double dt, Coordinate &baseCoordinate, Hull &hull, double expectYaw, double expectSpeed,
                            WheelMotionParamList &params) {
     // 参数计算
     double speed = baseCoordinate.directionWorldToBody(hull.velocity).x;
     double yaw_now = Quaternion::fromCompressedQuaternion(baseCoordinate.attitude).getEuler().z;
     // 目标偏航角与当前偏航角的差，目标偏右为正
-    double exp_yaw_diff = angleDiff(yaw_exp, yaw_now); // atan2(local_exp_direction.y, local_exp_direction.x);
+    double exp_yaw_diff = angleDiff(expectYaw, yaw_now); // atan2(local_exp_direction.y, local_exp_direction.x);
     // 倒车
     if (speed < 0)
         exp_yaw_diff = -exp_yaw_diff;
@@ -139,19 +142,23 @@ void WheelMoveSystem::tick(double dt, Coordinate &baseCoordinate, Hull &hull, do
     // if (rotate_restriction_on_speed <= 0.)
     //     rotate_restriction_on_speed = INFINITY;
     // 当前转向与期望转向相反,或限制速度太小(由于速度减小时方向盘角度可以变大,进一步又限制速度大小,若无限制减小速度最终会导致停车)
-    if (rotate_restriction_on_speed <= 5.)
-        rotate_restriction_on_speed = 5.;
+    if (rotate_restriction_on_speed <= MIN_SPEED)
+        rotate_restriction_on_speed = MIN_SPEED;
     speed_restriction = fmin(speed_restriction, rotate_restriction_on_speed);
     // 约束下的期望速度
-    exp_speed = clamp(exp_speed, speed_restriction);
+    expectSpeed = clamp(expectSpeed, speed_restriction);
     // 速度变化量
     double delta_speed;
     if (speed >= 0.) {
-        delta_speed = clamp(exp_speed - speed, (gravity_acceleration - params.MAX_BRAKE_ACCELERATION) * dt,
+        delta_speed = clamp(expectSpeed - speed, (gravity_acceleration - params.MAX_BRAKE_ACCELERATION) * dt,
                             (gravity_acceleration + params.MAX_FRONT_ACCELERATION) * dt);
     } else {
-        delta_speed = clamp(exp_speed - speed, (gravity_acceleration - params.MAX_FRONT_ACCELERATION / 2) * dt,
+        delta_speed = clamp(expectSpeed - speed, (gravity_acceleration - params.MAX_FRONT_ACCELERATION / 2) * dt,
                             (gravity_acceleration + params.MAX_BRAKE_ACCELERATION) * dt);
+    }
+    // small fix: 当前角度与期望角度差距过大且速度不小时不加速
+    if (delta_speed > 0. && speed >= MIN_SPEED && fabs(exp_yaw_diff) > PI / 10) {
+        delta_speed = 0.;
     }
     // 计算新速度和角速度
     double new_speed = speed + delta_speed;

@@ -53,6 +53,7 @@ struct CoordinateOrder{
     };
 
     constexpr CoordinateOrder(const Vector3 v){
+        // Vector3 always represent a NED coordinate
         pos[0] = v.x;
         pos[1] = v.y;
         pos[2] = v.z;
@@ -98,12 +99,12 @@ private:
 constexpr double Pi{ 3.14159265358979323846 };
 constexpr double DEG2RAD{ 0.017453292519943295 };
 constexpr double RAD2DEG{ 57.29577951308232087 };
-constexpr double a = 6378137.0;            /* (WGS84)椭球长轴 (m) */
-constexpr double a_2 = a * a;           /* (WGS84)椭球长轴平方 (m) */
-constexpr double b = 6356752.314245179;             /* (WGS84)椭球短轴 (m) */
-constexpr double b_2 = b * b;             /* (WGS84)椭球短轴平方 (m) */
-constexpr double f = (a - b) / a; /* (WGS84)椭球扁率 */
-constexpr double f_2 = (a - b) / b; /* (WGS84)椭球扁率 */
+constexpr double a = 6378137.0;
+constexpr double a_2 = a * a;
+constexpr double b = 6356752.314245179;
+constexpr double b_2 = b * b;
+constexpr double f = (a - b) / a;
+constexpr double f_2 = (a - b) / b;
 constexpr double j_e2 = b_2 / a_2;
 constexpr double e2 = 1.0 - j_e2;;
 constexpr double e2_2 = (a_2 - b_2) / b;

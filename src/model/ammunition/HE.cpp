@@ -37,9 +37,9 @@ void HEDamage::updateDamage(const FireEvent &fireEvent, Components &c) const {
             continue;
         }
         if (depthExplode == -1.) {
-            depthExplode = inter.depthMin;
+            depthExplode = inter.minDepth;
         } else {
-            depthExplode = fmin(depthExplode, inter.depthMin);
+            depthExplode = fmin(depthExplode, inter.minDepth);
         }
     }
     if (depthExplode == -1.) {

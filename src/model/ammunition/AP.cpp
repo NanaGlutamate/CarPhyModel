@@ -26,12 +26,12 @@ void APDamage::updateDamage(const FireEvent &fireEvent, Components &c) const {
         }
         collisionWithProtection.emplace_back(protection, inter);
     }
-    std::ranges::sort(collisionWithProtection, {}, [](auto &a) { return std::get<1>(a).depthMin; });
+    std::ranges::sort(collisionWithProtection, {}, [](auto &a) { return std::get<1>(a).minDepth; });
 
     // max depth, after which the projectile will disarmed
-    double depthMax;
+    double maxDepth;
     // // depth of first protection
-    // double depthMin;
+    // double minDepth;
     double piercing = piercingAbility;
 
     // process collision with protection model
@@ -39,12 +39,12 @@ void APDamage::updateDamage(const FireEvent &fireEvent, Components &c) const {
         // TODO: log?
         if (protection.activeProtectionAmmo) {
             protection.activeProtectionAmmo--;
-            depthMax = inter.depthMin;
+            maxDepth = inter.minDepth;
             break;
         }
         if (protection.reactiveArmor && rand() < protection.coverageRate) {
             protection.reactiveArmor--;
-            depthMax = inter.depthMin;
+            maxDepth = inter.minDepth;
             protection.coverageRate *= protection.reactiveArmor / (protection.reactiveArmor + 1);
             break;
         }
@@ -54,7 +54,7 @@ void APDamage::updateDamage(const FireEvent &fireEvent, Components &c) const {
         // armor / cos(theta)
         piercing -= armor / ((velocity.dot(direction)) / velocity.norm());
         if (piercing <= 0.) {
-            depthMax = inter.depthMin;
+            maxDepth = inter.minDepth;
             break;
         }
     }
@@ -64,7 +64,7 @@ void APDamage::updateDamage(const FireEvent &fireEvent, Components &c) const {
             continue;
         }
         auto inter = rayCollision(velocity, position, block, coordinate);
-        if (!inter.isCollision() || inter.depthMin >= depthMax) {
+        if (!inter.isCollision() || inter.minDepth >= maxDepth) {
             continue;
         }
         if (damage.damageLevel == DAMAGE_LEVEL::K){

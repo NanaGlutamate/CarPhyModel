@@ -2,28 +2,34 @@
 <ModelInfo id="" name="CarPhyModel" displayName="CarPhyModel" dllName="CarPhyModel" hasGeoInfo="false" category="ATOMIC_ENTITY" multiples="">
 	<Parameters>
 		<Parameter name="InstanceName" type="string" displayName="名称" usage="init,output" value="" unit=""/>
-		<Parameter name="EntityInfo" type="EntityInfo" displayName="其他实体信息" usage="input" value="" unit=""/>
 		<Parameter name="ForceSideID" type="uint16" displayName="所属阵营" usage="init,output" value="" unit=""/>
 		<Parameter name="ModelID" type="string" displayName="模型类型ID" usage="init,output" value="" unit=""/>
 		<Parameter name="KeyMessages" type="string[]" displayName="关键信息" usage="output" value="" unit=""/>
 		<Parameter name="ID" type="uint64" displayName="ID" usage="init,output" value="" unit=""/>
 		<Parameter name="State" type="uint16" displayName="模型状态" usage="output" value="" unit=""/>
+
 		<Parameter name="FireData" type="FireEvent" displayName="开火事件" usage="input" value="" unit=""/>
-		<Parameter name="EntityInfoOut" type="EntityInfo" displayName="本车信息" usage="output" value="" unit=""/>
 		<Parameter name="FireDataOut" type="FireEvent" displayName="本车开火事件" usage="output" value="" unit=""/>
+
 		<Parameter name="Command" type="uint64" displayName="动作号" usage="input" value="0" unit=""/>
 		<Parameter name="Param1" type="float64" displayName="动作参数1" usage="input" value="0" unit=""/>
 		<Parameter name="Param2" type="float64" displayName="动作参数2" usage="input" value="0" unit=""/>
+
+		<Parameter name="EntityInfoOut" type="EntityInfo" displayName="本车信息" usage="output" value="" unit=""/>
+		<Parameter name="EntityInfo" type="EntityInfo" displayName="其他实体信息" usage="input" value="" unit=""/>
+		<Parameter name="weaponInfoOut" type="weaponInfo[]" displayName="本车武器信息" usage="output" value="" unit=""/>
+		<Parameter name="scannedInfoOut" type="EntityInfo[]" displayName="本车扫描到的所有信息" usage="output" value="" unit=""/>
 		<Parameter name="longitude" type="float64" displayName="经度" usage="init,output" value="0" unit=""/>
 		<Parameter name="latitude" type="float64" displayName="纬度" usage="init,output" value="0" unit=""/>
 		<Parameter name="altitude" type="float64" displayName="高度" usage="init,output" value="0" unit=""/>
-		<Parameter name="baseLongitude" type="float64" displayName="原点经度" usage="init" value="0" unit=""/>
-		<Parameter name="baseLatitude" type="float64" displayName="原点纬度" usage="init" value="0" unit=""/>
-		<Parameter name="baseAltitude" type="float64" displayName="原点高度" usage="init" value="0" unit=""/>
 		<Parameter name="roll" type="float64" displayName="滚转" usage="output" value="0" unit=""/>
 		<Parameter name="pitch" type="float64" displayName="俯仰" usage="output" value="0" unit=""/>
 		<Parameter name="yaw" type="float64" displayName="偏航" usage="output" value="0" unit=""/>
 		<Parameter name="velocity_x" type="float64" displayName="速度x" usage="output" value="0" unit=""/>
 		<Parameter name="velocity_y" type="float64" displayName="速度y" usage="output" value="0" unit=""/>
+
+		<Parameter name="baseLongitude" type="float64" displayName="原点经度" usage="init" value="0" unit=""/>
+		<Parameter name="baseLatitude" type="float64" displayName="原点纬度" usage="init" value="0" unit=""/>
+		<Parameter name="baseAltitude" type="float64" displayName="原点高度" usage="init" value="0" unit=""/>
 	</Parameters>
 </ModelInfo>

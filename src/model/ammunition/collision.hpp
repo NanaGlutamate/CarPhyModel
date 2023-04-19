@@ -12,7 +12,7 @@ namespace carphymodel {
 /// @brief collision result
 struct IntersectionInfo {
     /// @brief depth range of collision, use dir.norm() as unit
-    double depthMin, depthMax;
+    double minDepth, maxDepth;
     enum class HIT_SURFACE {
         FRONT = 0,
         BACK = 1,
@@ -94,8 +94,8 @@ inline IntersectionInfo lineCollision(const Vector3 &dir, const Vector3 &pos, co
 inline IntersectionInfo rayCollision(const Vector3 &dir, const Vector3 &pos, const Block &size,
                                      const Coordinate &coordinate) {
     auto tmp = lineCollision(dir, pos, size, coordinate);
-    tmp.depthMin = fmax(tmp.depthMin, 0.);
-    if (tmp.depthMax < tmp.depthMin) {
+    tmp.minDepth = fmax(tmp.minDepth, 0.);
+    if (tmp.maxDepth < tmp.minDepth) {
         return NotHitInfo;
     }
     return tmp;
@@ -115,9 +115,9 @@ inline IntersectionInfo segmentCollision(const Vector3 &pos1, const Vector3 &pos
     auto dir = pos2 - pos1;
     double length = dir.norm();
     auto tmp = lineCollision(dir / length, pos1, size, coordinate);
-    tmp.depthMin = fmax(tmp.depthMin, 0.);
-    tmp.depthMax = fmin(tmp.depthMax, length);
-    if (tmp.depthMax < tmp.depthMin) {
+    tmp.minDepth = fmax(tmp.minDepth, 0.);
+    tmp.maxDepth = fmin(tmp.maxDepth, length);
+    if (tmp.maxDepth < tmp.minDepth) {
         return NotHitInfo;
     }
     return tmp;

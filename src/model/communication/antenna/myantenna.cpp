@@ -1,14 +1,6 @@
 ﻿#include "myantenna.h"
 #include "extern/Comm.h"
-
-namespace{
-
-struct DoJobOnConstruct{
-    template<typename Job, typename ...Params>
-    DoJobOnConstruct(Job&& j, Params&& ...params){std::invoke(std::forward<Job>(j), std::forward<Params>(params)...);};
-};
-
-}
+#include "../../tools/initjob.hpp"
 
 namespace carphymodel{
 

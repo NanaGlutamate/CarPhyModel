@@ -18,13 +18,13 @@ public:
     //! @param dt: 上一次调用后的时间
     //! @param baseCoordinate: 车辆随体坐标系
     //! @param hull: 运动参数：速度、角速度、质量、转动惯量
-    //! @param exp_direction: 期望方向
+    //! @param exp_yaw: 期望方向
     //! @param exp_speed: 期望速度
     void tick(
         double dt, 
         Coordinate& baseCoordinate, 
         Hull& hull, 
-        const Vector3& exp_direction, 
+        double yaw_exp, 
         double exp_speed
     ){
         using namespace externModel::track;

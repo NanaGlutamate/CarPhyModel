@@ -21,6 +21,15 @@
 			<Param name="position" type="Vector3" unit=""/>
 		</Params>
 	</Type>
+	<Type name="WeaponInfo">
+		<Params>
+			<Param name="ammo" type="int32" unit=""/>
+			<Param name="reloadingState" type="float64" unit=""/>
+			<Param name="range" type="float64" unit=""/>
+			<Param name="direction" type="float64" unit=""/>
+			<Param name="weaponName" type="string" unit=""/>
+		</Params>
+	</Type>
 	<Type name="CSMapPoint">
 		<Params>
 			<Param name="id" type="uint64"/>
