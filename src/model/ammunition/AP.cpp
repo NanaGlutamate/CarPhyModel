@@ -48,8 +48,8 @@ void APDamage::updateDamage(const FireEvent &fireEvent, Components &c) const {
             protection.coverageRate *= protection.reactiveArmor / (protection.reactiveArmor + 1);
             break;
         }
-        double armor = getSideArmor(protection)[static_cast<unsigned int>(inter.hitSurface)];
-        // nega unit normal vector of each surface
+        double armor = getSideArmor(protection, inter.hitSurface);
+        // negative unit normal vector of each surface
         auto direction = -1 * directionVector[static_cast<unsigned int>(inter.hitSurface)];
         // armor / cos(theta)
         piercing -= armor / ((velocity.dot(direction)) / velocity.norm());

@@ -29,14 +29,15 @@ struct IntersectionInfo {
 inline constexpr IntersectionInfo NotHitInfo{0, 0, IntersectionInfo::HIT_SURFACE::NOT_HIT};
 
 /**
- * @brief get armor thickness of a block in 6 direction
- * 
+ * @brief get armor thickness of givin surface of block
+ *
  * @param pm armor block
- * @return std::array<double, 6> 
+ * @param surface surface of block
+ * @return double
  */
-inline constexpr std::array<double, 6> getSideArmor(const ProtectionModel &pm) {
+inline constexpr double getSideArmor(const ProtectionModel &pm, IntersectionInfo::HIT_SURFACE surface) {
     return std::array<double, 6>{pm.armor_front, pm.armor_back,   pm.armor_side,
-                                 pm.armor_side,  pm.armor_bottom, pm.armor_top};
+                                 pm.armor_side,  pm.armor_bottom, pm.armor_top}[static_cast<unsigned int>(surface)];
 }
 
 /// @brief unit normal vector of 6 direction
@@ -46,7 +47,7 @@ inline constexpr std::array<Vector3, 6> directionVector{
 
 /**
  * @brief get collision result of a line with a block
- * 
+ *
  * @param dir direction of the line
  * @param pos start position of the line
  * @param size block size
@@ -84,7 +85,7 @@ inline IntersectionInfo lineCollision(const Vector3 &dir, const Vector3 &pos, co
 
 /**
  * @brief get collision result of a ray with a block
- * 
+ *
  * @param dir direction of the ray
  * @param pos start position of the ray
  * @param size block size
@@ -103,7 +104,7 @@ inline IntersectionInfo rayCollision(const Vector3 &dir, const Vector3 &pos, con
 
 /**
  * @brief get collision result of a segment with a block
- * 
+ *
  * @param pos1 start position of the segment
  * @param pos2 end position of the segment
  * @param size block size
@@ -125,7 +126,7 @@ inline IntersectionInfo segmentCollision(const Vector3 &pos1, const Vector3 &pos
 
 /**
  * @brief get distance between point and Block
- * 
+ *
  * @param pos point
  * @param size block size
  * @param coordinate base coordinate of the block
