@@ -186,7 +186,8 @@ class FireControlSystem : public System {
 
             // 4. check if target aimed
             if (fireUnit.fireZone.containsDirection({angleNormalize(expectDirection - fireUnit.presentDirection.yaw),
-                                                     angleNormalize(expectPitch - fireUnit.presentDirection.pitch)})) {
+                                                     angleNormalize(expectPitch - fireUnit.presentDirection.pitch)}) &&
+                inRange) {
                 ret.emplace(&fireUnit);
             }
         }
@@ -204,7 +205,7 @@ class FireControlSystem : public System {
             }
             // TODO: overflow?
             fireEvents.emplace("FireDataOut",
-                               weaponShoot(fireUnit, selfPosition, std::get<1>(mem[fireUnit.data]).position));
+                               weaponShoot(fireUnit, selfPosition, std::get<1>(mem.find(fireUnit.data)->second).position));
             // 1 shoot per frame
             break;
         }
