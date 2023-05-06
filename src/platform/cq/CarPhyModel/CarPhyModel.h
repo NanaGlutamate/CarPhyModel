@@ -24,6 +24,7 @@ extern "C"
 class CarPhyModel : public CSModelObject
 {
 public:
+    CarPhyModel() = default;
     virtual bool Init(const std::unordered_map<std::string, std::any> &value)
         override;
     
@@ -33,6 +34,12 @@ public:
         override;
     
     virtual std::unordered_map<std::string, std::any> *GetOutput() override;
+
+    inline static carphymodel::VID VIDCounter = 0;
+    carphymodel::VID myVID;
+    carphymodel::VID getVID() {
+        return myVID;
+    }
 
     // deg
     struct Location{

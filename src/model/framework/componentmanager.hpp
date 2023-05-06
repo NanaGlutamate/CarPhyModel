@@ -165,7 +165,7 @@ public:
         // else{return std::nullopt;}
         using TargetType = std::vector<std::pair<size_t, ComponentType>>;
         auto& specific = std::get<TargetType>(normalComponents);
-        if(auto it = std::find_if(specific.begin(), specific.end(), [](auto it){return it->first==ID;}); it!=specific.end()){
+        if(auto it = std::find_if(specific.begin(), specific.end(), [ID](auto p){return p.first==ID;}); it!=specific.end()){
             return it->second;
         }else{return std::nullopt;}
     };
@@ -229,7 +229,7 @@ private:
         std::tuple<typename std::vector<std::pair<std::size_t, Ty>>::iterator...> ends = {
             std::get<type_list_index<Ty, Normals...>::value>(normalComponents).end()...
         };
-        for(size_t index = 1; index < entityCounter; ++index){
+        for(size_t index = 1; index <= entityCounter; ++index){
             bool isEnd = false;
             bool isEntityFit = true;
             // for_each over each type in ...Ty
@@ -302,7 +302,7 @@ private:
                 }()...};
             };
             decltype(auto) operator*(){
-                return std::tuple<const std::size_t, ComponentTypes&...>(
+                return std::tuple<const std::size_t&, ComponentTypes&...>(
                     *entityIDIterator,
                     std::get<type_list_index<ComponentTypes, ComponentTypes...>::value>(iters)->second...
                 );

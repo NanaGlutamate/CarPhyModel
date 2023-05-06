@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
+<?xml-model href="car.xsd"?>
 <car>
     <name>testCar</name>
     <WheelMotionParamList>
@@ -35,13 +35,13 @@
                 <yaw>0.34906585</yaw>
                 <pitch>0.174532925</pitch>
             </rotateSpeed>
-            <Weapon>
+            <weapon>
                 <ammoType>125mmHE</ammoType>
                 <ammoRemain>30</ammoRemain>
                 <reloadingTime>8</reloadingTime>
                 <range>3000</range>
                 <speed>1300</speed>
-            </Weapon>
+            </weapon>
         </FireUnit>
         <Coordinate>
             <position>
@@ -55,6 +55,9 @@
                 <pitch>0</pitch>
             </attitude>
         </Coordinate>
+        <SensorData>
+            <type>radar</type>
+        </SensorData>
         <!-- base -->
     </entity>
 </car>

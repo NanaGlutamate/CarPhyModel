@@ -74,10 +74,10 @@ class FireControlSystem : public System {
             }
         }
     }
-    std::set<std::reference_wrapper<FireUnit>> updateFireUnitState(double dt, Components &c) {
+    std::set<FireUnit*> updateFireUnitState(double dt, Components &c) {
         // scanned memory中存储的位置所在的帧与目标解算毁伤事件所在帧相差的帧数
         constexpr auto lagFrameCounter = 1;
-        std::set<std::reference_wrapper<FireUnit>> ret;
+        std::set<FireUnit*> ret;
 
         // 0. data preparing
         const auto &baseCoordinate = c.getSpecificSingleton<Coordinate>().value();
@@ -88,7 +88,7 @@ class FireControlSystem : public System {
             for (auto &&[id, fireUnit] : c.getNormal<FireUnit>()) {
                 fireUnit.state = FIRE_UNIT_STATE::FREE;
             }
-            return;
+            return ret;
         }
         size_t nearstTarget = 0;
         double minDistance = -1;
@@ -106,7 +106,7 @@ class FireControlSystem : public System {
         // main loop
         for (auto &&[id, damageModel, fireUnit, coordinate] : c.getNormal<DamageModel, FireUnit, Coordinate>()) {
 
-            if (damageModel.damageLevel != DAMAGE_LEVEL::N || damageModel.damageLevel != DAMAGE_LEVEL::M) {
+            if (damageModel.damageLevel != DAMAGE_LEVEL::N && damageModel.damageLevel != DAMAGE_LEVEL::M) {
                 // destroyed
                 continue;
             }
@@ -126,6 +126,7 @@ class FireControlSystem : public System {
                 auto it = scannedMemory.value().find(fireUnit.data);
                 if (it == scannedMemory.value().end() || !isTargetAvailable(it->second)) {
                     if (fireUnit.state == FIRE_UNIT_STATE::MULTI_SHOOT) {
+                        my_assert(size_t(double(nearstTarget))==nearstTarget);
                         fireUnit.data = static_cast<double>(nearstTarget);
                     } else {
                         fireUnit.state = FIRE_UNIT_STATE::FREE;
@@ -173,7 +174,7 @@ class FireControlSystem : public System {
                 fireUnit.presentDirection.yaw = expectDirection;
                 fireUnit.presentDirection.pitch = expectPitch;
                 if (inRange) {
-                    ret.emplace(fireUnit);
+                    ret.emplace(&fireUnit);
                 }
             } else {
                 fireUnit.presentDirection.yaw += fireUnit.rotateSpeed.yaw * dt * (signbit(rotateYaw) ? -1 : 1);
@@ -183,22 +184,25 @@ class FireControlSystem : public System {
         }
         return ret;
     }
-    void setFire(double dt, Components &c, const std::set<std::reference_wrapper<FireUnit>> &aimedAndInRange) {
+    void setFire(double dt, Components &c, const std::set<FireUnit*> &aimedAndInRange) {
         auto &selfPosition = c.getSpecificSingleton<Coordinate>().value().position;
         auto &mem = c.getSpecificSingleton<ScannedMemory>().value();
         auto &fireEvents = c.getSpecificSingleton<EventBuffer>().value();
         for (auto &&[id, fireUnit] : c.getNormal<FireUnit>()) {
-            if (!aimedAndInRange.contains(fireUnit) ||
+            if (!aimedAndInRange.contains(&fireUnit) ||
                 (fireUnit.state != FIRE_UNIT_STATE::SINGLE_SHOOT && fireUnit.state != FIRE_UNIT_STATE::MULTI_SHOOT) ||
                 fireUnit.weapon.reloadingState != 0 || fireUnit.weapon.ammoRemain == 0) {
                 continue;
             }
+            // TODO: overflow?
             fireEvents.emplace("FireDataOut",
                                weaponShoot(fireUnit, selfPosition, std::get<1>(mem[fireUnit.data]).position));
             // 1 shoot per frame
             break;
         }
     }
+
+    // check if target detected and not destroyed
     bool isTargetAvailable(const std::tuple<double, carphymodel::EntityInfo> &tar) {
         return std::get<0>(tar) == 0. && std::get<1>(tar).baseInfo.damageLevel != DAMAGE_LEVEL::KK;
     }

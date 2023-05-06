@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="car" type="car"/>
+
+    <xs:complexType name="car">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string"/>
+            <xs:choice>
+                <xs:element name="WheelMotionParamList">
+                    <xs:complexType>
+                        <xs:all>
+                            <xs:element name="LENGTH" type="xs:double"/>
+                            <xs:element name="MAX_ANGLE" type="xs:double"/>
+                            <xs:element name="ROTATE_SPEED" type="xs:double"/>
+                            <xs:element name="MAX_LINEAR_SPEED" type="xs:double"/>
+                            <xs:element name="MAX_FRONT_ACCELERATION" type="xs:double"/>
+                            <xs:element name="MAX_BRAKE_ACCELERATION" type="xs:double"/>
+                            <xs:element name="MAX_LATERAL_ACCELERATION" type="xs:double"/>
+                        </xs:all>
+                    </xs:complexType>
+                </xs:element>
+            </xs:choice>
+            <xs:element name="entity" type="entity" minOccurs="1" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="entity">
+        <xs:sequence>
+            <xs:all minOccurs="1" maxOccurs="unbounded">
+            </xs:all>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

@@ -73,6 +73,7 @@ bool CarPhyModel::Init(const std::unordered_map<std::string, std::any> &value) {
     model.components.getSpecificSingleton<carphymodel::Coordinate>().value().position = locationTrans(location, tmp);
     state_ = CSInstanceState::IS_INITIALIZED;
     WriteLog("CarPhyModel model Init", 1);
+    myVID = VIDCounter++;
     return true;
 }
 
@@ -83,16 +84,20 @@ bool CarPhyModel::Tick(double time) {
     buffer->emplace("ForceSideID", GetForceSideID());
     buffer->emplace("ModelID", GetModelID());
     buffer->emplace("InstanceName", GetInstanceName());
+    // TODO: use ID starts from 0
     buffer->emplace("ID", GetID());
     buffer->emplace("State", uint16_t(GetState()));
+
+    buffer->emplace("VID", getVID());
     if (auto it = buffer->find("FireDataOut"); it != buffer->end()) {
         FireEvent tmp = any_cast<carphymodel::FireEvent>(it->second);
+        WriteLog("CarPhyModel model Fire", 1);
         it->second = tmp.ToValueMap();
     }
     carphymodel::Vector3 tmp = model.components.getSpecificSingleton<carphymodel::Coordinate>().value().position;
     EntityInfo info;
     info.baseInfo = BaseInfo{
-        GetID(),
+        getVID(),
         GetForceSideID(),
         static_cast<uint16_t>(carphymodel::BaseInfo::ENTITY_TYPE::CAR),
         static_cast<uint16_t>(model.components.getSpecificSingleton<carphymodel::DamageModel>()->damageLevel),
@@ -119,7 +124,7 @@ bool CarPhyModel::Tick(double time) {
 
     std::vector<std::any> weaponInfo;
     auto &baseCoordinate = model.components.getSpecificSingleton<carphymodel::Coordinate>().value();
-    for (auto [id, info, coordinate] : model.components.getNormal<carphymodel::FireUnit, carphymodel::Coordinate>()) {
+    for (auto&& [id, info, coordinate] : model.components.getNormal<carphymodel::FireUnit, carphymodel::Coordinate>()) {
         carphymodel::Vector3 relativeDirection = {cos(info.presentDirection.yaw), sin(info.presentDirection.yaw), 0};
         auto tmp = coordinate.directionBodyToWorld(relativeDirection);
         auto globalDirection = baseCoordinate.directionBodyToWorld(tmp);
@@ -131,7 +136,7 @@ bool CarPhyModel::Tick(double time) {
     buffer->emplace("weaponInfoOut", std::move(weaponInfo));
 
     std::vector<std::any> scannedInfoOut;
-    for (auto info : model.components.getSpecificSingleton<carphymodel::ScannedMemory>().value()) {
+    for (auto& info : model.components.getSpecificSingleton<carphymodel::ScannedMemory>().value()) {
         scannedInfoOut.emplace_back(EntityInfo(std::get<1>(info.second)).ToValueMap());
     }
     buffer->emplace("scannedInfoOut", std::move(scannedInfoOut));
@@ -141,16 +146,17 @@ bool CarPhyModel::Tick(double time) {
 }
 
 bool CarPhyModel::SetInput(const std::unordered_map<std::string, std::any> &value) {
-    carphymodel::VID ID = any_cast<carphymodel::VID>(value.find("ID")->second);
     if (auto it = value.find("EntityInfo"); it != value.end()) {
         auto &v = it->second;
         EntityInfo tmp;
         tmp.FromValueMap(any_cast<CSValueMap>(v));
+        carphymodel::VID ID = tmp.baseInfo.id;
         get<1>((*(model.components.getSpecificSingleton<carphymodel::ScannedMemory>()))[ID]) = tmp;
     }
     if (auto it = value.find("FireData"); it != value.end()) {
+        carphymodel::VID ID = any_cast<carphymodel::VID>(value.find("FireID")->second);
         auto &v = it->second;
-        if (ID != GetID()) {
+        if (ID != getVID()) {
             FireEvent tmp;
             tmp.FromValueMap(any_cast<CSValueMap>(v));
             model.components.getSpecificSingleton<carphymodel::FireEventQueue>()->push_back(tmp);

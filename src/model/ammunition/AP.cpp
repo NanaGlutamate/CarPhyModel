@@ -19,17 +19,20 @@ void APDamage::updateDamage(const FireEvent &fireEvent, Components &c) const {
 
     // calculate all collision with protection model
     std::vector<std::tuple<ProtectionModel &, IntersectionInfo>> collisionWithProtection;
-    for (auto [id, protection, block, coordinate] : c.getNormal<ProtectionModel, Block, Coordinate>()) {
+    for (auto &&[id, protection, block, coordinate] : c.getNormal<ProtectionModel, Block, Coordinate>()) {
         auto inter = rayCollision(velocity, position, block, coordinate);
         if (!inter.isCollision()) {
             continue;
         }
         collisionWithProtection.emplace_back(protection, inter);
     }
+    if (collisionWithProtection.empty()) {
+        return;
+    }
     std::ranges::sort(collisionWithProtection, {}, [](auto &a) { return std::get<1>(a).minDepth; });
 
     // max depth, after which the projectile will disarmed
-    double maxDepth;
+    double maxDepth = INF_BIG;
     // // depth of first protection
     // double minDepth;
     double piercing = piercingAbility;
@@ -59,7 +62,7 @@ void APDamage::updateDamage(const FireEvent &fireEvent, Components &c) const {
         }
     }
 
-    for (auto [id, damage, block, coordinate] : c.getNormal<DamageModel, Block, Coordinate>()) {
+    for (auto &&[id, damage, block, coordinate] : c.getNormal<DamageModel, Block, Coordinate>()) {
         if(damage.damageLevel == DAMAGE_LEVEL::KK){
             continue;
         }

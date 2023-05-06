@@ -19,7 +19,7 @@ namespace carphymodel {
 namespace command {
 
 enum class COMMAND_TYPE {
-    FORWARD,
+    FORWARD = 1,
     ACCELERATE,
     DECELERATE,
     BACKWARD,

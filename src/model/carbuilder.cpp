@@ -1,18 +1,20 @@
 ﻿#include <algorithm>
+
 #include "carbuilder.h"
 
-#include "tools/metatools.hpp"
 #include "framework/component.hpp"
 #include "src/extern/rapidxml-1.13/rapidxml.hpp"
+#include "tools/metatools.hpp"
 #include "tools/myassert.hpp"
+#include "tools/seterror.hpp"
 
+#include "damage/cardamage.h"
+#include "firecontrolsystem/carfcs.hpp"
 #include "hull/carhull.h"
 #include "protection/carprotection.h"
-#include "damage/cardamage.h"
 #include "sensors/carsensor.h"
-#include "firecontrolsystem/carfcs.hpp"
-#include "toolsystem/hitsystem.hpp"
 #include "toolsystem/ballisticsystem.hpp"
+#include "toolsystem/hitsystem.hpp"
 
 namespace{
 
@@ -21,6 +23,25 @@ using namespace std;
 using namespace carphymodel;
 using namespace carphymodel::component;
 using namespace carphymodel::mymeta;
+
+template <typename ...Ty>
+struct NameTable{
+    std::string_view table[sizeof...(Ty)];
+    template <typename T>
+    constexpr std::string_view getName(){
+        return table[get_type_list_index<T, Ty...>::value];
+    }
+};
+
+NameTable<WheelMotionParamList, Coordinate, DamageModel, Block, ProtectionModel, FireUnit, SensorData> nameTable{{
+    "WheelMotionParamList",
+    "Coordinate",
+    "DamageModel",
+    "Block",
+    "ProtectionModel",
+    "FireUnit",
+    "SensorData",
+}};
 
 class CStyleString{
 public:
@@ -37,14 +58,14 @@ struct loadComponent;
 
 template<typename ...Ty>
 struct loadComponent<NormalComponent<Ty...>>{
-    void operator()(
+    static void load(
         size_t ID, 
         rapidxml::xml_node<char>* component, 
-        carphymodel::Components::Modifier& handle, 
-        const std::vector<string_view>& token_list
+        carphymodel::Components::Modifier& handle
     ){
         bool match = (... || [&](){
-            if(component->name() == token_list[get_type_list_index<Ty, Ty...>::value]){
+            // TODO: use set instead?
+            if(component->name() == nameTable.getName<Ty>()){
                 handle.addNormalComponents<Ty>(ID, componentDeserialize<Ty>(component));
                 return true;
             }
@@ -56,12 +77,11 @@ struct loadComponent<NormalComponent<Ty...>>{
 
 template<typename ...Ty>
 struct loadComponent<SingletonComponent<Ty...>>{
-    void operator()(
+    static void load(
         rapidxml::xml_node<char>* root, 
-        carphymodel::Components::Modifier& handle,
-        const std::vector<string_view>& token_list){
+        carphymodel::Components::Modifier& handle){
         int tmp[] = {[&](){
-            if(auto p = root->first_node(token_list[get_type_list_index<Ty, Ty...>::value].data()); p != 0){
+            if(auto p = root->first_node(nameTable.getName<Ty>().data(), nameTable.getName<Ty>().size()); p != 0){
                 handle.addSingletonComponents<Ty>(componentDeserialize<Ty>(p));
             }
             return 0;
@@ -84,11 +104,71 @@ struct loadComponent<SingletonComponent<Ty...>>{
 //     }else throw BadComponentName("do not have a component named "s + component->name());
 // }
 
+template <typename Tar, typename... Dependencies>
+struct Restriction {
+    static std::string check(Components& c) {
+        for (auto&& [id, e] : c.getNormal<Tar>()) {
+            bool fit = (... && c.getSpecificNormal<Dependencies>(id).has_value());
+            if (!fit) {
+                std::string errorInfo = std::string(nameTable.getName<Tar>()) + " need dependencies ";
+                int tmp[] = {[&](){
+                    if (!c.getSpecificNormal<Dependencies>(id).has_value()){
+                        errorInfo += std::string(nameTable.getName<Dependencies>()) + ", ";
+                    }
+                    return 0;
+                }()...};
+                errorInfo += "but not found\n";
+                return errorInfo;
+            }
+        }
+        return "";
+    }
+};
+
+// template <typename Tar, typename... Dependencies>
+// struct WeakRestriction {
+//     static std::string check(Components& c) {
+//         for (auto&& [id, e] : c.getNormal<Tar>()) {
+//             bool fit = (... && c.getSpecificNormal<Dependencies>(id).has_value());
+//             if (!fit) {
+//                 int tmp[] = {[&](){
+//                     if (!c.getSpecificNormal<Dependencies>(id).has_value()){
+//                     }
+//                     return 0;
+//                 }()...};
+//             }
+//         }
+//         return "";
+//     }
+// };
+
+template <typename... Restrictions>
+struct RestrictionList {
+    static std::string check(Components& c) { return (... + Restrictions::check(c)); }
+};
+
+void checkRestriction(Components& c) {
+    using namespace carphymodel;
+    static RestrictionList<
+        Restriction<Block, Coordinate>,
+
+        Restriction<ProtectionModel, Block>,
+        Restriction<DamageModel, Block>,
+
+        Restriction<SensorData, DamageModel>,
+        Restriction<FireUnit, DamageModel>
+    > checker;
+    auto s = checker.check(c);
+    if(!s.empty()){
+        error(s);
+    }
+}
+
 }
 
 namespace carphymodel{
 
-void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model){
+void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model, bool check){
     if(model.systems.empty()){
         model.systems.push_back(std::make_unique<PrepareSystem>());
 
@@ -126,9 +206,7 @@ void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model){
 
         loadComponent<SingletonComponent<
             WheelMotionParamList
-        >>{}(root, handle, {
-            "WheelMotionParamList"
-        });
+        >>::load(root, handle);
 
         for(auto entity = root->first_node("entity"); entity; entity = entity->next_sibling("entity")){
             auto ID = handle.newEntity();
@@ -140,17 +218,15 @@ void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model){
                     ProtectionModel,
                     FireUnit,
                     SensorData
-                >>{}(ID, component, handle, {
-                    "Coordinate",
-                    "DamageModel",
-                    "Block",
-                    "ProtectionModel",
-                    "FireUnit",
-                    "SensorData"
-                });
+                >>::load(ID, component, handle);
             }
         }
     }
+
+    if(check){
+        checkRestriction(model.components);
+    }
+
 }
 
 }

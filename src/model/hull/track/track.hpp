@@ -24,7 +24,7 @@ public:
         double dt, 
         Coordinate& baseCoordinate, 
         Hull& hull, 
-        double yaw_exp, 
+        double exp_yaw, 
         double exp_speed
     ){
         using namespace externModel::track;

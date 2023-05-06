@@ -39,7 +39,7 @@ void HullSystem::tick(double dt, Components &c) {
     // TODO: check
     auto coordinate = c.getSpecificSingleton<Coordinate>().value();
     double direction = Quaternion::fromCompressedQuaternion(coordinate.attitude).getEuler().z;
-    double speed = c.getSpecificSingleton<Hull>()->velocity.norm();
+    double speed = c.getSpecificSingleton<Hull>()->velocity.dot(coordinate.directionBodyToWorld(Vector3(1., 0., 0.)));
     for (auto &&[k, v] : c.getSpecificSingleton<CommandBuffer>().value()) {
         if ((validMovingCommandMask & size_t(1) << static_cast<int>(k)) == 0) {
             continue;

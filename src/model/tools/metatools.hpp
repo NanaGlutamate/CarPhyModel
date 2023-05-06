@@ -8,9 +8,7 @@ template <typename ...T>
 struct type_list{};
 
 template <typename Test, typename ...List>
-struct get_type_list_index{
-    constexpr static inline std::size_t value = 0;
-};
+struct get_type_list_index;
 
 template <typename Test, typename ListStart, typename ...List>
 struct get_type_list_index<Test, ListStart, List...>{

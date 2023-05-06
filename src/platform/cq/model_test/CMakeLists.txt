@@ -16,3 +16,4 @@ link_libraries(dl)
 endif(WIN32)
 
 add_executable(model_test ${SRCS} ${CSCONFIG_SRCS})
+add_dependencies(model_test ${PROJ_NAME})

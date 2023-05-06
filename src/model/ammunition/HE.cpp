@@ -22,7 +22,7 @@ void HEDamage::updateDamage(const FireEvent &fireEvent, Components &c) const {
     auto velocity = c.getSpecificSingleton<Coordinate>()->directionWorldToBody(fireEvent.velocity);
     auto position = c.getSpecificSingleton<Coordinate>()->positionWorldToBody(fireEvent.position);
 
-    for (auto [id, protection] : c.getNormal<ProtectionModel>()) {
+    for (auto &&[id, protection] : c.getNormal<ProtectionModel>()) {
         if (protection.activeProtectionAmmo) {
             protection.activeProtectionAmmo--;
             return;
@@ -31,7 +31,7 @@ void HEDamage::updateDamage(const FireEvent &fireEvent, Components &c) const {
 
     // depth when projectile explode, which is the depth when meet first block
     double depthExplode = -1.;
-    for (auto [id, block, coordinate] : c.getNormal<Block, Coordinate>()) {
+    for (auto &&[id, block, coordinate] : c.getNormal<Block, Coordinate>()) {
         auto inter = rayCollision(velocity, position, block, coordinate);
         if (!inter.isCollision()) {
             continue;
@@ -48,13 +48,13 @@ void HEDamage::updateDamage(const FireEvent &fireEvent, Components &c) const {
     }
     auto explosionPoint = position + velocity * depthExplode;
 
-    for (auto [id, damage, coordinate] : c.getNormal<DamageModel, Coordinate>()) {
+    for (auto &&[id, damage, coordinate] : c.getNormal<DamageModel, Coordinate>()) {
         if (damage.damageLevel == DAMAGE_LEVEL::KK) {
             continue;
         }
         // use lambda to interupt damage calculation if protection available
         [&]() {
-            for (auto [_id, _protection, _block, _coordinate] : c.getNormal<ProtectionModel, Block, Coordinate>()) {
+            for (auto &&[_id, _protection, _block, _coordinate] : c.getNormal<ProtectionModel, Block, Coordinate>()) {
                 auto inter = segmentCollision(position, coordinate.position, _block, _coordinate);
                 if (inter.isCollision()) {
                     return;
