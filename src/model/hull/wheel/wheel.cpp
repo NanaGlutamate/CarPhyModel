@@ -17,8 +17,9 @@ double clamp(double value, double min, double max) {
     return value;
 }
 
+// force inline?
 double clamp(double value, double bound) {
-    my_assert(bound >= 0., "Bad Clamp Bound: " + std::to_string(bound));
+    bound = fabs(bound);
     // if (bound < 0)
     //     bound = -bound;
     if (value < -bound)

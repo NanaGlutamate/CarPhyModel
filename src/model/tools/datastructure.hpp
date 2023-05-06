@@ -136,6 +136,9 @@ struct AngleZone {
     double yawLeft, yawRight, pitchUp, pitchDown;
     double &operator[](size_t index) { return (&yawLeft)[index]; };
     const double &operator[](size_t index) const { return (&yawLeft)[index]; };
+    bool containsDirection(const Direction& d) const {
+        return d.yaw<=yawLeft+INF_SMALL && d.yaw>=yawRight-INF_SMALL && d.pitch<=pitchUp+INF_SMALL && d.pitch>=pitchDown-INF_SMALL;
+    }
 };
 
 struct Direction {

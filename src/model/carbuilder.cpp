@@ -1,4 +1,5 @@
 ﻿#include <algorithm>
+#include <array>
 
 #include "carbuilder.h"
 
@@ -26,22 +27,18 @@ using namespace carphymodel::mymeta;
 
 template <typename ...Ty>
 struct NameTable{
-    std::string_view table[sizeof...(Ty)];
+    std::array<std::string_view, sizeof...(Ty)> table;
+    template <typename ...S>
+    constexpr NameTable(S&&... s):table(std::forward<S>(s)...){};
     template <typename T>
-    constexpr std::string_view getName(){
+    constexpr std::string_view getName() const {
         return table[get_type_list_index<T, Ty...>::value];
     }
 };
 
-NameTable<WheelMotionParamList, Coordinate, DamageModel, Block, ProtectionModel, FireUnit, SensorData> nameTable{{
-    "WheelMotionParamList",
-    "Coordinate",
-    "DamageModel",
-    "Block",
-    "ProtectionModel",
-    "FireUnit",
-    "SensorData",
-}};
+constexpr NameTable<WheelMotionParamList, Coordinate, DamageModel, Block, ProtectionModel, FireUnit, SensorData>
+    nameTable{"WheelMotionParamList", "Coordinate", "DamageModel", "Block",
+              "ProtectionModel",      "FireUnit",   "SensorData"};
 
 class CStyleString{
 public:
@@ -212,12 +209,12 @@ void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model, boo
             auto ID = handle.newEntity();
             for(auto component = entity->first_node(0); component; component = component->next_sibling()){
                 loadComponent<NormalComponent<
-                    Coordinate,
-                    DamageModel,
                     Block,
                     ProtectionModel,
+                    DamageModel,
                     FireUnit,
-                    SensorData
+                    SensorData,
+                    Coordinate
                 >>::load(ID, component, handle);
             }
         }

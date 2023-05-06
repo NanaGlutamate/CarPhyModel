@@ -1,33 +1,132 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xs:element name="car" type="car"/>
+    <xs:element name="car" type="car" />
 
     <xs:complexType name="car">
         <xs:sequence>
-            <xs:element name="name" type="xs:string"/>
+            <xs:element name="name" type="xs:string" />
             <xs:choice>
                 <xs:element name="WheelMotionParamList">
                     <xs:complexType>
                         <xs:all>
-                            <xs:element name="LENGTH" type="xs:double"/>
-                            <xs:element name="MAX_ANGLE" type="xs:double"/>
-                            <xs:element name="ROTATE_SPEED" type="xs:double"/>
-                            <xs:element name="MAX_LINEAR_SPEED" type="xs:double"/>
-                            <xs:element name="MAX_FRONT_ACCELERATION" type="xs:double"/>
-                            <xs:element name="MAX_BRAKE_ACCELERATION" type="xs:double"/>
-                            <xs:element name="MAX_LATERAL_ACCELERATION" type="xs:double"/>
+                            <xs:element name="LENGTH" type="xs:double" />
+                            <xs:element name="MAX_ANGLE" type="xs:double" />
+                            <xs:element name="ROTATE_SPEED" type="xs:double" />
+                            <xs:element name="MAX_LINEAR_SPEED" type="xs:double" />
+                            <xs:element name="MAX_FRONT_ACCELERATION" type="xs:double" />
+                            <xs:element name="MAX_BRAKE_ACCELERATION" type="xs:double" />
+                            <xs:element name="MAX_LATERAL_ACCELERATION" type="xs:double" />
                         </xs:all>
                     </xs:complexType>
                 </xs:element>
             </xs:choice>
-            <xs:element name="entity" type="entity" minOccurs="1" maxOccurs="unbounded"/>
+            <xs:element name="entity" type="entity" minOccurs="1" maxOccurs="unbounded" />
         </xs:sequence>
     </xs:complexType>
 
     <xs:complexType name="entity">
         <xs:sequence>
-            <xs:all minOccurs="1" maxOccurs="unbounded">
-            </xs:all>
+            <xs:choice minOccurs="1" maxOccurs="unbounded">
+                <xs:element name="Block">
+                    <xs:complexType>
+                        <xs:all>
+                            <xs:element name="length" type="xs:double" />
+                            <xs:element name="width" type="xs:double" />
+                            <xs:element name="height" type="xs:double" />
+                        </xs:all>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="ProtectionModel">
+                    <xs:complexType>
+                        <xs:all>
+                            <xs:element name="armor_front" type="xs:double" />
+                            <xs:element name="armor_back" type="xs:double" />
+                            <xs:element name="armor_side" type="xs:double" />
+                            <xs:element name="armor_bottom" type="xs:double" />
+                            <xs:element name="armor_top" type="xs:double" />
+                            <xs:element name="activeProtectionAmmo" type="xs:int" />
+                            <xs:element name="reactiveArmor" type="xs:int" />
+                            <xs:element name="coverageRate" type="xs:double" />
+                        </xs:all>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="DamageModel">
+                    <xs:complexType>
+                        <xs:all>
+                            <xs:element name="functionalWeight" type="xs:int" minOccurs="0" />
+                            <xs:element name="structualWeight" type="xs:int" minOccurs="0" />
+                        </xs:all>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="FireUnit">
+                    <xs:complexType>
+                        <xs:all>
+                            <xs:element name="fireZone" type="AngleZone" />
+                            <xs:element name="rotateZone" type="AngleZone" />
+                            <xs:element name="rotateSpeed" type="Direction" />
+                            <xs:element name="weapon">
+                                <xs:complexType>
+                                    <xs:all>
+                                        <xs:element name="ammoType" type="xs:string" />
+                                        <xs:element name="ammoRemain" type="xs:int" />
+                                        <xs:element name="reloadingTime" type="xs:double" />
+                                        <xs:element name="range" type="xs:double" />
+                                        <xs:element name="speed" type="xs:double" />
+                                    </xs:all>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:all>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="SensorData">
+                    <xs:complexType>
+                        <xs:all>
+                            <xs:element name="type" type="xs:string" />
+                        </xs:all>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="Coordinate">
+                    <xs:complexType>
+                        <xs:all>
+                            <xs:element name="position" type="Vector3" />
+                            <xs:element name="attitude" type="Quaternion" />
+                        </xs:all>
+                    </xs:complexType>
+                </xs:element>
+            </xs:choice>
         </xs:sequence>
     </xs:complexType>
+
+    <xs:complexType name="AngleZone">
+        <xs:all>
+            <xs:element name="yawLeft" type="xs:double" />
+            <xs:element name="yawRight" type="xs:double" />
+            <xs:element name="pitchUp" type="xs:double" />
+            <xs:element name="pitchDown" type="xs:double" />
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="Direction">
+        <xs:all>
+            <xs:element name="yaw" type="xs:double" />
+            <xs:element name="pitch" type="xs:double" />
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="Vector3">
+        <xs:all>
+            <xs:element name="x" type="xs:double" />
+            <xs:element name="y" type="xs:double" />
+            <xs:element name="z" type="xs:double" />
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="Quaternion">
+        <xs:all>
+            <xs:element name="roll" type="xs:double" />
+            <xs:element name="yaw" type="xs:double" />
+            <xs:element name="pitch" type="xs:double" />
+        </xs:all>
+    </xs:complexType>
+
 </xs:schema>

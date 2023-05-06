@@ -15,7 +15,7 @@ namespace carphymodel {
 class FireControlSystem : public System {
   public:
     FireControlSystem() = default;
-    virtual void tick(double dt, Components &c) override {
+    virtual void tick(double dt, Components& c) override {
         using namespace command;
         using namespace std;
 
@@ -28,9 +28,9 @@ class FireControlSystem : public System {
     virtual ~FireControlSystem() = default;
 
   private:
-    FireUnit &getNthFireUnit(size_t n, Components &c) {
+    FireUnit& getNthFireUnit(size_t n, Components& c) {
         size_t cnt = 0;
-        for (auto &&[id, fireUnit] : c.getNormal<FireUnit>()) {
+        for (auto&& [id, fireUnit] : c.getNormal<FireUnit>()) {
             if (cnt == n) {
                 return fireUnit;
             }
@@ -39,7 +39,7 @@ class FireControlSystem : public System {
         my_assert(false, "Invalid Weapon Index " + std::to_string(n));
         return get<1>(*c.getNormal<FireUnit>().begin());
     }
-    void applyCommand(double dt, Components &c) {
+    void applyCommand(double dt, Components& c) {
         using namespace command;
         using namespace std;
 
@@ -50,14 +50,14 @@ class FireControlSystem : public System {
             {COMMAND_TYPE::UNLOCK, FIRE_UNIT_STATE::FREE},
         };
 
-        for (auto &[k, v] : c.getSpecificSingleton<CommandBuffer>().value()) {
+        for (auto& [k, v] : c.getSpecificSingleton<CommandBuffer>().value()) {
             if (auto it = commands.find(k); it != commands.end()) {
                 auto [index, param] = any_cast<tuple<double, double>>(v);
-                auto &tmp = getNthFireUnit((size_t)index, c);
+                auto& tmp = getNthFireUnit((size_t)index, c);
                 tmp.state = it->second;
                 tmp.data = param;
             } else if (k == COMMAND_TYPE::FREE_SHOOT) {
-                for (auto &&[id, fireUnit] : c.getNormal<FireUnit>()) {
+                for (auto&& [id, fireUnit] : c.getNormal<FireUnit>()) {
                     if (fireUnit.state == FIRE_UNIT_STATE::FREE || fireUnit.state == FIRE_UNIT_STATE::LOCK_DIRECTION ||
                         fireUnit.state == FIRE_UNIT_STATE::SEEK_TARGET) {
                         fireUnit.state = FIRE_UNIT_STATE::SEEK_TARGET;
@@ -67,32 +67,32 @@ class FireControlSystem : public System {
                 }
                 break;
             } else if (k == COMMAND_TYPE::STOP_SHOOT) {
-                for (auto &&[id, fireUnit] : c.getNormal<FireUnit>()) {
+                for (auto&& [id, fireUnit] : c.getNormal<FireUnit>()) {
                     fireUnit.state = FIRE_UNIT_STATE::FREE;
                 }
                 break;
             }
         }
     }
-    std::set<FireUnit*> updateFireUnitState(double dt, Components &c) {
-        // scanned memory中存储的位置所在的帧与目标解算毁伤事件所在帧相差的帧数
+    std::set<FireUnit*> updateFireUnitState(double dt, Components& c) {
+        // lag between frame which generate target information in ScannedMemory and frame of this tick
         constexpr auto lagFrameCounter = 1;
         std::set<FireUnit*> ret;
 
         // 0. data preparing
-        const auto &baseCoordinate = c.getSpecificSingleton<Coordinate>().value();
-        const auto &selfPosition = baseCoordinate.position;
-        auto &scannedMemory = c.getSpecificSingleton<ScannedMemory>();
+        const auto& baseCoordinate = c.getSpecificSingleton<Coordinate>().value();
+        const auto& selfPosition = baseCoordinate.position;
+        auto& scannedMemory = c.getSpecificSingleton<ScannedMemory>();
         if (scannedMemory.value().size() == 0) {
             // no target, clear fire unit state
-            for (auto &&[id, fireUnit] : c.getNormal<FireUnit>()) {
+            for (auto&& [id, fireUnit] : c.getNormal<FireUnit>()) {
                 fireUnit.state = FIRE_UNIT_STATE::FREE;
             }
             return ret;
         }
         size_t nearstTarget = 0;
         double minDistance = -1;
-        for (auto &[id, tar] : scannedMemory.value()) {
+        for (auto& [id, tar] : scannedMemory.value()) {
             if (!isTargetAvailable(tar)) {
                 continue;
             }
@@ -104,7 +104,7 @@ class FireControlSystem : public System {
         }
 
         // main loop
-        for (auto &&[id, damageModel, fireUnit, coordinate] : c.getNormal<DamageModel, FireUnit, Coordinate>()) {
+        for (auto&& [id, damageModel, fireUnit, coordinate] : c.getNormal<DamageModel, FireUnit, Coordinate>()) {
 
             if (damageModel.damageLevel != DAMAGE_LEVEL::N && damageModel.damageLevel != DAMAGE_LEVEL::M) {
                 // destroyed
@@ -119,6 +119,7 @@ class FireControlSystem : public System {
             if (fireUnit.state == FIRE_UNIT_STATE::FREE) {
                 continue;
             }
+            // for now, fireUnit.state is not FREE
 
             // 2. make target avaliable
             if (fireUnit.state == FIRE_UNIT_STATE::MULTI_SHOOT || fireUnit.state == FIRE_UNIT_STATE::SINGLE_SHOOT ||
@@ -126,7 +127,7 @@ class FireControlSystem : public System {
                 auto it = scannedMemory.value().find(fireUnit.data);
                 if (it == scannedMemory.value().end() || !isTargetAvailable(it->second)) {
                     if (fireUnit.state == FIRE_UNIT_STATE::MULTI_SHOOT) {
-                        my_assert(size_t(double(nearstTarget))==nearstTarget);
+                        my_assert(size_t(double(nearstTarget)) == nearstTarget);
                         fireUnit.data = static_cast<double>(nearstTarget);
                     } else {
                         fireUnit.state = FIRE_UNIT_STATE::FREE;
@@ -138,6 +139,7 @@ class FireControlSystem : public System {
                 fireUnit.data = static_cast<double>(nearstTarget);
                 fireUnit.state = FIRE_UNIT_STATE::MULTI_SHOOT;
             }
+            // for now, fireUnit.state is LOCK_TARGET, LOCK_DIRECTION, SINGLE_SHOOT or MULTI_SHOOT
 
             // 3. rotate turret
             double expectDirection, expectPitch;
@@ -149,10 +151,11 @@ class FireControlSystem : public System {
                 expectDirection = atan2(relativeDirection.y, relativeDirection.x);
                 expectPitch = 0;
             } else {
+                // fireUnit.state is LOCK_TARGET, SINGLE_SHOOT or MULTI_SHOOT, that means it will lock at target
                 auto it = scannedMemory.value().find(fireUnit.data);
                 my_assert(it != scannedMemory.value().end() && isTargetAvailable(it->second));
                 // TODO: cache?
-                auto &info = std::get<1>(it->second);
+                auto& info = std::get<1>(it->second);
                 auto tmp = baseCoordinate.positionWorldToBody(info.position + lagFrameCounter * dt * info.velocity);
                 auto relativePosition = coordinate.positionWorldToBody(tmp);
                 if (relativePosition.norm() < fireUnit.weapon.range) {
@@ -168,27 +171,32 @@ class FireControlSystem : public System {
 
             double rotateYaw = angleNormalize(expectDirection - fireUnit.presentDirection.yaw);
             double rotatePitch = angleNormalize(expectPitch - fireUnit.presentDirection.pitch);
-            if (fabs(rotateYaw) < fireUnit.rotateSpeed.yaw * dt &&
-                fabs(rotatePitch) < fireUnit.rotateSpeed.pitch * dt) {
-                // 4. check if aimed and target in range
+
+            if (fabs(rotateYaw) < fireUnit.rotateSpeed.yaw * dt) {
                 fireUnit.presentDirection.yaw = expectDirection;
-                fireUnit.presentDirection.pitch = expectPitch;
-                if (inRange) {
-                    ret.emplace(&fireUnit);
-                }
             } else {
                 fireUnit.presentDirection.yaw += fireUnit.rotateSpeed.yaw * dt * (signbit(rotateYaw) ? -1 : 1);
-                fireUnit.presentDirection.pitch += fireUnit.rotateSpeed.pitch * dt * (signbit(rotatePitch) ? -1 : 1);
                 fireUnit.presentDirection.yaw = angleNormalize(fireUnit.presentDirection.yaw);
+            }
+            if (fabs(rotatePitch) < fireUnit.rotateSpeed.pitch * dt) {
+                fireUnit.presentDirection.pitch = expectPitch;
+            } else {
+                fireUnit.presentDirection.pitch += fireUnit.rotateSpeed.pitch * dt * (signbit(rotatePitch) ? -1 : 1);
+            }
+
+            // 4. check if target aimed
+            if (fireUnit.fireZone.containsDirection({angleNormalize(expectDirection - fireUnit.presentDirection.yaw),
+                                                     angleNormalize(expectPitch - fireUnit.presentDirection.pitch)})) {
+                ret.emplace(&fireUnit);
             }
         }
         return ret;
     }
-    void setFire(double dt, Components &c, const std::set<FireUnit*> &aimedAndInRange) {
-        auto &selfPosition = c.getSpecificSingleton<Coordinate>().value().position;
-        auto &mem = c.getSpecificSingleton<ScannedMemory>().value();
-        auto &fireEvents = c.getSpecificSingleton<EventBuffer>().value();
-        for (auto &&[id, fireUnit] : c.getNormal<FireUnit>()) {
+    void setFire(double dt, Components& c, const std::set<FireUnit*>& aimedAndInRange) {
+        auto& selfPosition = c.getSpecificSingleton<Coordinate>().value().position;
+        auto& mem = c.getSpecificSingleton<ScannedMemory>().value();
+        auto& fireEvents = c.getSpecificSingleton<EventBuffer>().value();
+        for (auto&& [id, fireUnit] : c.getNormal<FireUnit>()) {
             if (!aimedAndInRange.contains(&fireUnit) ||
                 (fireUnit.state != FIRE_UNIT_STATE::SINGLE_SHOOT && fireUnit.state != FIRE_UNIT_STATE::MULTI_SHOOT) ||
                 fireUnit.weapon.reloadingState != 0 || fireUnit.weapon.ammoRemain == 0) {
@@ -203,7 +211,7 @@ class FireControlSystem : public System {
     }
 
     // check if target detected and not destroyed
-    bool isTargetAvailable(const std::tuple<double, carphymodel::EntityInfo> &tar) {
+    bool isTargetAvailable(const std::tuple<double, carphymodel::EntityInfo>& tar) {
         return std::get<0>(tar) == 0. && std::get<1>(tar).baseInfo.damageLevel != DAMAGE_LEVEL::KK;
     }
 
@@ -216,9 +224,17 @@ class FireControlSystem : public System {
         }
         return angle;
     }
+    double clamp(double value, double bound) {
+        bound = fabs(bound);
+        if (value < -bound)
+            value = -bound;
+        if (value > bound)
+            value = bound;
+        return value;
+    }
 
-    FireEvent weaponShoot(carphymodel::FireUnit &fireUnit, const carphymodel::Vector3 &selfPosition,
-                          const carphymodel::Vector3 &targetPosition) {
+    FireEvent weaponShoot(carphymodel::FireUnit& fireUnit, const carphymodel::Vector3& selfPosition,
+                          const carphymodel::Vector3& targetPosition) {
         fireUnit.weapon.ammoRemain -= 1;
         fireUnit.weapon.reloadingState = fireUnit.weapon.reloadingTime;
         if (fireUnit.state == FIRE_UNIT_STATE::SINGLE_SHOOT) {
