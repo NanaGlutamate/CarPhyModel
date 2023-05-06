@@ -12,6 +12,7 @@
 
 #include "../framework/componentmanager.hpp"
 #include "coordinate.hpp"
+#include "constant.hpp"
 #include "vector3.hpp"
 
 namespace carphymodel {
@@ -131,6 +132,13 @@ struct FireEvent {
     double range;
 };
 
+struct Direction {
+    constexpr static const char *token_list[] = {"yaw", "pitch"};
+    double yaw, pitch;
+    double &operator[](size_t index) { return (&yaw)[index]; };
+    const double &operator[](size_t index) const { return (&yaw)[index]; };
+};
+
 struct AngleZone {
     constexpr static const char *token_list[] = {"yawLeft", "yawRight", "pitchUp", "pitchDown"};
     double yawLeft, yawRight, pitchUp, pitchDown;
@@ -139,13 +147,6 @@ struct AngleZone {
     bool containsDirection(const Direction& d) const {
         return d.yaw<=yawLeft+INF_SMALL && d.yaw>=yawRight-INF_SMALL && d.pitch<=pitchUp+INF_SMALL && d.pitch>=pitchDown-INF_SMALL;
     }
-};
-
-struct Direction {
-    constexpr static const char *token_list[] = {"yaw", "pitch"};
-    double yaw, pitch;
-    double &operator[](size_t index) { return (&yaw)[index]; };
-    const double &operator[](size_t index) const { return (&yaw)[index]; };
 };
 
 // carfireunit
