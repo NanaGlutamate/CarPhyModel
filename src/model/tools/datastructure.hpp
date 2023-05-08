@@ -68,6 +68,7 @@ struct Block {
     constexpr double operator[](size_t i) const { return (&length)[i]; };
     double &operator[](size_t i) { return (&length)[i]; };
     double length, width, height;
+    static Block make(){return Block{};}
 };
 
 struct Sphere {
@@ -95,6 +96,7 @@ struct ProtectionModel {
     int reactiveArmor;
     // rate of surface area which covered by reactive armor
     double coverageRate;
+    static ProtectionModel make(){return ProtectionModel{};}
 };
 
 // carhull
@@ -116,11 +118,12 @@ struct DamageModel {
     DAMAGE_LEVEL damageLevel;
     int functionalWeight;
     int structualWeight;
+    static DamageModel make(){return DamageModel{DAMAGE_LEVEL::N, 0, 0};}
 };
 
 // TODO: index to prevent redundant processing?
 struct FireEvent {
-    constexpr static const char *token_list[] = {"weaponName", "target", "position", "velocity", "range"};
+    // constexpr static const char *token_list[] = {"weaponName", "target", "position", "velocity", "range"};
     std::string weaponName;
     // 目标点的世界坐标
     Vector3 target;
@@ -137,6 +140,7 @@ struct Direction {
     double yaw, pitch;
     double &operator[](size_t index) { return (&yaw)[index]; };
     const double &operator[](size_t index) const { return (&yaw)[index]; };
+    static Direction make(){return Direction{};}
 };
 
 struct AngleZone {
@@ -147,6 +151,7 @@ struct AngleZone {
     bool containsDirection(const Direction& d) const {
         return d.yaw<=yawLeft+INF_SMALL && d.yaw>=yawRight-INF_SMALL && d.pitch<=pitchUp+INF_SMALL && d.pitch>=pitchDown-INF_SMALL;
     }
+    static AngleZone make(){return AngleZone{};}
 };
 
 // carfireunit
@@ -168,6 +173,11 @@ struct Weapon {
     double reloadingState; ///< current remain reloading time
     double range;
     double speed;
+    static Weapon make(){
+        Weapon tmp;
+        tmp.reloadingState = 0;
+        return tmp;
+    }
 };
 
 struct FireUnit {
@@ -180,12 +190,20 @@ struct FireUnit {
     Direction presentDirection; ///< [yaw, pitch]
     Direction rotateSpeed;      ///< [yaw, pitch]
     Weapon weapon;
+    static FireUnit make(){
+        FireUnit tmp;
+        tmp.state = FIRE_UNIT_STATE::FREE;
+        tmp.data = 0;
+        tmp.presentDirection = Direction{0, 0};
+        return tmp;
+    }
 };
 
 // carsensor
 struct SensorData {
     constexpr static const char *token_list[] = {"type"};
     std::string type;
+    static SensorData make(){return SensorData{};}
 };
 
 struct BaseInfo {
@@ -197,10 +215,11 @@ struct BaseInfo {
     VID id;
     SID side;
     DAMAGE_LEVEL damageLevel;
+    static BaseInfo make(){return BaseInfo{};}
 };
 
 struct EntityInfo {
-    constexpr static const char *token_list[] = {"position", "velocity", "baseInfo"};
+    // constexpr static const char *token_list[] = {"position", "velocity", "baseInfo"};
     Vector3 position;
     Vector3 velocity;
     BaseInfo baseInfo;
@@ -239,6 +258,11 @@ struct WheelMotionParamList {
     double MAX_BRAKE_ACCELERATION;
     // 最大转弯向心加速度(侧向加速度)约束
     double MAX_LATERAL_ACCELERATION;
+    static WheelMotionParamList make(){
+        WheelMotionParamList tmp;
+        tmp.angle = 0;
+        return tmp;
+    }
 };
 
 struct HitEventQueue : public std::vector<FireEvent> {};

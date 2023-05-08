@@ -19,8 +19,9 @@ namespace carphymodel {
 // no damage if any armor between explosion point and damage model
 void HEDamage::updateDamage(const FireEvent &fireEvent, Components &c) const {
 
-    auto velocity = c.getSpecificSingleton<Coordinate>()->directionWorldToBody(fireEvent.velocity);
-    auto position = c.getSpecificSingleton<Coordinate>()->positionWorldToBody(fireEvent.position);
+    auto& carCoordinate = c.getSpecificSingleton<Coordinate>().value();
+    auto velocity = carCoordinate.directionWorldToBody(fireEvent.velocity);
+    auto position = carCoordinate.positionWorldToBody(fireEvent.position);
 
     for (auto &&[id, protection] : c.getNormal<ProtectionModel>()) {
         if (protection.activeProtectionAmmo) {
@@ -30,23 +31,20 @@ void HEDamage::updateDamage(const FireEvent &fireEvent, Components &c) const {
     }
 
     // depth when projectile explode, which is the depth when meet first block
-    double depthExplode = -1.;
+    double depthExplode = INF_BIG;
     for (auto &&[id, block, coordinate] : c.getNormal<Block, Coordinate>()) {
         auto inter = rayCollision(velocity, position, block, coordinate);
         if (!inter.isCollision()) {
             continue;
         }
-        if (depthExplode == -1.) {
-            depthExplode = inter.minDepth;
-        } else {
-            depthExplode = fmin(depthExplode, inter.minDepth);
-        }
+        depthExplode = fmin(depthExplode, inter.minDepth);
     }
-    if (depthExplode == -1.) {
-        // not hit
-        return;
+    Vector3 explosionPoint;
+    if (depthExplode == INF_BIG) {
+        explosionPoint = carCoordinate.positionWorldToBody(fireEvent.target);
+    } else {
+        explosionPoint = position + velocity * depthExplode;
     }
-    auto explosionPoint = position + velocity * depthExplode;
 
     for (auto &&[id, damage, coordinate] : c.getNormal<DamageModel, Coordinate>()) {
         if (damage.damageLevel == DAMAGE_LEVEL::KK) {

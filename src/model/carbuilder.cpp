@@ -17,7 +17,7 @@
 #include "toolsystem/ballisticsystem.hpp"
 #include "toolsystem/hitsystem.hpp"
 
-namespace{
+namespace {
 
 using namespace rapidxml;
 using namespace std;
@@ -25,11 +25,9 @@ using namespace carphymodel;
 using namespace carphymodel::component;
 using namespace carphymodel::mymeta;
 
-template <typename ...Ty>
-struct NameTable{
+template <typename... Ty>
+struct NameTable {
     std::array<std::string_view, sizeof...(Ty)> table;
-    template <typename ...S>
-    constexpr NameTable(S&&... s):table(std::forward<S>(s)...){};
     template <typename T>
     constexpr std::string_view getName() const {
         return table[get_type_list_index<T, Ty...>::value];
@@ -37,48 +35,49 @@ struct NameTable{
 };
 
 constexpr NameTable<WheelMotionParamList, Coordinate, DamageModel, Block, ProtectionModel, FireUnit, SensorData>
-    nameTable{"WheelMotionParamList", "Coordinate", "DamageModel", "Block",
-              "ProtectionModel",      "FireUnit",   "SensorData"};
+    nameTable{{
+        "WheelMotionParamList",
+        "Coordinate",
+        "DamageModel",
+        "Block",
+        "ProtectionModel",
+        "FireUnit",
+        "SensorData",
+    }};
 
-class CStyleString{
-public:
-    char*s;
-    CStyleString(size_t n):s(new char[n]){};
-    CStyleString(const CStyleString& s)=delete;
-    void operator=(const CStyleString& s)=delete;
-    CStyleString(const std::string& str):s(new char[str.size()+5]){memcpy(s,str.c_str(),str.size()+1);};
-    ~CStyleString(){delete[] s;};
+class CStyleString {
+  public:
+    char* s;
+    CStyleString(size_t n) : s(new char[n]){};
+    CStyleString(const CStyleString& s) = delete;
+    void operator=(const CStyleString& s) = delete;
+    CStyleString(const std::string& str) : s(new char[str.size() + 5]) { memcpy(s, str.c_str(), str.size() + 1); };
+    ~CStyleString() { delete[] s; };
 };
 
-template<typename Ty>
+template <typename Ty>
 struct loadComponent;
 
-template<typename ...Ty>
-struct loadComponent<NormalComponent<Ty...>>{
-    static void load(
-        size_t ID, 
-        rapidxml::xml_node<char>* component, 
-        carphymodel::Components::Modifier& handle
-    ){
-        bool match = (... || [&](){
+template <typename... Ty>
+struct loadComponent<NormalComponent<Ty...>> {
+    static void load(size_t ID, rapidxml::xml_node<char>* component, carphymodel::Components::Modifier& handle) {
+        bool match = (... || [&]() {
             // TODO: use set instead?
-            if(component->name() == nameTable.getName<Ty>()){
+            if (component->name() == nameTable.getName<Ty>()) {
                 handle.addNormalComponents<Ty>(ID, componentDeserialize<Ty>(component));
                 return true;
             }
             return false;
         }());
         my_assert(match, "Invalid Component Named "s + component->name());
-    } 
+    }
 };
 
-template<typename ...Ty>
-struct loadComponent<SingletonComponent<Ty...>>{
-    static void load(
-        rapidxml::xml_node<char>* root, 
-        carphymodel::Components::Modifier& handle){
-        int tmp[] = {[&](){
-            if(auto p = root->first_node(nameTable.getName<Ty>().data(), nameTable.getName<Ty>().size()); p != 0){
+template <typename... Ty>
+struct loadComponent<SingletonComponent<Ty...>> {
+    static void load(rapidxml::xml_node<char>* root, carphymodel::Components::Modifier& handle) {
+        int tmp[] = {[&]() {
+            if (auto p = root->first_node(nameTable.getName<Ty>().data(), nameTable.getName<Ty>().size()); p != 0) {
                 handle.addSingletonComponents<Ty>(componentDeserialize<Ty>(p));
             }
             return 0;
@@ -108,8 +107,8 @@ struct Restriction {
             bool fit = (... && c.getSpecificNormal<Dependencies>(id).has_value());
             if (!fit) {
                 std::string errorInfo = std::string(nameTable.getName<Tar>()) + " need dependencies ";
-                int tmp[] = {[&](){
-                    if (!c.getSpecificNormal<Dependencies>(id).has_value()){
+                int tmp[] = {[&]() {
+                    if (!c.getSpecificNormal<Dependencies>(id).has_value()) {
                         errorInfo += std::string(nameTable.getName<Dependencies>()) + ", ";
                     }
                     return 0;
@@ -148,82 +147,65 @@ void checkRestriction(Components& c) {
     using namespace carphymodel;
     static RestrictionList<
         Restriction<Block, Coordinate>,
-
-        Restriction<ProtectionModel, Block>,
+        Restriction<ProtectionModel, Block>, 
         Restriction<DamageModel, Block>,
-
-        Restriction<SensorData, DamageModel>,
+        Restriction<SensorData, DamageModel>, 
         Restriction<FireUnit, DamageModel>
     > checker;
     auto s = checker.check(c);
-    if(!s.empty()){
+    if (!s.empty()) {
         error(s);
     }
 }
 
-}
+} // namespace
 
-namespace carphymodel{
+namespace carphymodel {
 
-void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model, bool check){
-    if(model.systems.empty()){
-        model.systems.push_back(std::make_unique<PrepareSystem>());
+void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model, bool check) {
+    static struct InitJob{
+        InitJob() { 
+            auto& system = CarModel::systems;
+            system.push_back(std::make_unique<PrepareSystem>());
 
-        model.systems.push_back(std::make_unique<SensorSystem>());
-        model.systems.push_back(std::make_unique<FireControlSystem>());
+            system.push_back(std::make_unique<SensorSystem>());
+            system.push_back(std::make_unique<FireControlSystem>());
 
-        model.systems.push_back(std::make_unique<BallisticSystem>());
-        model.systems.push_back(std::make_unique<HitSystem>());
+            system.push_back(std::make_unique<BallisticSystem>());
+            system.push_back(std::make_unique<HitSystem>());
 
-        // model.systems.push_back(std::make_unique<ProtectionSystem>());
-        model.systems.push_back(std::make_unique<DamageSystem>());
+            system.push_back(std::make_unique<DamageSystem>());
 
-        model.systems.push_back(std::make_unique<HullSystem>());
+            system.push_back(std::make_unique<HullSystem>());
 
-        model.systems.push_back(std::make_unique<OutputSystem>());
-    }
+            system.push_back(std::make_unique<OutputSystem>());
+        }
+    } initJob;
 
-    //初始化xml解析器
+    // 初始化xml解析器
     xml_document<> doc;
     CStyleString s(srcXML);
     doc.parse<parse_default>(s.s);
-    auto root=doc.first_node("car");
-    
-    if(auto handle = model.components.getModifier()){
-        handle.addSingletonComponents<
-            CommandBuffer,
-            EventBuffer,
-            DamageModel,
-            Coordinate,
-            HitEventQueue,
-            FireEventQueue,
-            ScannedMemory,
-            Hull
-        >({}, {}, {}, {}, {}, {}, {}, {});
+    auto root = doc.first_node("car");
 
-        loadComponent<SingletonComponent<
-            WheelMotionParamList
-        >>::load(root, handle);
+    if (auto handle = model.components.getModifier()) {
+        handle.addSingletonComponents<CommandBuffer, EventBuffer, DamageModel, Coordinate, HitEventQueue,
+                                      FireEventQueue, ScannedMemory, Hull>({}, {}, {}, {}, {}, {}, {}, {});
 
-        for(auto entity = root->first_node("entity"); entity; entity = entity->next_sibling("entity")){
+        loadComponent<SingletonComponent<WheelMotionParamList>>::load(root, handle);
+
+        for (auto entity = root->first_node("entity"); entity; entity = entity->next_sibling("entity")) {
             auto ID = handle.newEntity();
-            for(auto component = entity->first_node(0); component; component = component->next_sibling()){
-                loadComponent<NormalComponent<
-                    Block,
-                    ProtectionModel,
-                    DamageModel,
-                    FireUnit,
-                    SensorData,
-                    Coordinate
-                >>::load(ID, component, handle);
+            for (auto component = entity->first_node(0); component; component = component->next_sibling()) {
+                loadComponent<NormalComponent<Block, ProtectionModel, DamageModel, FireUnit, SensorData,
+                                              Coordinate>>::load(ID, component, handle);
             }
         }
     }
 
-    if(check){
+    if (check) {
         checkRestriction(model.components);
     }
-
 }
 
-}
+} // namespace carphymodel

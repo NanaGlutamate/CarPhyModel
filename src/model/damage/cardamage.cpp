@@ -12,7 +12,12 @@ void DamageSystem::tick(double dt, Components &c) {
     int loseFunction = 0, loseStructure = 0;
     int totalFunction = 0, totalStructure = 0;
 
-    for (auto &&fireEvent : c.getSpecificSingleton<HitEventQueue>().value()) {
+    auto& hitEventQueue = c.getSpecificSingleton<HitEventQueue>().value();
+    if (hitEventQueue.empty() && c.getSpecificSingleton<DamageModel>().has_value()) {
+        return;
+    }
+
+    for (auto&& fireEvent : hitEventQueue) {
         auto ammunitionModel = AmmunitionDamageFactory::getProduct(fireEvent.weaponName);
 
         ammunitionModel->updateDamage(fireEvent, c);

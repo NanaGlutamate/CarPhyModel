@@ -54,26 +54,30 @@ string getLibDir() {
 } // namespace
 
 bool CarPhyModel::Init(const std::unordered_map<std::string, std::any> &value) {
+    // must init 1 by 1?
+    const std::lock_guard lock(initLock);
     if (auto it = value.find("filePath"); it != value.end()) {
         carphymodel::CarBuilder::buildFromFile(any_cast<std::string>(it->second), model);
     } else {
         carphymodel::CarBuilder::buildFromFile(getLibDir() + "car.xml", model);
     }
-    if (auto it = value.find("baseLongitude"); it != value.end()) {
-        location.longitude = std::any_cast<double>(it->second);
-        location.latitude = std::any_cast<double>(value.find("baseLatitude")->second);
-        location.altitude = std::any_cast<double>(value.find("baseAltitude")->second);
-    }
+    //if (auto it = value.find("baseLongitude"); it != value.end()) {
+    //    location.longitude = std::any_cast<double>(it->second);
+    //    location.latitude = std::any_cast<double>(value.find("baseLatitude")->second);
+    //    location.altitude = std::any_cast<double>(value.find("baseAltitude")->second);
+    //}
+    myVID = VIDCounter++;
     Location tmp{0, 0, 0};
-    if (auto it = value.find("longitude"); it != value.end()) {
-        tmp.longitude = std::any_cast<double>(it->second);
-        tmp.latitude = std::any_cast<double>(value.find("latitude")->second);
-        tmp.altitude = std::any_cast<double>(value.find("altitude")->second);
+    tmp.longitude = std::any_cast<double>(value.find("longitude")->second);
+    tmp.latitude = std::any_cast<double>(value.find("latitude")->second);
+    tmp.altitude = std::any_cast<double>(value.find("altitude")->second);
+    if (!myVID) {
+        // location of car 0 is base location.
+        // CQ will not release dll when restart, but has no unexpected affect
+        location = tmp;
     }
     model.components.getSpecificSingleton<carphymodel::Coordinate>().value().position = locationTrans(location, tmp);
     state_ = CSInstanceState::IS_INITIALIZED;
-    WriteLog("CarPhyModel model Init", 1);
-    myVID = VIDCounter++;
     return true;
 }
 
@@ -81,12 +85,6 @@ bool CarPhyModel::Tick(double time) {
     // time: ms -> s
     model.tick(time / 1000);
     auto &buffer = model.components.getSpecificSingleton<carphymodel::EventBuffer>();
-    buffer->emplace("ForceSideID", GetForceSideID());
-    buffer->emplace("ModelID", GetModelID());
-    buffer->emplace("InstanceName", GetInstanceName());
-    // TODO: use ID starts from 0
-    buffer->emplace("ID", GetID());
-    buffer->emplace("State", uint16_t(GetState()));
 
     buffer->emplace("VID", getVID());
     if (auto it = buffer->find("FireDataOut"); it != buffer->end()) {
@@ -105,8 +103,7 @@ bool CarPhyModel::Tick(double time) {
     info.position = model.components.getSpecificSingleton<carphymodel::Coordinate>()->position;
     info.velocity = model.components.getSpecificSingleton<carphymodel::Hull>()->velocity;
     buffer->emplace("EntityInfoOut", info.ToValueMap());
-    Location tmpl =
-        positionTrans(location, model.components.getSpecificSingleton<carphymodel::Coordinate>().value().position);
+    Location tmpl = positionTrans(location, info.position);
     // deg
     buffer->emplace("longitude", tmpl.longitude);
     buffer->emplace("altitude", tmpl.altitude);
@@ -117,7 +114,7 @@ bool CarPhyModel::Tick(double time) {
     // deg
     buffer->emplace("roll", carphymodel::RAD2DEG(attitude.x));
     buffer->emplace("pitch", carphymodel::RAD2DEG(attitude.y));
-    buffer->emplace("yaw", carphymodel::RAD2DEG(attitude.z));
+    buffer->emplace("yaw", carphymodel::RAD2DEG(attitude.z - carphymodel::PI / 2));
     auto velocity = model.components.getSpecificSingleton<carphymodel::Hull>().value().velocity;
     buffer->emplace("velocity_x", velocity.x);
     buffer->emplace("velocity_y", velocity.y);
@@ -140,8 +137,6 @@ bool CarPhyModel::Tick(double time) {
         scannedInfoOut.emplace_back(EntityInfo(std::get<1>(info.second)).ToValueMap());
     }
     buffer->emplace("scannedInfoOut", std::move(scannedInfoOut));
-
-    WriteLog("CarPhyModel model Tick", 1);
     return true;
 }
 
@@ -176,14 +171,18 @@ bool CarPhyModel::SetInput(const std::unordered_map<std::string, std::any> &valu
         WriteLog(std::format("CarPhyModel model receive command {}({},{})", (uint64_t)command, param1, param2), 1);
         buffer->emplace(command, make_tuple(param1, param2));
     }
-    WriteLog("CarPhyModel model SetInput", 1);
     return true;
 }
 
 std::unordered_map<std::string, std::any> *CarPhyModel::GetOutput() {
     state_ = CSInstanceState::IS_RUNNING;
-    WriteLog("CarPhyModel model GetOutput", 1);
-    return model.getOutput();
+    auto& buffer = model.components.getSpecificSingleton<carphymodel::EventBuffer>().value();
+    buffer.emplace("ForceSideID", GetForceSideID());
+    buffer.emplace("ModelID", GetModelID());
+    buffer.emplace("InstanceName", GetInstanceName());
+    buffer.emplace("ID", GetID());
+    buffer.emplace("State", uint16_t(GetState()));
+    return &buffer;
 }
 
 CARPHYMODEL_EXPORT CSModelObject *CreateModelObject() {

@@ -4,6 +4,8 @@
 #include <functional>
 #include <set>
 #include <tuple>
+#include <ctime>
+#include <random>
 
 #include "../framework/system.hpp"
 #include "../tools/constant.hpp"
@@ -28,6 +30,7 @@ class FireControlSystem : public System {
     virtual ~FireControlSystem() = default;
 
   private:
+    constexpr inline static size_t lagFrameCounter = 1;
     FireUnit& getNthFireUnit(size_t n, Components& c) {
         size_t cnt = 0;
         for (auto&& [id, fireUnit] : c.getNormal<FireUnit>()) {
@@ -76,7 +79,6 @@ class FireControlSystem : public System {
     }
     std::set<FireUnit*> updateFireUnitState(double dt, Components& c) {
         // lag between frame which generate target information in ScannedMemory and frame of this tick
-        constexpr auto lagFrameCounter = 1;
         std::set<FireUnit*> ret;
 
         // 0. data preparing
@@ -203,9 +205,12 @@ class FireControlSystem : public System {
                 fireUnit.weapon.reloadingState != 0 || fireUnit.weapon.ammoRemain == 0) {
                 continue;
             }
+            auto& targetInfo = std::get<1>(mem.find(fireUnit.data)->second);
+            auto aimPoint = targetInfo.position + dt * lagFrameCounter * targetInfo.velocity;
+            // TODO: random
+            
             // TODO: overflow?
-            fireEvents.emplace("FireDataOut",
-                               weaponShoot(fireUnit, selfPosition, std::get<1>(mem.find(fireUnit.data)->second).position));
+            fireEvents.emplace("FireDataOut", weaponShoot(fireUnit, selfPosition, aimPoint));
             // 1 shoot per frame
             break;
         }
