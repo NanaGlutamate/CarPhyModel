@@ -17,4 +17,6 @@ inline double rand() {
     return u(e);
 }
 
+inline bool randEvent(double prob) { return rand() < prob; }
+
 } // namespace carphymodel

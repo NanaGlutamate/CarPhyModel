@@ -45,7 +45,7 @@ void APDamage::updateDamage(const FireEvent &fireEvent, Components &c) const {
             maxDepth = inter.minDepth;
             break;
         }
-        if (protection.reactiveArmor && rand() < protection.coverageRate) {
+        if (protection.reactiveArmor && randEvent(protection.coverageRate)) {
             protection.reactiveArmor--;
             maxDepth = inter.minDepth;
             protection.coverageRate *= protection.reactiveArmor / (protection.reactiveArmor + 1);
