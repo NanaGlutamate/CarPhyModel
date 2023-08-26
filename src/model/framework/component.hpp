@@ -170,9 +170,26 @@ inline ProtectionModel componentDeserialize<ProtectionModel>(rapidxml::xml_node<
 template <>
 inline DamageModel componentDeserialize<DamageModel>(rapidxml::xml_node<char>* node) {
     DamageModel tmp = DamageModel::make();
-    tmp.damageLevel = DAMAGE_LEVEL::N;
-    emplaceIfNotNull(tmp.functionalWeight, node->first_node("functionalWeight"));
-    emplaceIfNotNull(tmp.structualWeight, node->first_node("structualWeight"));
+    emplaceIfNotNull(tmp.maxInfluence, node->first_node("maxInfluence"));
+    return tmp;
+}
+
+template <>
+inline DAMAGE_LEVEL componentDeserialize<DAMAGE_LEVEL>(rapidxml::xml_node<char>* node) {
+    DAMAGE_LEVEL tmp = DAMAGE_LEVEL::KK;
+    auto content = node->value();
+    while (isspace(*content)) {
+        content++;
+    }
+    if (isdigit(*content)) {
+        tmp = static_cast<DAMAGE_LEVEL>(componentDeserialize<int>(node));
+    } else if (content[0] == 'N'){
+        tmp = DAMAGE_LEVEL::N;
+    } else if (content[0] == 'M') {
+        tmp = DAMAGE_LEVEL::M;
+    } else if (content[0] == 'K' && content[1] != 'K') {
+        tmp = DAMAGE_LEVEL::K;
+    }
     return tmp;
 }
 

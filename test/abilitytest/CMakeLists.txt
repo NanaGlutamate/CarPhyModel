@@ -1,0 +1,1 @@
+add_executable(hulltest hulltest.cpp ${MODEL_SRC})

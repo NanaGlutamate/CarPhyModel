@@ -25,7 +25,7 @@ class BaseInfo {
             if (it.first == "type")
                 type = std::any_cast<uint16_t>(it.second);
             if (it.first == "damageLevel")
-                type = std::any_cast<uint16_t>(it.second);
+                damageLevel = std::any_cast<uint16_t>(it.second);
         }
     }
 

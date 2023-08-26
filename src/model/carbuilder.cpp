@@ -191,6 +191,7 @@ void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model, boo
     if (auto handle = model.components.getModifier()) {
         handle.addSingletonComponents<CommandBuffer, EventBuffer, DamageModel, Coordinate, HitEventQueue,
                                       FireEventQueue, ScannedMemory, Hull>({}, {}, {}, {}, {}, {}, {}, {});
+        handle.addSingletonComponents<DamageModel>({DAMAGE_LEVEL::N, DAMAGE_LEVEL::KK});
 
         loadComponent<SingletonComponent<WheelMotionParamList>>::load(root, handle);
 

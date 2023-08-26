@@ -107,18 +107,17 @@ struct Hull {
 
 // cardamage，越小越正常
 enum class DAMAGE_LEVEL {
-    N,  // 正常
-    M,  // 中度毁伤
-    K,  // 失去功能
-    KK, // 失去结构
+    N = 0,  // 正常
+    M = 1,  // 中度毁伤
+    K = 2,  // 失去功能
+    KK = 3, // 失去结构
 };
 
 struct DamageModel {
-    constexpr static const char *token_list[] = {"-damageLevel", "functionalWeight", "structualWeight"};
+    constexpr static const char *token_list[] = {"-damageLevel", "maxInfluence"};
     DAMAGE_LEVEL damageLevel;
-    int functionalWeight;
-    int structualWeight;
-    static DamageModel make(){return DamageModel{DAMAGE_LEVEL::N, 0, 0};}
+    DAMAGE_LEVEL maxInfluence;
+    static DamageModel make() { return DamageModel{DAMAGE_LEVEL::N, DAMAGE_LEVEL::KK}; }
 };
 
 // TODO: index to prevent redundant processing?
