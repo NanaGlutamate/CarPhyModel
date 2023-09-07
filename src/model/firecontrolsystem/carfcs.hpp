@@ -84,18 +84,15 @@ class FireControlSystem : public System {
         // 0. data preparing
         const auto& baseCoordinate = c.getSpecificSingleton<Coordinate>().value();
         const auto& selfPosition = baseCoordinate.position;
+
+        auto vid = c.getSpecificSingleton<carphymodel::VID>().value();
+        auto sid = c.getSpecificSingleton<carphymodel::SID>().value();
+
         auto& scannedMemory = c.getSpecificSingleton<ScannedMemory>();
-        if (scannedMemory.value().size() == 0) {
-            // no target, clear fire unit state
-            for (auto&& [id, fireUnit] : c.getNormal<FireUnit>()) {
-                fireUnit.state = FIRE_UNIT_STATE::FREE;
-            }
-            return ret;
-        }
         size_t nearstTarget = 0;
         double minDistance = -1;
         for (auto& [id, tar] : scannedMemory.value()) {
-            if (!isTargetAvailable(tar)) {
+            if (!isTargetAvailable(tar, sid)) {
                 continue;
             }
             auto dis = (std::get<1>(tar).position - selfPosition).norm();
@@ -103,6 +100,13 @@ class FireControlSystem : public System {
                 minDistance = dis;
                 nearstTarget = id;
             }
+        }
+        if (minDistance == -1) {
+            // no target, clear fire unit state
+            for (auto&& [id, fireUnit] : c.getNormal<FireUnit>()) {
+                fireUnit.state = FIRE_UNIT_STATE::FREE;
+            }
+            return ret;
         }
 
         // main loop
@@ -121,13 +125,13 @@ class FireControlSystem : public System {
             if (fireUnit.state == FIRE_UNIT_STATE::FREE) {
                 continue;
             }
-            // for now, fireUnit.state is not FREE
+            // from now, fireUnit.state is not FREE
 
             // 2. make target avaliable
             if (fireUnit.state == FIRE_UNIT_STATE::MULTI_SHOOT || fireUnit.state == FIRE_UNIT_STATE::SINGLE_SHOOT ||
                 fireUnit.state == FIRE_UNIT_STATE::LOCK_TARGET) {
                 auto it = scannedMemory.value().find(fireUnit.data);
-                if (it == scannedMemory.value().end() || !isTargetAvailable(it->second)) {
+                if (it == scannedMemory.value().end() || !isTargetAvailable(it->second, sid)) {
                     if (fireUnit.state == FIRE_UNIT_STATE::MULTI_SHOOT) {
                         my_assert(size_t(double(nearstTarget)) == nearstTarget);
                         fireUnit.data = static_cast<double>(nearstTarget);
@@ -141,7 +145,7 @@ class FireControlSystem : public System {
                 fireUnit.data = static_cast<double>(nearstTarget);
                 fireUnit.state = FIRE_UNIT_STATE::MULTI_SHOOT;
             }
-            // for now, fireUnit.state is LOCK_TARGET, LOCK_DIRECTION, SINGLE_SHOOT or MULTI_SHOOT
+            // from now, fireUnit.state is LOCK_TARGET, LOCK_DIRECTION, SINGLE_SHOOT or MULTI_SHOOT
 
             // 3. rotate turret
             double expectDirection, expectPitch;
@@ -155,7 +159,7 @@ class FireControlSystem : public System {
             } else {
                 // fireUnit.state is LOCK_TARGET, SINGLE_SHOOT or MULTI_SHOOT, that means it will lock at target
                 auto it = scannedMemory.value().find(fireUnit.data);
-                my_assert(it != scannedMemory.value().end() && isTargetAvailable(it->second));
+                my_assert(it != scannedMemory.value().end() && isTargetAvailable(it->second, sid));
                 // TODO: cache?
                 auto& info = std::get<1>(it->second);
                 auto tmp = baseCoordinate.positionWorldToBody(info.position + lagFrameCounter * dt * info.velocity);
@@ -217,8 +221,9 @@ class FireControlSystem : public System {
     }
 
     // check if target detected and not destroyed
-    bool isTargetAvailable(const std::tuple<double, carphymodel::EntityInfo>& tar) {
-        return std::get<0>(tar) == 0. && std::get<1>(tar).baseInfo.damageLevel != DAMAGE_LEVEL::KK;
+    bool isTargetAvailable(const std::tuple<double, carphymodel::EntityInfo>& tar, SID selfSide) {
+        return std::get<0>(tar) == 0. && std::get<1>(tar).baseInfo.damageLevel != DAMAGE_LEVEL::KK &&
+               std::get<1>(tar).baseInfo.side != selfSide;
     }
 
     double angleNormalize(double angle) {

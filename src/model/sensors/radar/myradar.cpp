@@ -14,7 +14,7 @@ struct DoJobOnConstruct{
 
 namespace carphymodel{
 
-bool MyRadar::isDetectable(const Coordinate& self, const EntityInfo& e, const SensorData& sensor, const Hull& hull) const
+bool MyRadar::isDetectable(const Coordinate& self, const EntityInfo& e, const SensorData& sensor, const Hull& hull, double jammerPower) const
 {
     static externModel::radar::Radar PdRadar1;
     static DoJobOnConstruct init{[&](){
@@ -25,6 +25,7 @@ bool MyRadar::isDetectable(const Coordinate& self, const EntityInfo& e, const Se
     PdRadar1.ENURadarState.rVel = { hull.velocity.x, hull.velocity.y, hull.velocity.z };
     PdRadar1.ENUTargetState.tPos = { e.position.x, e.position.y, e.position.z };
     PdRadar1.ENUTargetState.tVel = { e.velocity.x, e.velocity.y, e.velocity.z };
+    PdRadar1.Set_JamPower(jammerPower);
     PdRadar1.update();
     return PdRadar1.ENUTargetState.detected;
 }

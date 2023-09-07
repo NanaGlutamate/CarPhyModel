@@ -34,7 +34,8 @@ struct NameTable {
     }
 };
 
-constexpr NameTable<WheelMotionParamList, Coordinate, DamageModel, Block, ProtectionModel, FireUnit, SensorData>
+constexpr NameTable<WheelMotionParamList, Coordinate, DamageModel, Block, ProtectionModel, FireUnit, SensorData,
+                    CommunicationData>
     nameTable{{
         "WheelMotionParamList",
         "Coordinate",
@@ -43,6 +44,7 @@ constexpr NameTable<WheelMotionParamList, Coordinate, DamageModel, Block, Protec
         "ProtectionModel",
         "FireUnit",
         "SensorData",
+        "CommunicationData",
     }};
 
 class CStyleString {
@@ -192,6 +194,7 @@ void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model, boo
         handle.addSingletonComponents<CommandBuffer, EventBuffer, DamageModel, Coordinate, HitEventQueue,
                                       FireEventQueue, ScannedMemory, Hull>({}, {}, {}, {}, {}, {}, {}, {});
         handle.addSingletonComponents<DamageModel>({DAMAGE_LEVEL::N, DAMAGE_LEVEL::KK});
+        handle.addSingletonComponents<SID, VID>(0, 0);
 
         loadComponent<SingletonComponent<WheelMotionParamList>>::load(root, handle);
 
@@ -199,6 +202,7 @@ void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model, boo
             auto ID = handle.newEntity();
             for (auto component = entity->first_node(0); component; component = component->next_sibling()) {
                 loadComponent<NormalComponent<Block, ProtectionModel, DamageModel, FireUnit, SensorData,
+                                              CommunicationData,
                                               Coordinate>>::load(ID, component, handle);
             }
         }

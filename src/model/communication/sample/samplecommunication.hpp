@@ -4,11 +4,13 @@
 
 namespace carphymodel{
 
-class SampleCommunication : public Communication{
+class SimpleCommunication : public Communication{
 public:
-    SampleCommunication(double range): range(range){};
-    virtual bool sendMessage() override {};
-    virtual ~SampleCommunication() = default;
+    SimpleCommunication(double range): range(range){};
+    virtual bool sendMessage(const Vector3& self, const Vector3& target) override{
+        return (self - target).norm() <= range;
+    };
+    virtual ~SimpleCommunication() = default;
 private:
     double range;
 };

@@ -4,7 +4,7 @@
 
 namespace carphymodel{
 
-bool MyAntenna::sendMessage(){
+bool MyAntenna::sendMessage(const Vector3& self, const Vector3& target){
     using namespace externModel::comm;
 	static Comm comm1, comm2;
     static Env environment{1, 1, 1};
@@ -18,12 +18,12 @@ bool MyAntenna::sendMessage(){
     }};
 	facilityPOS pos1, pos2;
     // TODO:
-	// pos1.Comm_Set_longitude = Posa_x;
-	// pos1.Comm_Set_latitude = Posa_y;
-	// pos1.Comm_Set_altitude = Posa_z;
-	// pos2.Comm_Set_longitude = Posb_x;
-	// pos2.Comm_Set_latitude = Posb_y;
-	// pos2.Comm_Set_altitude = Posb_z;
+	pos1.Comm_Set_longitude = target.y;
+    pos1.Comm_Set_latitude = target.x;
+    pos1.Comm_Set_altitude = -target.z;
+	pos2.Comm_Set_longitude = self.y;
+	pos2.Comm_Set_latitude = self.x;
+	pos2.Comm_Set_altitude = -self.z;
     double jam = 1e-16;
 	//一号设备
 	comm1.SetInput(pos1, environment, jam, plat);

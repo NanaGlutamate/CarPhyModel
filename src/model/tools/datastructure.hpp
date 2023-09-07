@@ -205,6 +205,13 @@ struct SensorData {
     static SensorData make(){return SensorData{};}
 };
 
+// carcommunication
+struct CommunicationData {
+    constexpr static const char* token_list[] = {"type"};
+    std::string type;
+    static CommunicationData make() { return CommunicationData{}; }
+};
+
 struct BaseInfo {
     constexpr static const char *token_list[] = {"type", "id", "side", "damageLevel"};
     enum class ENTITY_TYPE {
@@ -274,7 +281,7 @@ struct EventBuffer : public std::unordered_map<std::string, std::any> {};
 
 using Components =
     ComponentManager<SingletonComponent<Coordinate, DamageModel, CommandBuffer, EventBuffer, HitEventQueue,
-                                        FireEventQueue, WheelMotionParamList, ScannedMemory, Sphere, Hull>,
-                     NormalComponent<Coordinate, DamageModel, Block, ProtectionModel, FireUnit, SensorData>>;
+                                        FireEventQueue, WheelMotionParamList, ScannedMemory, Sphere, Hull, SID, VID>,
+    NormalComponent<Coordinate, DamageModel, Block, ProtectionModel, FireUnit, SensorData, CommunicationData>>;
 
 }; // namespace carphymodel

@@ -39,14 +39,14 @@
                 <xs:element name="ProtectionModel">
                     <xs:complexType>
                         <xs:all>
-                            <xs:element name="armor_front" type="xs:double" />
-                            <xs:element name="armor_back" type="xs:double" />
-                            <xs:element name="armor_side" type="xs:double" />
-                            <xs:element name="armor_bottom" type="xs:double" />
-                            <xs:element name="armor_top" type="xs:double" />
-                            <xs:element name="activeProtectionAmmo" type="xs:int" />
-                            <xs:element name="reactiveArmor" type="xs:int" />
-                            <xs:element name="coverageRate" type="xs:double" />
+                            <xs:element name="armor_front" type="xs:double" minOccurs="0" />
+                            <xs:element name="armor_back" type="xs:double" minOccurs="0" />
+                            <xs:element name="armor_side" type="xs:double" minOccurs="0" />
+                            <xs:element name="armor_bottom" type="xs:double" minOccurs="0" />
+                            <xs:element name="armor_top" type="xs:double" minOccurs="0" />
+                            <xs:element name="activeProtectionAmmo" type="xs:int" minOccurs="0" />
+                            <xs:element name="reactiveArmor" type="xs:int" minOccurs="0" />
+                            <xs:element name="coverageRate" type="xs:double" minOccurs="0" />
                         </xs:all>
                     </xs:complexType>
                 </xs:element>
@@ -79,6 +79,13 @@
                     </xs:complexType>
                 </xs:element>
                 <xs:element name="SensorData">
+                    <xs:complexType>
+                        <xs:all>
+                            <xs:element name="type" type="xs:string" />
+                        </xs:all>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="CommunicationData">
                     <xs:complexType>
                         <xs:all>
                             <xs:element name="type" type="xs:string" />

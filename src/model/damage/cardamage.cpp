@@ -8,6 +8,9 @@ namespace carphymodel {
 
 void DamageSystem::tick(double dt, Components &c) {
     auto& hitEventQueue = c.getSpecificSingleton<HitEventQueue>().value();
+    if (hitEventQueue.size() == 0) {
+        return;
+    }
 
     auto& totalDamage = c.getSpecificSingleton<DamageModel>().value();
     for (auto&& fireEvent : hitEventQueue) {

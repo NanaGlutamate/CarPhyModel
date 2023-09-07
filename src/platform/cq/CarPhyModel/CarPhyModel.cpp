@@ -4,6 +4,7 @@
 #include "CarPhyModel.h"
 #include "src/model/carbuilder.h"
 #include "src/model/tools/constant.hpp"
+#include "src/model/tools/rand.hpp"
 
 namespace {
 
@@ -76,6 +77,9 @@ bool CarPhyModel::Init(const std::unordered_map<std::string, std::any> &value) {
         // CQ will not release dll when restart, but has no unexpected affect
         location = tmp;
     }
+    auto& buffer = model.components.getSpecificSingleton<carphymodel::EventBuffer>().value();
+    buffer.emplace("longitude", tmp.longitude);
+    buffer.emplace("latitude", tmp.latitude);
     model.components.getSpecificSingleton<carphymodel::Coordinate>().value().position = locationTrans(location, tmp);
     state_ = CSInstanceState::IS_INITIALIZED;
     return true;
@@ -89,8 +93,14 @@ bool CarPhyModel::Tick(double time) {
     buffer->emplace("VID", getVID());
     if (auto it = buffer->find("FireDataOut"); it != buffer->end()) {
         FireEvent tmp = any_cast<carphymodel::FireEvent>(it->second);
-        WriteLog("CarPhyModel model Fire", 1);
-        it->second = tmp.ToValueMap();
+        if (carphymodel::testRandom(0.9)) {
+            buffer->erase(it);
+        } else {
+            WriteLog(format("carphymodel send fireEvent: {{weapon: {}, from: {}({}, {}, {}), to: ({}, {}, {})}}",
+                            tmp.weaponName, getVID(), tmp.position.x, tmp.position.y, tmp.position.z, tmp.target.x, tmp.target.y,
+                            tmp.target.z));
+            it->second = tmp.ToValueMap();
+        }
     }
     carphymodel::Vector3 tmp = model.components.getSpecificSingleton<carphymodel::Coordinate>().value().position;
     EntityInfo info;
@@ -176,6 +186,8 @@ bool CarPhyModel::SetInput(const std::unordered_map<std::string, std::any> &valu
 
 std::unordered_map<std::string, std::any> *CarPhyModel::GetOutput() {
     state_ = CSInstanceState::IS_RUNNING;
+    std::get<0>(model.components.getSingleton<carphymodel::VID>()) = getVID();
+    std::get<0>(model.components.getSingleton<carphymodel::SID>()) = GetForceSideID();
     auto& buffer = model.components.getSpecificSingleton<carphymodel::EventBuffer>().value();
     buffer.emplace("ForceSideID", GetForceSideID());
     buffer.emplace("ModelID", GetModelID());

@@ -108,6 +108,9 @@ void emplaceIfNotNull(Tar& tar, rapidxml::xml_node<char>* node) {
 
 template <>
 inline double componentDeserialize<double>(rapidxml::xml_node<char>* node) {
+    if (!node) {
+        return 0.;
+    }
     return std::stof(node->value());
 }
 
@@ -118,6 +121,9 @@ inline float componentDeserialize<float>(rapidxml::xml_node<char>* node) {
 
 template <>
 inline int componentDeserialize<int>(rapidxml::xml_node<char>* node) {
+    if (!node) {
+        return 0;
+    }
     return std::stoi(node->value());
 }
 
@@ -235,6 +241,13 @@ inline FireUnit componentDeserialize<FireUnit>(rapidxml::xml_node<char>* node) {
 template <>
 inline SensorData componentDeserialize<SensorData>(rapidxml::xml_node<char>* node) {
     SensorData tmp = SensorData::make();
+    tmp.type = componentDeserialize<std::string>(node->first_node("type"));
+    return tmp;
+}
+
+template <>
+inline CommunicationData componentDeserialize<CommunicationData>(rapidxml::xml_node<char>* node) {
+    CommunicationData tmp = CommunicationData::make();
     tmp.type = componentDeserialize<std::string>(node->first_node("type"));
     return tmp;
 }

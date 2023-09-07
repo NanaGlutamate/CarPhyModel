@@ -21,8 +21,8 @@ public:
             opt_hitbox = Sphere{r * 1.5};
         }
         auto& hitbox = opt_hitbox.value();
+        auto& carPosition = c.getSpecificSingleton<Coordinate>()->position;
         for(auto&& _fireEvent : c.getSpecificSingleton<FireEventQueue>().value()){
-            auto& carPosition = c.getSpecificSingleton<Coordinate>()->position;
             // auto direction = _fireEvent.target - _fireEvent.position;
             // auto distance = carPosition - _fireEvent.position;
             // // no need to filter out the event that is fired by this car, cause it's already done by CarPhyModel::SetInput
