@@ -14,7 +14,7 @@ std::ostream& operator<<(std::ostream& o, const EntityInfo& e) {
 int main() {
     using namespace std;
     Vector3 self{0, 0, 0};
-    auto target = EntityInfo{.position = {1000, 0, 0},
+    auto target = EntityInfo{.position = {100000, 0, 0},
                              .velocity = {0, 0, 0},
                              .baseInfo = {BaseInfo::ENTITY_TYPE::CAR, 1, 1, DAMAGE_LEVEL::N}};
 

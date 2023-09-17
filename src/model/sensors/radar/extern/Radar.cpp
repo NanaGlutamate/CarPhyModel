@@ -94,20 +94,24 @@ namespace externModel::radar {
 					2) * 1 * m_Transmitter.Dav) + 2 * m_Antenna.Gml;
 				B1 = 30 * log10(4 * PI) + SystemLoss;
 
-				double C1, C2, C3, C4;
-				if (m_Switch.RD_HasClutter)
-					C2 = 0;
-				else
-					C2 = 0;
-				C3 = pow(10.0, m_Receiver.CalNPower() / 10.0);					
-				if (m_Switch.RD_HasJam)
-					C4 = CJam; 
-				else
-					C4 = 0;
-				if (ENUTargetState.tPos.z > ENURadarState.rPos.z)   
-					C1 = 10.0 * log10(C2 + C3 + C4);        
-				else
-					C1 = m_Receiver.CalNPower();
+				//double C1, C2, C3, C4;
+				//if (m_Switch.RD_HasClutter)
+				//	C2 = 0;
+				//else
+				//	C2 = 0;
+				//C3 = pow(10.0, m_Receiver.CalNPower() / 10.0);					
+				//if (m_Switch.RD_HasJam)
+				//	C4 = CJam; 
+				//else
+				//	C4 = 0;
+				//if (ENUTargetState.tPos.z > ENURadarState.rPos.z)   
+				//	C1 = 10.0 * log10(C2 + C3 + C4);
+				//else
+				//	C1 = m_Receiver.CalNPower();
+                                double C3 = pow(10.0, m_Receiver.CalNPower() / 10.0);	
+								double C1 = 10.0 * log10(C3 + 1e-8 * CJam);
+                // double C1 = 10 * log10((4e-21) * m_Receiver.B + CJam) + m_Receiver.Nf;
+                // if (CJam != 0)C1 += 10.0 * log10(CJam);
 
 				double DetectRange;
 				DetectRange = pow(10, (A1 - B1 - C1 - 10 * log10(SNRThreshold)) /
@@ -125,9 +129,10 @@ namespace externModel::radar {
 				
 
 				
-				srand(time(NULL));
-				double randnum = ((double)rand()) / ((double)RAND_MAX);
-				if (randnum <= Pd2 && range <= DetectRange)
+				//srand(time(NULL));
+				//double randnum = ((double)rand()) / ((double)RAND_MAX);
+                //double randnum = 0.5; 
+				if (range <= DetectRange)
 					ENUTargetState.detected = true;
 				else
 					ENUTargetState.detected = false;

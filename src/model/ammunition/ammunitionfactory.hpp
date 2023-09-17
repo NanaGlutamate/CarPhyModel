@@ -12,6 +12,7 @@ namespace carphymodel{
 struct AmmunitionDamageFactory : public Factory<AmmunitionDamageFactory, AmmunitionDamage>{
     inline static LUT look_up_table{
         {"125mmHE", std::make_shared<HEDamage>(std::array<double, 3>{5., 10., 30.})},
+        {"125mmAP", std::make_shared<APDamage>(800)},
     };
 };
 
