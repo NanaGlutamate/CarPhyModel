@@ -22,34 +22,34 @@ constexpr size_t validMovingCommandMask =
 
 namespace carphymodel {
 
-void HullSystem::tick(double dt, Components &c) {
+void HullSystem::tick(double dt, Components& c) {
     using namespace std;
-    auto &damage = c.getSpecificSingleton<DamageModel>().value();
-    if (damage.damageLevel == DAMAGE_LEVEL::K || damage.damageLevel == DAMAGE_LEVEL::KK){
+    auto& damage = c.getSpecificSingleton<DamageModel>().value();
+    if (damage.damageLevel == DAMAGE_LEVEL::K || damage.damageLevel == DAMAGE_LEVEL::KK) {
         return;
     }
 
-    auto &optParam = c.getSpecificSingleton<WheelMotionParamList>();
-    if (!optParam.has_value()){
+    auto& optParam = c.getSpecificSingleton<WheelMotionParamList>();
+    if (!optParam.has_value()) {
         return;
     }
     // TODO: track
-    auto &param = optParam.value();
+    auto& param = optParam.value();
 
     // TODO: check
     auto coordinate = c.getSpecificSingleton<Coordinate>().value();
     double direction = Quaternion::fromCompressedQuaternion(coordinate.attitude).getEuler().z;
     double speed = c.getSpecificSingleton<Hull>()->velocity.dot(coordinate.directionBodyToWorld(Vector3(1., 0., 0.)));
-    for (auto &&[k, v] : c.getSpecificSingleton<CommandBuffer>().value()) {
+    for (auto&& [k, v] : c.getSpecificSingleton<CommandBuffer>().value()) {
         if ((validMovingCommandMask & size_t(1) << static_cast<int>(k)) == 0) {
             continue;
         }
         auto [param1, param2] = any_cast<tuple<double, double>>(v);
-        //if (k == COMMAND_TYPE::ACCELERATE_TURN || k == COMMAND_TYPE::ACCELERATE) {
-        //    param1 = max(param1, speed);
-        //} else if (k == COMMAND_TYPE::DECELERATE_TURN || k == COMMAND_TYPE::DECELERATE) {
-        //    param1 = min(param1, speed);
-        //}
+        // if (k == COMMAND_TYPE::ACCELERATE_TURN || k == COMMAND_TYPE::ACCELERATE) {
+        //     param1 = max(param1, speed);
+        // } else if (k == COMMAND_TYPE::DECELERATE_TURN || k == COMMAND_TYPE::DECELERATE) {
+        //     param1 = min(param1, speed);
+        // }
         if (k == COMMAND_TYPE::STOP) {
             speed = 0.;
         } else if (k == COMMAND_TYPE::TURN) {
@@ -63,8 +63,14 @@ void HullSystem::tick(double dt, Components &c) {
         }
         // TODO:
     }
-    WheelMoveSystem::tick(dt, c.getSpecificSingleton<Coordinate>().value(), c.getSpecificSingleton<Hull>().value(),
-                          direction, speed, param);
+    size_t times = 1;
+    if (dt > 0.1) {
+        times = size_t(std::ceil(dt / 0.1));
+    }
+    for (size_t i = 0; i < times; ++i) {
+        WheelMoveSystem::tick(dt / times, c.getSpecificSingleton<Coordinate>().value(),
+                              c.getSpecificSingleton<Hull>().value(), direction, speed, param);
+    }
 };
 
 } // namespace carphymodel

@@ -25,7 +25,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 # set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
 if(MSVC)
-  string(APPEND CMAKE_CXX_FLAGS " /permissive- /Zc:__cplusplus ")
+  string(APPEND CMAKE_CXX_FLAGS " /permissive- /Zc:__cplusplus /utf-8 ")
 endif()
 
 add_subdirectory(lib)
