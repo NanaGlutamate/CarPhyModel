@@ -12,17 +12,18 @@ public:
     Environment(){}
     Environment(const Environment&) = delete;
     Environment& operator=(const Environment&) = delete;
-private:
+// protected:
     virtual double getAltitude(const Vector3& pos) const { return 0.; }
     virtual double getSlope(const Vector3& pos, const Vector3& dir) const { return 0.; }
     virtual bool getIntervisibility(const Vector3& pos1, const Vector3& pos2) const { return pos1.z >= 0. && pos2.z >= 0.; }
+    virtual ~Environment() = default;
 };
 
 class EnvironmentInfoAgent {
 public:
     EnvironmentInfoAgent() = default;
 
-    void changeEnvironmentSupplier(std::unique_ptr<Environment>&& n) { env = std::move(n); return; }
+    static void changeEnvironmentSupplier(std::unique_ptr<Environment> n) { env = std::move(n); return; }
 
     //! 采用北东地坐标系
     //! @param pos: 位置坐标(北东地)
