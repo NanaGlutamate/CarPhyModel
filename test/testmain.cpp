@@ -16,7 +16,7 @@
 #include "testreadtif.hpp"
 
 int main(){
-    testmain();
+    wsfplugin::testmain();
     // test01::test_main();
     //test02::test_main();
     //test03::test_main();
