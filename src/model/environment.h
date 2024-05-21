@@ -19,8 +19,8 @@ class Environment {
     virtual bool getIntervisibility(const Vector3& pos1, const Vector3& pos2) const {
         return pos1.z >= 0. && pos2.z >= 0.;
     }
-    virtual std::optional<std::vector<Vector3>> getRoute(const Vector3& start, const Vector3& end) {
-        return std::nullopt;
+    virtual std::vector<Vector3> getRoute(const Vector3& start, const Vector3& end) const {
+        return std::vector<Vector3>{start, end};
     }
 };
 
@@ -49,12 +49,12 @@ class EnvironmentInfoAgent {
         return env->getIntervisibility(pos1, pos2);
     }
 
-    //! @brief 获取两点间路径
+    //! @brief 获取两点间路径序列，序列必须包含起始点与终止点
     //!
     //! @param start 起始点
     //! @param end 终止点
     //! @return 中间路径点序列
-    std::optional<std::vector<Vector3>> getRoute(const Vector3& start, const Vector3& end) { return std::nullopt; }
+    std::vector<Vector3> getRoute(const Vector3& start, const Vector3& end) { return env->getRoute(start, end); }
 
   private:
     inline static std::unique_ptr<Environment> env = std::make_unique<Environment>();

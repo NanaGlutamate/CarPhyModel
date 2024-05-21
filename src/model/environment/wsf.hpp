@@ -1,7 +1,6 @@
 #pragma once
 
-#define wsf wsb
-#define WSF WSB
+
 
 #include <string>
 
@@ -62,7 +61,7 @@ struct WSFEnvironment : public carphymodel::Environment {
 
         double elevation1, elevation2, elevation3, elevation4;
 
-        GDALRasterBand* band = dataset->GetRasterBand(1); // 假设DEM只有一个波段
+        GDALRasterBand* band = dataset->GetRasterBand(1);
         band->RasterIO(GF_Read, x1, y1, 1, 1, &elevation1, 1, 1, GDT_Float64, 0, 0);
         band->RasterIO(GF_Read, x2, y1, 1, 1, &elevation2, 1, 1, GDT_Float64, 0, 0);
         band->RasterIO(GF_Read, x1, y2, 1, 1, &elevation3, 1, 1, GDT_Float64, 0, 0);
@@ -100,7 +99,10 @@ struct WSFEnvironment : public carphymodel::Environment {
         }
         return true;
     }
-
+    virtual std::vector<carphymodel::Vector3> getRoute(const carphymodel::Vector3& start, const carphymodel::Vector3& end) const override {
+        // TODO: rpc?
+        return {};
+    }
     virtual ~WSFEnvironment() {
         if (dataset) {
             GDALClose(dataset);
@@ -109,4 +111,4 @@ struct WSFEnvironment : public carphymodel::Environment {
     }
 };
 
-} // namespace carphymodel
+}

@@ -36,6 +36,8 @@ enum class COMMAND_TYPE {
     LOCK_TARGET,
     UNLOCK,
     RADAR_SWITCH,
+    FOLLOW_ROAD,
+    SET_ROAD,
 };
 
 inline size_t NoParamMask =
@@ -45,7 +47,7 @@ inline size_t NoParamMask =
 inline size_t SingleParamMask =
     size_t(1) << static_cast<int>(COMMAND_TYPE::ACCELERATE) | size_t(1) << static_cast<int>(COMMAND_TYPE::DECELERATE) |
     size_t(1) << static_cast<int>(COMMAND_TYPE::BACKWARD) | size_t(1) << static_cast<int>(COMMAND_TYPE::TURN) |
-    size_t(1) << static_cast<int>(COMMAND_TYPE::UNLOCK);
+    size_t(1) << static_cast<int>(COMMAND_TYPE::FOLLOW_ROAD) | size_t(1) << static_cast<int>(COMMAND_TYPE::UNLOCK);
 
 inline size_t DoubleParamMask = size_t(1) << static_cast<int>(COMMAND_TYPE::ACCELERATE_TURN) |
                                 size_t(1) << static_cast<int>(COMMAND_TYPE::DECELERATE_TURN) |
@@ -53,7 +55,8 @@ inline size_t DoubleParamMask = size_t(1) << static_cast<int>(COMMAND_TYPE::ACCE
                                 size_t(1) << static_cast<int>(COMMAND_TYPE::SHOOT) |
                                 size_t(1) << static_cast<int>(COMMAND_TYPE::LOCK_DIRECTION) |
                                 size_t(1) << static_cast<int>(COMMAND_TYPE::LOCK_TARGET) |
-                                size_t(1) << static_cast<int>(COMMAND_TYPE::RADAR_SWITCH);
+                                size_t(1) << static_cast<int>(COMMAND_TYPE::RADAR_SWITCH) | 
+                                size_t(1) << static_cast<int>(COMMAND_TYPE::SET_ROAD);
 
 } // namespace command
 
@@ -279,9 +282,15 @@ struct CommandBuffer : public std::map<command::COMMAND_TYPE, std::any> {};
 
 struct EventBuffer : public std::unordered_map<std::string, std::any> {};
 
+struct PathPlanningModel {
+    std::vector<Vector3> route;
+    Vector3 prePoint;
+    size_t nextPoint;
+};
+
 using Components =
-    ComponentManager<SingletonComponent<Coordinate, DamageModel, CommandBuffer, EventBuffer, HitEventQueue,
-                                        FireEventQueue, WheelMotionParamList, ScannedMemory, Sphere, Hull, SID, VID>,
+    ComponentManager<SingletonComponent<Coordinate, DamageModel, CommandBuffer, EventBuffer, HitEventQueue, FireEventQueue,
+                       WheelMotionParamList, ScannedMemory, Sphere, Hull, SID, VID, PathPlanningModel>,
     NormalComponent<Coordinate, DamageModel, Block, ProtectionModel, FireUnit, SensorData, CommunicationData>>;
 
 }; // namespace carphymodel
