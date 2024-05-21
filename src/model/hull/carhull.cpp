@@ -63,14 +63,13 @@ void HullSystem::tick(double dt, Components& c) {
         }
         // TODO:
     }
-    size_t times = 1;
-    if (dt > 0.1) {
-        times = size_t(std::ceil(dt / 0.1));
-    }
-    for (size_t i = 0; i < times; ++i) {
-        WheelMoveSystem::tick(dt / times, c.getSpecificSingleton<Coordinate>().value(),
-                              c.getSpecificSingleton<Hull>().value(), direction, speed, param);
-    }
+    // size_t times = 1;
+    // if (dt > 0.1) {
+    //     times = size_t(std::ceil(dt / 0.1));
+    // }
+    // for (size_t i = 0; i < times; ++i) {
+    WheelMoveSystem::tick(dt, c.getSpecificSingleton<Coordinate>().value(), c.getSpecificSingleton<Hull>().value(),
+                          direction, speed, param);
 };
 
 } // namespace carphymodel

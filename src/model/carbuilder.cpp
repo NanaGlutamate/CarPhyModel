@@ -80,7 +80,7 @@ struct loadComponent<SingletonComponent<Ty...>> {
     static void load(rapidxml::xml_node<char>* root, carphymodel::Components::Modifier& handle) {
         int tmp[] = {[&]() {
             if (auto p = root->first_node(nameTable.getName<Ty>().data(), nameTable.getName<Ty>().size()); p != 0) {
-                handle.addSingletonComponents<Ty>(componentDeserialize<Ty>(p));
+                handle.addSingletonComponents<Ty>(componentDeserialize<Ty>(p));//反序列化wsbbz
             }
             return 0;
         }()...};

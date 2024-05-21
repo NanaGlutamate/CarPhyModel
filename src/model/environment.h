@@ -28,7 +28,7 @@ class EnvironmentInfoAgent {
   public:
     EnvironmentInfoAgent() = default;
 
-    void changeEnvironmentSupplier(std::unique_ptr<Environment>&& n) { env = std::move(n); }
+    static void changeEnvironmentSupplier(std::unique_ptr<Environment>&& n) { env = std::move(n); }
 
     //! 采用北东地坐标系
     //! @param pos: 位置坐标(北东地)

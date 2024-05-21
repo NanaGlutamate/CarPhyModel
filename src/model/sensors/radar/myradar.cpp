@@ -1,9 +1,12 @@
+#include <mutex>
+#include <iostream>
+
 #include "myradar.h"
 #include "extern/Radar.h"
-#include <iostream>
 
 namespace {
 //using namespace radar;
+std::mutex mtx;
 
 struct DoJobOnConstruct{
     template<typename Job, typename ...Params>
@@ -21,6 +24,7 @@ bool MyRadar::isDetectable(const Coordinate& self, const EntityInfo& e, const Se
         PdRadar1.Init();
         PdRadar1.Set_JamPower(0);
     }};
+    std::lock_guard lock{mtx};
     PdRadar1.ENURadarState.rPos = { self.position.x, self.position.y, self.position.z };
     PdRadar1.ENURadarState.rVel = { hull.velocity.x, hull.velocity.y, hull.velocity.z };
     PdRadar1.ENUTargetState.tPos = { e.position.x, e.position.y, e.position.z };

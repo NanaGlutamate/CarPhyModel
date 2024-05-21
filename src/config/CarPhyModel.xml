@@ -26,6 +26,7 @@
     <Parameter name="longitude" type="float64" displayName="经度" usage="init,output" value="0" unit=""/>
     <Parameter name="latitude" type="float64" displayName="纬度" usage="init,output" value="0" unit=""/>
     <Parameter name="altitude" type="float64" displayName="高度" usage="init,output" value="0" unit=""/>
+	<Parameter name="demFilePath" type="string" displayName="DEM文件路径" usage="init" value="" unit=""/>
     <Parameter name="roll" type="float64" displayName="滚转" usage="output" value="0" unit=""/>
     <Parameter name="pitch" type="float64" displayName="俯仰" usage="output" value="0" unit=""/>
     <Parameter name="yaw" type="float64" displayName="偏航" usage="output" value="0" unit=""/>

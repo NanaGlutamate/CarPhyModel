@@ -5,6 +5,7 @@
 #include "src/model/carbuilder.h"
 #include "src/model/tools/constant.hpp"
 #include "src/model/tools/rand.hpp"
+#include "src/model/environment/wsf.hpp"
 
 namespace {
 
@@ -65,13 +66,18 @@ bool CarPhyModel::Init(const std::unordered_map<std::string, std::any>& value) {
     tmp.latitude = std::any_cast<double>(value.find("latitude")->second);
     tmp.altitude = std::any_cast<double>(value.find("altitude")->second);
     {
-        // must init 1 by 1?
-        std::lock_guard lock(initLock);
+        std::lock_guard<std::mutex> lock(initLock);
         myVID = VIDCounter++;
         if (!myVID) {
             // location of car 0 is base location.
             // CQ will not release dll when restart, but has no unexpected affect
             location = tmp;
+            if (auto it = value.find("demFilePath"); it != value.end()) {
+                auto env = std::make_unique<wsfplugin::WSFEnvironment>();
+                auto filePath = any_cast<std::string>(it->second);
+                env->init(filePath, tmp.longitude, tmp.latitude);
+                carphymodel::EnvironmentInfoAgent::changeEnvironmentSupplier(std::move(env));
+            }
         }
     }
     auto& buffer = model.components.getSpecificSingleton<carphymodel::EventBuffer>().value();
@@ -91,7 +97,7 @@ bool CarPhyModel::Tick(double time) {
     if (auto it = buffer->find("FireDataOut"); it != buffer->end()) {
         FireEvent tmp = any_cast<carphymodel::FireEvent>(it->second);
         if (carphymodel::testRandom(0.9)) {
-            buffer->erase(it);
+            buffer->erase(it);//fire_unsucceed
         } else {
             WriteLog(format("carphymodel send fireEvent: {{weapon: {}, from: {}({}, {}, {}), to: ({}, {}, {})}}",
                             tmp.weaponName, getVID(), tmp.position.x, tmp.position.y, tmp.position.z, tmp.target.x,
