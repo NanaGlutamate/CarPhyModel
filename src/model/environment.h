@@ -30,18 +30,18 @@ class EnvironmentInfoAgent {
 
     static void changeEnvironmentSupplier(std::unique_ptr<Environment>&& n) { env = std::move(n); }
 
-    //! 采用北东地坐标系
+    //! @brief 采用北东地坐标系
     //! @param pos: 位置坐标(北东地)
     //! @return 位置在地表的投影相对某固定平面的高度(上为正)
     double getAltitude(const Vector3& pos) const { return env->getAltitude(pos); }
 
-    //! 采用北东地坐标系
+    //! @brief 采用北东地坐标系
     //! @param pos: 位置坐标(北东地)
     //! @param dir: 方向向量(北东地)
     //! @return 斜率(坡比，上坡为正)
     double getSlope(const Vector3& pos, const Vector3& dir) const { return env->getSlope(pos, dir); }
 
-    //! 采用北东地坐标系
+    //! @brief 采用北东地坐标系
     //! @param pos1: 位置坐标1(北东地)
     //! @param pos2: 位置坐标2(北东地)
     //! @return 是否可见
@@ -50,7 +50,6 @@ class EnvironmentInfoAgent {
     }
 
     //! @brief 获取两点间路径
-    //!
     //! @param start 起始点
     //! @param end 终止点
     //! @return 中间路径点序列
