@@ -35,7 +35,11 @@ void APDamage::updateDamage(const FireEvent &fireEvent, Components &c) const {
     double maxDepth = INF_BIG;
     // // depth of first protection
     // double minDepth;
-    double piercing = piercingAbility;
+    auto it = piercingAbilityTable.lower_bound(fireEvent.range);
+    if (it == piercingAbilityTable.end()) {
+        return;
+    }
+    double piercing = it->second;
 
     // process collision with protection model
     for (auto &[protection, inter] : collisionWithProtection) {

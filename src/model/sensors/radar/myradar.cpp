@@ -3,6 +3,7 @@
 
 #include "myradar.h"
 #include "extern/Radar.h"
+#include "../../tools/myrandom.hpp"
 
 namespace {
 //using namespace radar;
@@ -31,6 +32,9 @@ bool MyRadar::isDetectable(const Coordinate& self, const EntityInfo& e, const Se
     PdRadar1.ENUTargetState.tVel = { e.velocity.x, e.velocity.y, e.velocity.z };
     PdRadar1.Set_JamPower(jammerPower);
     PdRadar1.update();
+    if (carphymodel::rand() >= 0.95){
+        return false;
+    }
     return PdRadar1.ENUTargetState.detected;
 }
 
