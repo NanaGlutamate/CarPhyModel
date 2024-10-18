@@ -13,6 +13,10 @@ class BaseInfo {
         value.emplace("side", side);
         value.emplace("type", type);
         value.emplace("damageLevel", damageLevel);
+        value.emplace("jammer", jammer);
+        value.emplace("hidden", hidden);
+        value.emplace("active_interference_rate", active_interference_rate);
+        value.emplace("active_interference_distance", active_interference_distance);
         return value;
     }
 
@@ -26,6 +30,14 @@ class BaseInfo {
                 type = std::any_cast<uint16_t>(it.second);
             if (it.first == "damageLevel")
                 damageLevel = std::any_cast<uint16_t>(it.second);
+            if (it.first == "jammer")
+                jammer = std::any_cast<double>(it.second);
+            if (it.first == "hidden")
+                hidden = std::any_cast<double>(it.second);
+            if (it.first == "active_interference_rate")
+                active_interference_rate = std::any_cast<double>(it.second);
+            if (it.first == "active_interference_distance")
+                active_interference_distance = std::any_cast<double>(it.second);
         }
     }
 
@@ -35,6 +47,10 @@ class BaseInfo {
             .id = id,
             .side = side,
             .damageLevel = static_cast<carphymodel::DAMAGE_LEVEL>(damageLevel),
+            .jammer = jammer,
+            .hidden = hidden,
+            .active_interference_rate = active_interference_rate,
+            .active_interference_distance = active_interference_distance,
         };
     }
 
@@ -46,6 +62,10 @@ class BaseInfo {
     // type
     uint16_t type;
     uint16_t damageLevel;
+    double jammer;
+    double hidden;
+    double active_interference_rate;
+    double active_interference_distance;
 };
 
 // Vector3
@@ -134,6 +154,10 @@ class EntityInfo {
         baseInfo.id = e.baseInfo.id;
         baseInfo.side = e.baseInfo.side;
         baseInfo.type = static_cast<uint16_t>(e.baseInfo.type);
+        baseInfo.jammer = e.baseInfo.jammer;
+        baseInfo.hidden = e.baseInfo.hidden;
+        baseInfo.active_interference_rate = e.baseInfo.active_interference_rate;
+        baseInfo.active_interference_distance = e.baseInfo.active_interference_distance;
         position = e.position;
         velocity = e.velocity;
     }
@@ -158,6 +182,9 @@ class FireEvent {
         value.emplace("target", target.ToValueMap());
         value.emplace("velocity", velocity.ToValueMap());
         value.emplace("weaponName", weaponName);
+        value.emplace("isFirst", isFirst);
+        value.emplace("param1", param1);
+        value.emplace("param2", param2);
         return value;
     }
 
@@ -179,6 +206,12 @@ class FireEvent {
             }
             if (it.first == "weaponName")
                 weaponName = std::any_cast<std::string>(it.second);
+            if (it.first == "isFirst")
+                isFirst = std::any_cast<double>(it.second);
+            if (it.first == "param1")
+                param1 = std::any_cast<double>(it.second);
+            if (it.first == "param2")
+                param2 = std::any_cast<double>(it.second);
         }
     }
 
@@ -190,6 +223,9 @@ class FireEvent {
         position = f.position;
         velocity = f.velocity;
         range = f.range;
+        isFirst = f.isFirst;
+        param1 = f.param1;
+        param2 = f.param2;
     }
 
     operator carphymodel::FireEvent () const {
@@ -199,6 +235,9 @@ class FireEvent {
             .position = position,
             .velocity = velocity,
             .range = range,
+            .isFirst = isFirst,
+            .param1 = param1,
+            .param2 = param2,
         };
     }
 
@@ -213,6 +252,12 @@ class FireEvent {
     Vector3 velocity;
     // weaponName
     std::string weaponName;
+    // 是否首发
+    double isFirst;
+    // 参数1
+    double param1;
+    // 参数2
+    double param2;
 };
 
 // WeaponInfo

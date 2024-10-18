@@ -27,7 +27,13 @@ void HullSystem::tick(double dt, Components& c) {
     using namespace std;
     auto& damage = c.getSpecificSingleton<DamageModel>().value();
     if (damage.damageLevel == DAMAGE_LEVEL::K || damage.damageLevel == DAMAGE_LEVEL::KK) {
-        return;
+    //TODO: add repair time compute
+    double& repairTime = (damage.damageLevel == DAMAGE_LEVEL::K) ? damage.repairTime_K : damage.repairTime_KK;
+    repairTime -= dt;
+    if (repairTime <= 0) {
+        damage.damageLevel = DAMAGE_LEVEL::N;
+    }
+    return;
     }
 
     auto& optParam = c.getSpecificSingleton<WheelMotionParamList>();
@@ -85,7 +91,7 @@ void HullSystem::tick(double dt, Components& c) {
             }
             continue;
         } else if (k == COMMAND_TYPE::SET_ROAD) {
-            pathPlanningModelData.route = EnvironmentInfoAgent{}.getRoute(coordinate.position, {param1, param2, 0});
+            pathPlanningModelData.route = EnvironmentInfoAgent{}.getRoute(coordinate.position, {param1, param2, 0});//TOCHANGE:终点的经纬度，需要变换到carphymodel坐标系
             pathPlanningModelData.nextPoint = 1;
             auto firstSegmentDir = pathPlanningModelData.route[1] - pathPlanningModelData.route[0];
             pathPlanningModelData.prePoint = pathPlanningModelData.route[0] - firstSegmentDir;

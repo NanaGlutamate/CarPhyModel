@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ModelInfo id="" name="CarPhyModel" displayName="CarPhyModel" dllName="CarPhyModel" hasGeoInfo="false" category="ATOMIC_ENTITY" multiples="">
+<ModelInfo id="" name="CarPhyModelv3" displayName="CarPhyModelv3" dllName="CarPhyModelv3" hasGeoInfo="false" category="ATOMIC_ENTITY" multiples="">
   <Parameters>
     <Parameter name="InstanceName" type="string" displayName="名称" usage="init,output" value="" unit=""/>
     <Parameter name="ForceSideID" type="uint16" displayName="所属阵营" usage="init,output" value="" unit=""/>
@@ -20,6 +20,8 @@
     <Parameter name="EntityInfo" type="EntityInfo" displayName="其他实体信息" usage="input" value="" unit=""/>
     <Parameter name="weaponInfoOut" type="WeaponInfo[]" displayName="本车武器信息" usage="output" value="" unit=""/>
     <Parameter name="scannedInfoOut" type="EntityInfo[]" displayName="本车扫描到的所有信息" usage="output" value="" unit=""/>
+	<Parameter name="scannedInfo" type="EntityInfo[]" displayName="其他实体扫描到的信息" usage="input" value="" unit=""/>
+	<Parameter name="forceSideID" type="uint16" displayName="其他实体的阵营" usage="input" value="" unit=""/>
 
     <Parameter name="VID" type="uint64" displayName="本车VID,从0开始编号" usage="output" value="" unit=""/>
 
@@ -32,5 +34,9 @@
     <Parameter name="yaw" type="float64" displayName="偏航" usage="output" value="0" unit=""/>
     <Parameter name="velocity_x" type="float64" displayName="速度x" usage="output" value="0" unit=""/>
     <Parameter name="velocity_y" type="float64" displayName="速度y" usage="output" value="0" unit=""/>
+	<Parameter name="oil_remain" type="float64" displayName="当前油量" usage="output" value="0" unit=""/>
+	<Parameter name="weapon1_ammoremain" type="float64" displayName="武器1剩余弹药量" usage="output" value="0" unit=""/>
+	<Parameter name="maxdetectrange" type="float64" displayName="最大探测范围" usage="output" value="0" unit=""/>
+    <Parameter name="target_id" type="float64" displayName="目标ID" usage="output" value="0" unit=""/>
   </Parameters>
 </ModelInfo>

@@ -1,6 +1,9 @@
 ﻿#include "HE.h"
 #include "../tools/constant.hpp"
 #include "collision.hpp"
+#include "../tools/myrandom.hpp"
+#include <fstream>
+   
 
 namespace {
 
@@ -22,12 +25,32 @@ void HEDamage::updateDamage(const FireEvent &fireEvent, Components &c) const {
     auto& carCoordinate = c.getSpecificSingleton<Coordinate>().value();
     auto velocity = carCoordinate.directionWorldToBody(fireEvent.velocity);
     auto position = carCoordinate.positionWorldToBody(fireEvent.position);
+    std::ofstream logFile("interception_log.txt", std::ios::app);
+
+
 
     for (auto &&[id, protection] : c.getNormal<ProtectionModel>()) {
         if (protection.activeProtectionAmmo) {
+            // probability add
             protection.activeProtectionAmmo--;
-            return;
+            if ((fireEvent.weaponName == "AP" || fireEvent.weaponName == "HE") &&
+                carphymodel::rand() <= protection.Interception_probability1) {
+                logFile << "HE interception result: success" << std::endl; // 写入文件
+                //std::cout << "HE interception result: success" << std::endl;
+                return;
+            } else if ((fireEvent.weaponName == "antitankmissile" || fireEvent.weaponName == "rocket") &&
+                       carphymodel::rand() <= protection.Interception_probability2) {
+                logFile << "HE interception result: success" << std::endl; // 写入文件
+                //std::cout << "HE interception result: success" << std::endl;
+                //protection.activeProtectionAmmo--;
+                return;
+            }
+            logFile << "HE interception result: fail" << std::endl; // 写入文件
+            //std::cout << "HE interception result: fail" << std::endl;
+            //return;
         }
+        logFile.close();
+        return;// for test
     }
 
     // depth when projectile explode, which is the depth when meet first block

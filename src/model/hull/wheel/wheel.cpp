@@ -146,15 +146,27 @@ void WheelMoveSystem::tick(double dt, Coordinate &baseCoordinate, Hull &hull, do
     if (rotate_restriction_on_speed <= MIN_SPEED)
         rotate_restriction_on_speed = MIN_SPEED;
     speed_restriction = fmin(speed_restriction, rotate_restriction_on_speed);
+    // 计算剩余油量add by wsb
+    if (params.OIL_REMAIN > 0)
+        params.OIL_REMAIN -= (hull.velocity * dt).norm() / 100000 * params.OIL_CONSUMPTION;
+    // 判断还有油
+    if (params.OIL_REMAIN <= 0) {
+        expectSpeed = 0.;
+        params.OIL_REMAIN = 0;
+    }
     // 约束下的期望速度
     expectSpeed = clamp(expectSpeed, speed_restriction);
     // 速度变化量
     double delta_speed;
+    //add by wsb:在不同坡度采用不同的加速度
+    double acceleration = params.MAX_FRONT_ACCELERATION;
+    if (slope > 0.1)
+        acceleration = params.MAX_CLIMBING_ACCELERATION;
     if (speed >= 0.) {
         delta_speed = clamp(expectSpeed - speed, (gravity_acceleration - params.MAX_BRAKE_ACCELERATION) * dt,
-                            (gravity_acceleration + params.MAX_FRONT_ACCELERATION) * dt);
+                            (gravity_acceleration + acceleration) * dt);
     } else {
-        delta_speed = clamp(expectSpeed - speed, (gravity_acceleration - params.MAX_FRONT_ACCELERATION / 2) * dt,
+        delta_speed = clamp(expectSpeed - speed, (gravity_acceleration - acceleration / 2) * dt,
                             (gravity_acceleration + params.MAX_BRAKE_ACCELERATION) * dt);
     }
     // small fix: 当前角度与期望角度差距过大且速度不小时不加速

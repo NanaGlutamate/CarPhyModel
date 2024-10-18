@@ -170,12 +170,20 @@ inline ProtectionModel componentDeserialize<ProtectionModel>(rapidxml::xml_node<
     tmp.activeProtectionAmmo = componentDeserialize<int>(node->first_node("activeProtectionAmmo"));
     tmp.reactiveArmor = componentDeserialize<int>(node->first_node("reactiveArmor"));
     tmp.coverageRate = componentDeserialize<double>(node->first_node("coverageRate"));
+    tmp.jammer = componentDeserialize<double>(node->first_node("jammer"));
+    tmp.hidden = componentDeserialize<double>(node->first_node("hidden"));
+    tmp.Interception_probability1 = componentDeserialize<double>(node->first_node("Interception_probability1"));
+    tmp.Interception_probability2 = componentDeserialize<double>(node->first_node("Interception_probability2"));
+    tmp.active_interference_rate = componentDeserialize<double>(node->first_node("active_interference_rate"));
+    tmp.active_interference_distance = componentDeserialize<double>(node->first_node("active_interference_distance"));
     return tmp;
 }
 
 template <>
 inline DamageModel componentDeserialize<DamageModel>(rapidxml::xml_node<char>* node) {
     DamageModel tmp = DamageModel::make();
+    tmp.repairTime_K = componentDeserialize<double>(node->first_node("repairTime_K"));
+    tmp.repairTime_KK = componentDeserialize<double>(node->first_node("repairTime_KK"));
     emplaceIfNotNull(tmp.maxInfluence, node->first_node("maxInfluence"));
     return tmp;
 }
@@ -225,6 +233,9 @@ inline Weapon componentDeserialize<Weapon>(rapidxml::xml_node<char>* node) {
     tmp.reloadingTime = componentDeserialize<double>(node->first_node("reloadingTime"));
     tmp.range = componentDeserialize<double>(node->first_node("range"));
     tmp.speed = componentDeserialize<double>(node->first_node("speed"));
+    tmp.param1 = componentDeserialize<double>(node->first_node("param1"));
+    tmp.param2 = componentDeserialize<double>(node->first_node("param2"));
+    tmp.ammototal = tmp.ammoRemain;
     return tmp;
 }
 
@@ -242,6 +253,9 @@ template <>
 inline SensorData componentDeserialize<SensorData>(rapidxml::xml_node<char>* node) {
     SensorData tmp = SensorData::make();
     tmp.type = componentDeserialize<std::string>(node->first_node("type"));
+    tmp.detectrange = componentDeserialize<double>(node->first_node("detectrange"));
+    tmp.detectprobability = componentDeserialize<double>(node->first_node("detectprobability"));
+    tmp.target_positioning_accuracy = componentDeserialize<double>(node->first_node("target_positioning_accuracy"));
     return tmp;
 }
 
@@ -262,6 +276,9 @@ inline WheelMotionParamList componentDeserialize<WheelMotionParamList>(rapidxml:
     tmp.MAX_FRONT_ACCELERATION = componentDeserialize<double>(node->first_node("MAX_FRONT_ACCELERATION"));
     tmp.MAX_BRAKE_ACCELERATION = componentDeserialize<double>(node->first_node("MAX_BRAKE_ACCELERATION"));
     tmp.MAX_LATERAL_ACCELERATION = componentDeserialize<double>(node->first_node("MAX_LATERAL_ACCELERATION"));
+    tmp.OIL_REMAIN = componentDeserialize<double>(node->first_node("OIL_REMAIN"));
+    tmp.OIL_CONSUMPTION = componentDeserialize<double>(node->first_node("OIL_CONSUMPTION"));
+    tmp.MAX_CLIMBING_ACCELERATION = componentDeserialize<double>(node->first_node("MAX_CLIMBING_ACCELERATION"));
     return tmp;
 }
 

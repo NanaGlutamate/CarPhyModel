@@ -38,6 +38,8 @@ enum class COMMAND_TYPE {
     RADAR_SWITCH,
     FOLLOW_ROAD,
     SET_ROAD,
+    ACTIVATE_INTERFERE,
+    //REPAIR,
 };
 
 inline size_t NoParamMask =
@@ -47,7 +49,8 @@ inline size_t NoParamMask =
 inline size_t SingleParamMask =
     size_t(1) << static_cast<int>(COMMAND_TYPE::ACCELERATE) | size_t(1) << static_cast<int>(COMMAND_TYPE::DECELERATE) |
     size_t(1) << static_cast<int>(COMMAND_TYPE::BACKWARD) | size_t(1) << static_cast<int>(COMMAND_TYPE::TURN) |
-    size_t(1) << static_cast<int>(COMMAND_TYPE::FOLLOW_ROAD) | size_t(1) << static_cast<int>(COMMAND_TYPE::UNLOCK);
+    size_t(1) << static_cast<int>(COMMAND_TYPE::FOLLOW_ROAD) | size_t(1) << static_cast<int>(COMMAND_TYPE::UNLOCK) |
+    size_t(1) << static_cast<int>(COMMAND_TYPE::ACTIVATE_INTERFERE);
 
 inline size_t DoubleParamMask = size_t(1) << static_cast<int>(COMMAND_TYPE::ACCELERATE_TURN) |
                                 size_t(1) << static_cast<int>(COMMAND_TYPE::DECELERATE_TURN) |
@@ -56,7 +59,8 @@ inline size_t DoubleParamMask = size_t(1) << static_cast<int>(COMMAND_TYPE::ACCE
                                 size_t(1) << static_cast<int>(COMMAND_TYPE::LOCK_DIRECTION) |
                                 size_t(1) << static_cast<int>(COMMAND_TYPE::LOCK_TARGET) |
                                 size_t(1) << static_cast<int>(COMMAND_TYPE::RADAR_SWITCH) | 
-                                size_t(1) << static_cast<int>(COMMAND_TYPE::SET_ROAD);
+                                size_t(1) << static_cast<int>(COMMAND_TYPE::SET_ROAD)/*|
+                                size_t(1) << static_cast<int>(COMMAND_TYPE::REPAIR)*/;
 
 } // namespace command
 
@@ -85,7 +89,9 @@ struct Sphere {
 struct ProtectionModel {
     constexpr static const char *token_list[] = {
         "armor_front", "armor_back",           "armor_side",    "armor_bottom",
-        "armor_top",   "activeProtectionAmmo", "reactiveArmor", "coverageRate",
+        "armor_top",   "activeProtectionAmmo", "reactiveArmor", "coverageRate", 
+        "jammer", "hidden", "Interception_probability1", "Interception probability2",
+        "active_interference_rate", "active_interference_distance"
     };
     // armor thickness of each side
     double armor_front;
@@ -99,6 +105,18 @@ struct ProtectionModel {
     int reactiveArmor;
     // rate of surface area which covered by reactive armor
     double coverageRate;
+    //the jammer capability
+    double jammer;
+    // the hidden capability, the founded probability
+    double hidden;
+    // the Interception probability of Anti tank missiles, rockets
+    double Interception_probability1;
+    // the Interception probability of AP,HE
+    double Interception_probability2;
+    // Success rate of active interference
+    double active_interference_rate;
+    // the distance of active interference
+    double active_interference_distance;
     static ProtectionModel make(){return ProtectionModel{};}
 };
 
@@ -117,10 +135,12 @@ enum class DAMAGE_LEVEL {
 };
 
 struct DamageModel {
-    constexpr static const char *token_list[] = {"-damageLevel", "maxInfluence"};
+    constexpr static const char* token_list[] = {"-damageLevel", "maxInfluence", "repairTime_K", "repairTime_KK"};
     DAMAGE_LEVEL damageLevel;
     DAMAGE_LEVEL maxInfluence;
-    static DamageModel make() { return DamageModel{DAMAGE_LEVEL::N, DAMAGE_LEVEL::KK}; }
+    double repairTime_K;
+    double repairTime_KK;
+    static DamageModel make() { return DamageModel{DAMAGE_LEVEL::N, DAMAGE_LEVEL::KK, 0, 0}; }
 };
 
 // TODO: index to prevent redundant processing?
@@ -135,6 +155,13 @@ struct FireEvent {
     Vector3 velocity;
     // 发射者和命中点的直线距离
     double range;
+    // add by wsb
+    // 是否首发
+    double isFirst;
+    // 参数1
+    double param1;
+    // 参数2
+    double param2;
 };
 
 struct Direction {
@@ -167,14 +194,18 @@ enum class FIRE_UNIT_STATE {
 };
 
 struct Weapon {
-    constexpr static const char *token_list[] = {"ammoType",        "ammoRemain", "reloadingTime",
-                                                 "-reloadingState", "range",      "speed"};
+    constexpr static const char* token_list[] = {"ammoType", "ammoRemain", "reloadingTime", "-reloadingState",
+                                                 "range",    "speed",      "param1",        "param2"};
     std::string ammoType;
     int ammoRemain;
     double reloadingTime;
     double reloadingState; ///< current remain reloading time
     double range;
     double speed;
+    //add by wsb:for different weapon type, the param1 and param2 refers to different meaning
+    double param1;
+    double param2;
+    int ammototal;
     static Weapon make(){
         Weapon tmp;
         tmp.reloadingState = 0;
@@ -203,8 +234,11 @@ struct FireUnit {
 
 // carsensor
 struct SensorData {
-    constexpr static const char *token_list[] = {"type"};
+    constexpr static const char* token_list[] = {"type", "detectrange", "detectprobability", "target_positioning_accuracy"};
     std::string type;
+    double detectrange;
+    double detectprobability;
+    double target_positioning_accuracy;
     static SensorData make(){return SensorData{};}
 };
 
@@ -216,7 +250,7 @@ struct CommunicationData {
 };
 
 struct BaseInfo {
-    constexpr static const char *token_list[] = {"type", "id", "side", "damageLevel"};
+    constexpr static const char *token_list[] = {"type", "id", "side", "damageLevel", "jammer", "hidden", "active_interference_rate", "active_interference_distance"};
     enum class ENTITY_TYPE {
         CAR,
         UNKNOWN = -1,
@@ -224,6 +258,10 @@ struct BaseInfo {
     VID id;
     SID side;
     DAMAGE_LEVEL damageLevel;
+    double jammer;
+    double hidden;
+    double active_interference_rate;
+    double active_interference_distance;
     static BaseInfo make(){return BaseInfo{};}
 };
 
@@ -239,6 +277,10 @@ struct EntityInfo {
 using CID = size_t;
 
 struct ScannedMemory : public std::map<VID, std::tuple<double, EntityInfo>> {};
+//add by wsb:add system scanned memory
+struct SystemScannedMemory : public std::map<VID, std::tuple<double, EntityInfo>> {};
+
+struct SystemScannedMemoryget : public std::map<VID, std::tuple<double, std::map<VID, EntityInfo>>> {};
 
 struct WheelMotionParamList {
     constexpr static const char *token_list[] = {
@@ -250,6 +292,10 @@ struct WheelMotionParamList {
         "MAX_FRONT_ACCELERATION",
         "MAX_BRAKE_ACCELERATION",
         "MAX_LATERAL_ACCELERATION",
+        //below add by wsb
+        "OIL_REMAIN",
+        "OIL_CONSUMPTION",
+        "MAX_CLIMBING_ACCELERATION"
     };
     // 车轮转角，右为正
     double angle;
@@ -267,6 +313,12 @@ struct WheelMotionParamList {
     double MAX_BRAKE_ACCELERATION;
     // 最大转弯向心加速度(侧向加速度)约束
     double MAX_LATERAL_ACCELERATION;
+    // 剩余油量
+    double OIL_REMAIN;
+    // 油耗,百公里耗油量
+    double OIL_CONSUMPTION;
+    // 最大爬坡加速度约束
+    double MAX_CLIMBING_ACCELERATION;
     static WheelMotionParamList make(){
         WheelMotionParamList tmp;
         tmp.angle = 0;
@@ -290,7 +342,7 @@ struct PathPlanningModel {
 
 using Components =
     ComponentManager<SingletonComponent<Coordinate, DamageModel, CommandBuffer, EventBuffer, HitEventQueue, FireEventQueue,
-                       WheelMotionParamList, ScannedMemory, Sphere, Hull, SID, VID, PathPlanningModel>,
+                       WheelMotionParamList, ScannedMemory, Sphere, Hull, SID, VID, PathPlanningModel, SystemScannedMemory, SystemScannedMemoryget>,
     NormalComponent<Coordinate, DamageModel, Block, ProtectionModel, FireUnit, SensorData, CommunicationData>>;
 
 }; // namespace carphymodel

@@ -7,6 +7,20 @@
 #include <set>
 #include "../environment.h"
 #include <list>
+#include <chrono>
+
+struct TimeCounter {
+    size_t& tar;
+    std::chrono::high_resolution_clock::time_point start_time;
+    TimeCounter(size_t& tar) : tar(tar) {
+        start_time = std::chrono::high_resolution_clock::now();
+    }
+    ~TimeCounter() {
+        auto end_time = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count();
+        tar += duration;
+    }
+};
 
 /**
  * @brief use Bresenham algorithm to draw line with callback function
@@ -17,9 +31,12 @@
  * @param f call back function, return false to stop
  * @return requires
  */
+
 template <std::invocable<size_t, size_t> Func>
     requires std::is_convertible_v<std::invoke_result_t<Func, int, int>, bool>
 void BresenhamLine(int x1, int y1, int x2, int y2, Func&& f) {
+    TimeCounter tc{Astar::line_time};
+    Astar::linkedchecked++;
     int dx = x2 - x1, dy = y2 - y1;
     int s1 = (dx >= 0 ? 1 : -1), s2 = (dy >= 0 ? 1 : -1);
     dx = abs(dx);
@@ -78,6 +95,7 @@ Astar::Astar(double resolution, double robotRadius) : resolution(resolution), ro
  * @param oy 障碍物y坐标集合
  */
 void Astar::calObstacleMap(const std::vector<double>& ox, const std::vector<double>& oy) {
+    //TimeCounter tc{Astar::calfinalpath_time};
     min_x = round(*min_element(ox.begin(), ox.end()));
     min_y = round(*min_element(oy.begin(), oy.end()));
     max_x = round(*max_element(ox.begin(), ox.end()));
@@ -89,9 +107,13 @@ void Astar::calObstacleMap(const std::vector<double>& ox, const std::vector<doub
     y_width = round((max_y - min_y) / resolution);
     std::cout << "x_width:" << x_width << "  y_width:" << y_width << std::endl;
 
-    obstacle_map = std::vector<std::vector<bool>>(x_width, std::vector<bool>(y_width, false));//这里的std::vector不好？
+    obstacle_map = std::vector<std::vector<bool>>(x_width + 1, std::vector<bool>(y_width + 1, false));//这里的std::vector不好？
 
-    for (double i = 0; i < x_width; i++) {
+    for (double i = 0; i < ox.size(); i++) {
+        obstacle_map[calXyIndex(ox[i], min_x)][calXyIndex(oy[i], min_y)] = true;
+    }
+
+    /*for (double i = 0; i < x_width; i++) {
         double x = calPosition(i, min_x);
         for (double j = 0; j < y_width; j++) {
             double y = calPosition(j, min_y);
@@ -103,7 +125,7 @@ void Astar::calObstacleMap(const std::vector<double>& ox, const std::vector<doub
                 }
             }
         }
-    }
+    }*/
 }
 
 /**
@@ -198,7 +220,7 @@ std::vector<carphymodel::Vector3> Astar::calFinalPath(Astar::Node* goal_node, st
 
 template <typename Ty>
 struct Mempool {
-    std::list<Ty> pool;
+    std::deque<Ty> pool;
     template <typename... Args>
     Ty* emplace(Args&&... args) {
         pool.emplace_back(std::forward<Args>(args)...);
@@ -216,6 +238,7 @@ std::vector<carphymodel::Vector3> Astar::planning(std::vector<double> start, std
     double sx = start[0], sy = start[1];
     double gx = goal[0], gy = goal[1];
 
+    TimeCounter tc{Astar::total_time};
     // use memory pool to avoid memory leak writed by WSB.
     Mempool<Node> mempool{};
 
@@ -246,6 +269,10 @@ std::vector<carphymodel::Vector3> Astar::planning(std::vector<double> start, std
         //     }
         //     //cout<<it->first<<","<<it->second->cost<<endl;
         // }
+        if (open_set.empty()) {
+            std::cout << "No path found" << std::endl;
+            return std::vector<carphymodel::Vector3>();
+        }
         current = open_set.top();
         open_set.pop();
         if (open_set_id.find(calIndex(current)) ==
@@ -257,23 +284,7 @@ std::vector<carphymodel::Vector3> Astar::planning(std::vector<double> start, std
             open_set_id.erase(calIndex(current));
         }
 
-        // plotGraph(current);//画图
-
-        //
-        if (abs(current->x - goal_node->x) < EPS && abs(current->y - goal_node->y) < EPS) {
-            std::cout << "Find goal" << std::endl;
-            goal_node->parent_index = current->parent_index;
-            goal_node->cost = current->cost;
-            break;
-        }
-
-        // 从open set中去除
-        /*auto iter = open_set.find(c_id);
-        open_set.erase(iter);*/
-        // 将其加入到closed set
-
         double c_id = calIndex(current);//check
-        closed_set[c_id] = current;
         Node *parent_node = (current->parent_index == -1)? nullptr : closed_set[current->parent_index];
         auto linked = [&, this](int x1, int y1, int x2, int y2) {
             bool ans = true;
@@ -288,6 +299,41 @@ std::vector<carphymodel::Vector3> Astar::planning(std::vector<double> start, std
         auto distance = [&, this](int x1, int y1, int x2, int y2) {
             return std::sqrt(std::pow(x1 - x2, 2) + std::pow(y1 - y2, 2));
         };
+
+        // lazy theta*
+        //if (parent_node && !linked(current->x, current->y, parent_node->x, parent_node->y))// 父节点和当前节点不连通
+        //{
+        //    double costtmp = 1e9;
+        //    //遍历current的相邻节点，且必须满足在close_set中，是否满足linked关系，在满足的节点中再选择(cost + calHeuristic)最小的
+        //    for (auto& move : motion)
+        //    {
+        //        int x = current->x + move[0];
+        //        int y = current->y + move[1];
+        //        if (closed_set.find(y * x_width + x) != closed_set.end() && linked(current->x, current->y, x, y))
+        //        {
+        //            Node* neighbornode = closed_set[y * x_width + x];
+        //            if (costtmp > neighbornode->cost + distance(x, y, current->x, current->y))//calHeuristic(neighbornode, current, closed_set))//多个相等怎么办？
+        //            {
+        //                costtmp = neighbornode->cost + distance(x, y, current->x, current->y);
+        //                current -> parent_index = calIndex(neighbornode);
+        //                current->cost = costtmp;
+        //            }
+        //        }
+        //    }
+        //}
+        parent_node = (current->parent_index == -1) ? nullptr : closed_set[current->parent_index];
+        // plotGraph(current);//画图
+
+        //find goal
+        if (abs(current->x - goal_node->x) < EPS && abs(current->y - goal_node->y) < EPS) {
+            std::cout << "Find goal" << std::endl;
+            goal_node->parent_index = current->parent_index;
+            goal_node->cost = current->cost;
+            break;
+        }
+
+        // 将其加入到closed set
+        closed_set[c_id] = current;
         // expand search grid based on motion model
         for (auto&& move : motion) {
             // cout<<move[0]<<move[1]<<move[2]<<endl;
@@ -300,15 +346,23 @@ std::vector<carphymodel::Vector3> Astar::planning(std::vector<double> start, std
             if (!verifyNode(node))
                 continue; // 如果超出边界或者碰到障碍物了
 
-            // 判断current和c_id的父节点能否直接相连
+            // 判断current和c_id的父节点能否直接相连——theta*
             if (parent_node && linked(node->x, node->y, parent_node->x, parent_node->y)) {
                 node->cost = parent_node->cost + distance(node->x, node->y, parent_node->x, parent_node->y);
                 node->parent_index = calIndex(parent_node);
             }
-            // 这里不判断，直接push
+
+            //lazy theta*
+            /*if (parent_node) {
+                node->cost = parent_node->cost + distance(node->x, node->y, parent_node->x, parent_node->y);
+                node->parent_index = calIndex(parent_node);
+            }*/
+
+            // 这里不判断cost，直接push
             open_set.push(node); // 疑问：相同的整体cost情况下，后加入的节点是先出还是后出？
             open_set_id.insert(n_id); // 可能有重复的节点，后边pop时候做处理
         }
+
         //std::cout << "closed_set_size:" << closed_set.size() << std::endl;
     }
     //plotGraph(current);
@@ -348,31 +402,31 @@ void Astar::setOy(const std::vector<double>& oy) { Astar::oy = oy; }
 double Astar::calHeuristic(Astar::Node* n1, Astar::Node* n2, const std::map<double, Node*>& closed_set) {
     double w = 1.0; // 启发函数权重
 
-    double ob_num = 0; // 两层的n1与父节点直线连线上的障碍物个数，n1最多有一个坐标与父节点坐标相差2
-    Node* parent = closed_set.find(n1->parent_index)->second;
-    double dx = n1->x - parent->x;
-    double dy = n1->y - parent->y;
-    if (abs(dx) == 2) // 左右两侧
-    {
-        if (obstacle_map[parent->x + dx / 2][parent->y])
-            ob_num++;
-        if (obstacle_map[parent->x + dx / 2][parent->y + dy])
-            ob_num++;
+    //double ob_num = 0; // 两层的n1与父节点直线连线上的障碍物个数，n1最多有一个坐标与父节点坐标相差2
+    //Node* parent = closed_set.find(n1->parent_index)->second;
+    //double dx = n1->x - parent->x;
+    //double dy = n1->y - parent->y;
+    //if (abs(dx) == 2) // 左右两侧
+    //{
+    //    if (obstacle_map[parent->x + dx / 2][parent->y])
+    //        ob_num++;
+    //    if (obstacle_map[parent->x + dx / 2][parent->y + dy])
+    //        ob_num++;
 
-    } else if (abs(dy) == 2) // 上下两侧
-    {
-        if (obstacle_map[parent->x][parent->y + dy / 2])
-            ob_num++;
-        if (obstacle_map[parent->x + dx][parent->y + dy / 2])
-            ob_num++;
-    }
+    //} else if (abs(dy) == 2) // 上下两侧
+    //{
+    //    if (obstacle_map[parent->x][parent->y + dy / 2])
+    //        ob_num++;
+    //    if (obstacle_map[parent->x + dx][parent->y + dy / 2])
+    //        ob_num++;
+    //}
 
-    double distance = sqrt(pow(n1->x - parent->x, 2) + pow(n1->y - parent->y, 2));
+    //double distance = sqrt(pow(n1->x - parent->x, 2) + pow(n1->y - parent->y, 2));
     double m = 0;
     double n = 0;
-    double t = abs((n1->x - n2->x) / (n1->y - n2->y));
+    /*double t = abs((n1->x - n2->x) / (n1->y - n2->y));
     abs(parent->y - n1->y) == 2 && t >= 0.6667 ? m = ob_num, n = distance : m = 0, n = 0;
-    abs(parent->x - n1->x) == 2 && t <= 1.4721 ? m = ob_num, n = distance : m = 0, n = 0;
+    abs(parent->x - n1->x) == 2 && t <= 1.4721 ? m = ob_num, n = distance : m = 0, n = 0;*/
 
     double d = w * (sqrt(pow(n1->x - n2->x, 2) + pow(n1->y - n2->y, 2)) + m - n); // 欧式距离+改进
     // double d = w * (abs(n1->x - n2->x) + abs(n1->y - n2->y));//曼哈顿距离

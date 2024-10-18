@@ -51,4 +51,23 @@ public:
         double longitude, latitude, altitude;
     } location;
     carphymodel::CarModel model;
+    double timeiter = 0;
+    std::chrono::high_resolution_clock::time_point lastFrameTime;
+    //for test
+    std::vector<std::any> lasttimemessage = {};
+    bool areVectorsEqual(const std::vector<std::any>& vec1, const std::vector<std::any>& vec2) {
+        if (vec1.size() != vec2.size()) {
+            return false;
+        }
+        // 逐个比较向量中的元素
+        for (size_t i = 0; i < vec1.size(); ++i) {
+            if (vec1[i].type() != typeid(std::string) || vec2[i].type() != typeid(std::string)) {
+                return false; // 类型不是 std::string，不相等
+            }
+            if (std::any_cast<std::string>(vec1[i]) != std::any_cast<std::string>(vec2[i])) {
+                return false; // std::string 类型不相等
+            }
+        }
+        return true;
+    }
 };

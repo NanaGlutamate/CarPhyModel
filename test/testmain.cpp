@@ -4,7 +4,7 @@
 #include "test02.hpp"
 //#include "test03.hpp"
 //#include "test04.hpp"
-//#include "test05.hpp"
+#include "test05.hpp"
 //#include "test06.hpp"
 #include "test07.hpp"
 #include "test08.hpp"
@@ -17,7 +17,7 @@
 
 int main(){
     wsfplugin::testmain();
-    // test01::test_main();
+    //test01::test_main();
     //test02::test_main();
     //test03::test_main();
     //test04::test_main();
@@ -28,8 +28,7 @@ int main(){
     //test09::test_main();
     //test11::test_main();
     //test12::test_main();
-    test13::test_main();
-
+    //test13::test_main();
     // struct{int a; float b;} a;
     // auto [i, j] = a;
 

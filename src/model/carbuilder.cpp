@@ -80,7 +80,7 @@ struct loadComponent<SingletonComponent<Ty...>> {
     static void load(rapidxml::xml_node<char>* root, carphymodel::Components::Modifier& handle) {
         int tmp[] = {[&]() {
             if (auto p = root->first_node(nameTable.getName<Ty>().data(), nameTable.getName<Ty>().size()); p != 0) {
-                handle.addSingletonComponents<Ty>(componentDeserialize<Ty>(p));//反序列化wsbbz
+                handle.addSingletonComponents<Ty>(componentDeserialize<Ty>(p));//反序列化
             }
             return 0;
         }()...};
@@ -192,12 +192,13 @@ void CarBuilder::buildFromSource(const std::string& srcXML, CarModel& model, boo
 
     if (auto handle = model.components.getModifier()) {
         handle.addSingletonComponents<CommandBuffer, EventBuffer, DamageModel, Coordinate, HitEventQueue,
-                                      FireEventQueue, ScannedMemory, Hull, PathPlanningModel>({}, {}, {}, {}, {}, {},
-                                                                                              {}, {}, {});
-        handle.addSingletonComponents<DamageModel>({DAMAGE_LEVEL::N, DAMAGE_LEVEL::KK});
+                                      FireEventQueue, ScannedMemory, Hull, PathPlanningModel, SystemScannedMemory, SystemScannedMemoryget>({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {});
+        handle.addSingletonComponents<DamageModel>({DAMAGE_LEVEL::N, DAMAGE_LEVEL::KK, 1e10, 1e10});
         handle.addSingletonComponents<SID, VID>(0, 0);
 
         loadComponent<SingletonComponent<WheelMotionParamList>>::load(root, handle);
+        //add by wsb
+        loadComponent<SingletonComponent<DamageModel>>::load(root, handle);
 
         for (auto entity = root->first_node("entity"); entity; entity = entity->next_sibling("entity")) {
             auto ID = handle.newEntity();

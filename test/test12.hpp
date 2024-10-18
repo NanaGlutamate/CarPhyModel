@@ -22,7 +22,7 @@ int test_main() {
                 {0, 0, 0},
             };
             WheelMotionParamList param{
-                0, 5, 0.523, 0.349, 40, 3, 2.5, 1,
+                0, 5, 0.523, 0.349, 40, 3, 2.5, 1, 1000.0, 250.0,
             };
             struct Target {
                 Vector3 position;

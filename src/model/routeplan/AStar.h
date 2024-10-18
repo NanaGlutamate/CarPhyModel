@@ -47,6 +47,10 @@ class Astar {
     std::vector<double> ox, oy;
 
   public:
+    inline static int linkedchecked = 0;
+    inline static size_t line_time = 0;
+    inline static size_t total_time = 0;
+    inline static size_t calfinalpath_time = 0;
     Astar(double resolution, double robotRadius);
 
     void calObstacleMap(const std::vector<double>& ox, const std::vector<double>& oy);

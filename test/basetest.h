@@ -94,6 +94,7 @@ std::ostream &operator<<(std::ostream &os, const Quaternion &v) {
     return os;
 }
 
-inline void buildBaseModel(carphymodel::CarModel& model) {
-    carphymodel::CarBuilder::buildFromFile("D:\\Desktop\\FinalProj\\Code\\CarPhyModel\\src\\config\\car_protection.xml", model);
+inline void buildBaseModel(const std::string& XMLFilePath, carphymodel::CarModel& model) {
+    carphymodel::CarBuilder::buildFromFile(XMLFilePath, model);
+    //"D:\\codeproject\\CarPhyModel\\src\\config\\car_protection.xml"
 }

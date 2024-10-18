@@ -28,6 +28,9 @@ if(MSVC)
   string(APPEND CMAKE_CXX_FLAGS " /permissive- /Zc:__cplusplus /utf-8 ")
 endif()
 
+#πÿ±’”≈ªØ
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi -Od -Ob0")
+
 add_subdirectory(lib)
 add_subdirectory(src)
 add_subdirectory(test)

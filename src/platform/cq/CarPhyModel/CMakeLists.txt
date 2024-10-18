@@ -4,8 +4,10 @@ set(SRCS ${MODEL_SRC} ${CQ_SRC})
 link_directories(${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 
 add_library(${PROJ_NAME} SHARED ${SRCS})
-find_package(GDAL CONFIG REQUIRED)
-target_link_libraries(${PROJ_NAME} PRIVATE GDAL::GDAL)
+
+target_include_directories(${PROJ_NAME} PUBLIC D:/GDAL/GLADLibrary/include)
+#find_package(GDAL CONFIG REQUIRED)
+target_link_libraries(${PROJ_NAME} PRIVATE D:/GDAL/GLADLibrary/lib/gdal_i.lib)
 
 # if(MSVC)
 #   SET_TARGET_PROPERTIES(${PROJ_NAME} PROPERTIES LINK_FLAGS "/PROFILE")

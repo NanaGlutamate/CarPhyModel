@@ -1,5 +1,6 @@
-#include <format>
+﻿#include <format>
 #include <string>
+#include <chrono>
 
 #include "CarPhyModel.h"
 #include "src/model/carbuilder.h"
@@ -85,19 +86,47 @@ bool CarPhyModel::Init(const std::unordered_map<std::string, std::any>& value) {
     buffer.emplace("latitude", tmp.latitude);
     model.components.getSpecificSingleton<carphymodel::Coordinate>().value().position = locationTrans(location, tmp);
     state_ = CSInstanceState::IS_RUNNING;
+    lastFrameTime = std::chrono::high_resolution_clock::now();
     return true;
 }
 
 bool CarPhyModel::Tick(double time) {
+    //first deal with Systemscannedmemoryget to Systemscannedmemory
+    size_t memsize = model.components.getSpecificSingleton<carphymodel::SystemScannedMemoryget>().value().size();//所有车的扫描实体列表，vector<vector<EntityInfo>>
+    auto& memit = model.components.getSpecificSingleton<carphymodel::ScannedMemory>();
+    auto& memsysscan = model.components.getSpecificSingleton<carphymodel::SystemScannedMemory>();
+    for (auto& infomem : model.components.getSpecificSingleton<carphymodel::SystemScannedMemoryget>().value())
+    {
+        if (memit.value().find(infomem.first) != memit.value().end() && get<1>((*(memit))[infomem.first]).baseInfo.side == GetForceSideID())
+        {//遍历infomem，更新memsysscan
+            for (auto& info : get<1>(infomem.second))
+            {
+                //判断扫描到的车在不在扫描车的探测范围内___________________________________________________
+                if ((info.second.position - get<1>((*(memit))[infomem.first]).position).norm() < 10000) {
+                    carphymodel::VID IDmem = info.second.baseInfo.id;
+                    get<1>((*(model.components.getSpecificSingleton<carphymodel::SystemScannedMemory>()))[IDmem]) =
+                        info.second;
+                }
+            }
+        }
+    }
     // time: ms -> s
     model.tick(time / 1000);
-    auto& buffer = model.components.getSpecificSingleton<carphymodel::EventBuffer>();
+    //声明一个变量记录当前的系统时间
+    auto currentFrameTime = std::chrono::high_resolution_clock::now();
+    // 计算时间差
+    std::chrono::duration<double> deltaTime = currentFrameTime - lastFrameTime;
+    // 更新上一帧时间
+    lastFrameTime = currentFrameTime;
+    double dtmessage = deltaTime.count();
 
+    timeiter += time;
+    auto& buffer = model.components.getSpecificSingleton<carphymodel::EventBuffer>();
     buffer->emplace("VID", getVID());
     if (auto it = buffer->find("FireDataOut"); it != buffer->end()) {
         FireEvent tmp = any_cast<carphymodel::FireEvent>(it->second);
-        if (carphymodel::testRandom(0.9)) {
-            buffer->erase(it);//fire_unsucceed
+        if (carphymodel::testRandom(0.05/*0.9*/)) {
+            buffer->erase(it);//fire_unsucceed,
         } else {
             WriteLog(format("carphymodel send fireEvent: {{weapon: {}, from: {}({}, {}, {}), to: ({}, {}, {})}}",
                             tmp.weaponName, getVID(), tmp.position.x, tmp.position.y, tmp.position.z, tmp.target.x,
@@ -112,14 +141,20 @@ bool CarPhyModel::Tick(double time) {
         GetForceSideID(),
         static_cast<uint16_t>(carphymodel::BaseInfo::ENTITY_TYPE::CAR),
         static_cast<uint16_t>(model.components.getSpecificSingleton<carphymodel::DamageModel>()->damageLevel),
+        get<1>(*model.components.getNormal<carphymodel::ProtectionModel>().begin()).jammer,//约定第一个entity反映整体特征
+        get<1>(*model.components.getNormal<carphymodel::ProtectionModel>().begin()).hidden,//约定第一个entity反映整体特征
+        get<1>(*model.components.getNormal<carphymodel::ProtectionModel>().begin()).active_interference_rate,//约定第一个entity反映整体特征
+        get<1>(*model.components.getNormal<carphymodel::ProtectionModel>().begin()).active_interference_distance,//约定第一个entity反映整体特征
     };
     if (info.baseInfo.damageLevel >= static_cast<uint16_t>(carphymodel::DAMAGE_LEVEL::K)) {
         state_ = CSInstanceState::IS_DESTROYED;
     }
     info.position = model.components.getSpecificSingleton<carphymodel::Coordinate>()->position;
     info.velocity = model.components.getSpecificSingleton<carphymodel::Hull>()->velocity;
+    
     buffer->emplace("EntityInfoOut", info.ToValueMap());
     Location tmpl = positionTrans(location, info.position);
+    double oilremain = model.components.getSpecificSingleton<carphymodel::WheelMotionParamList>()->OIL_REMAIN;
     // deg
     buffer->emplace("longitude", tmpl.longitude);
     buffer->emplace("altitude", tmpl.altitude);
@@ -134,6 +169,10 @@ bool CarPhyModel::Tick(double time) {
     auto velocity = model.components.getSpecificSingleton<carphymodel::Hull>().value().velocity;
     buffer->emplace("velocity_x", velocity.x);
     buffer->emplace("velocity_y", velocity.y);
+    buffer->emplace("oil_remain", oilremain);
+    buffer->emplace("weapon1_ammoremain",
+        static_cast<double>(get<1>(*model.components.getNormal<carphymodel::FireUnit>().begin()).weapon.ammoRemain));
+    buffer->emplace("target_id", get<1>(*model.components.getNormal<carphymodel::FireUnit>().begin()).data);
 
     std::vector<std::any> weaponInfo;
     auto& baseCoordinate = model.components.getSpecificSingleton<carphymodel::Coordinate>().value();
@@ -150,9 +189,69 @@ bool CarPhyModel::Tick(double time) {
 
     std::vector<std::any> scannedInfoOut;
     for (auto& info : model.components.getSpecificSingleton<carphymodel::ScannedMemory>().value()) {
-        scannedInfoOut.emplace_back(EntityInfo(std::get<1>(info.second)).ToValueMap());
+        //判断info中的tuple中的double参数是否==0
+        int i = 0;
+        if (std::get<0>(info.second) == 0.)
+        {
+            scannedInfoOut.emplace_back(EntityInfo(std::get<1>(info.second)).ToValueMap());
+            //scannedInfoOut.emplace_back(EntityInfo(std::get<1>(info.second)).ToValueMap());
+            carphymodel::VID lcc1 = getVID();
+            std::cout << "lcc1:" << lcc1 << std::endl;
+            i++;
+            if (lcc1 == uint64_t(1) && i == 2)
+            std::cout << lcc1 << std::endl;
+        WriteLog(std::format("test0905 当前车辆ID{};目标ID为{},", getVID(), std::get<1>(info.second).baseInfo.id));
+        }
+        std::cout << "tance:" << i << std::endl;
     }
+    WriteLog(std::format("test0905 当前车辆ID{};扫描到的实体列表大小为{},", getVID(), scannedInfoOut.size()));
     buffer->emplace("scannedInfoOut", std::move(scannedInfoOut));
+    //ask for if a param can be used for dds and send to behaviour model simutaneously;
+    //std::vector<std::any> scannedInfoOut1;
+    //for (auto& info : model.components.getSpecificSingleton<carphymodel::ScannedMemory>().value()) {
+    //    // 判断info中的tuple中的double参数是否==0
+    //    if (std::get<0>(info.second) == 0.) {
+    //        // scannedInfoOut.emplace_back(EntityInfo(std::get<1>(info.second)).ToValueMap());
+    //    }
+    //    scannedInfoOut1.emplace_back(EntityInfo(std::get<1>(info.second)).ToValueMap());
+    //}
+    //buffer->emplace("scannedInfoOut1", std::move(scannedInfoOut1));
+    //auto it = buffer->find("FireDataOut");
+    if (getVID() == 0 /*|| (static_cast<int>(timeiter) % 5000 == 0 ||it != buffer->end())*/ ) {
+        std::vector<std::any> messages;
+        int i = 1;
+        auto& it = model.components.getSpecificSingleton<carphymodel::SystemScannedMemory>().value();
+        for (auto& info : model.components.getSpecificSingleton<carphymodel::ScannedMemory>().value()) {
+            // 判断info中的tuple中的double参数是否==0
+            auto targetID = std::get<1>(info.second).baseInfo.id + 1;
+            if (std::get<0>(info.second) == 0. && std::get<1>(info.second).baseInfo.side != GetForceSideID()) {
+                // scannedInfoOut.emplace_back(EntityInfo(std::get<1>(info.second)).ToValueMap());
+                messages.push_back(std::format("当前车辆所在编队探测到的第{}个,目标ID为{}", (uint64_t)i, targetID));
+                i += 1;
+                continue;
+            }
+            if (it.find(std::get<1>(info.second).baseInfo.id) != it.end() && std::get<1>(info.second).baseInfo.side != GetForceSideID())
+            {
+                messages.push_back(std::format("当前车辆未探测到，编队系统中前出侦查车辆探测到的第{}个,目标ID为{}", (uint64_t)i, targetID));
+                i += 1;
+            }
+        }
+        if (areVectorsEqual(messages, lasttimemessage))
+            messages.clear();
+        else
+            lasttimemessage = messages;
+        if (auto it = buffer->find("FireDataOut"); it != buffer->end()) {
+            FireEvent tmp = any_cast<FireEvent>(it->second);
+            Location tmp1 = positionTrans(location, tmp.position);
+            Location tmp2 = positionTrans(location, tmp.target);
+            messages.push_back(/*std::format("carphymodel send fireEvent,range{}m", (uint64_t)tmp.range)*/
+                               std::string("fire"));
+        }
+        //messages.push_back(std::format("相邻两帧运行的真实时间为{}s", deltaTime.count()));
+        buffer->emplace("KeyMessages", messages);
+    }
+    model.components.getSpecificSingleton<carphymodel::SystemScannedMemory>().value().clear();
+    model.components.getSpecificSingleton<carphymodel::SystemScannedMemoryget>().value().clear();
     return true;
 }
 
@@ -163,7 +262,59 @@ bool CarPhyModel::SetInput(const std::unordered_map<std::string, std::any>& valu
         tmp.FromValueMap(any_cast<CSValueMap>(v));
         carphymodel::VID ID = tmp.baseInfo.id;
         get<1>((*(model.components.getSpecificSingleton<carphymodel::ScannedMemory>()))[ID]) = tmp;
+        if (auto it = value.find("scannedInfo"); it != value.end()/* && tmp.baseInfo.side == GetForceSideID()*/) {
+            auto& v1 = it->second;
+            std::vector<std::any> tmp_sc = any_cast<std::vector<std::any>>(v1);
+            size_t size_tmp = tmp_sc.size();
+            //std::vector<EntityInfo> tmp1;
+            //tmp1.reserve(size_tmp);
+            //tmp1.resize(static_cast<int>(size_tmp));
+            //WriteLog(std::format("test0905 当前车辆ID{};目标ID为{},", getVID(), std::get<1>(info.second).baseInfo.id));
+            WriteLog(std::format("test0905 当前接收到的探测信息来源于车辆ID{};该车扫描到的实体列表大小为{}", ID, size_tmp));
+            for (size_t i = 0; i < size_tmp; i++) {
+                EntityInfo lcc;
+                lcc.FromValueMap(any_cast<CSValueMap>(tmp_sc[i]));
+                //tmp1[i] = lcc;
+                carphymodel::VID NewID = lcc.baseInfo.id;
+                get<1>((*(model.components.getSpecificSingleton<carphymodel::SystemScannedMemoryget>()))[ID])[NewID] = lcc;
+                WriteLog(std::format("test0905 当前接收到的探测信息来源于车辆ID{};目标ID为{},", getVID(), NewID));
+            }
+        }
     }
+    //if (auto it = value.find("scannedInfo"); it != value.end()) {
+    //    auto& v = it->second;
+    //    std::vector<std::any> tmp_sc;
+    //    std::vector<EntityInfo> tmp1;
+    //    if (any_cast<uint16_t>(value.find("forceSideID")->second) == force_side_id_ ) {
+    //        tmp_sc = any_cast<std::vector<std::any>>(v);
+    //        size_t size_tmp = tmp_sc.size();
+    //        tmp1.resize(size_tmp);
+    //        for (size_t i = 0; i < size_tmp; i++) {
+    //            tmp1[i].FromValueMap(any_cast<CSValueMap>(tmp_sc[i]));
+    //            EntityInfo tmp1_look;
+    //            tmp1_look = tmp1[i];
+    //            carphymodel::VID ID;
+    //            ID = tmp1[i].baseInfo.id;
+    //            get<1>((*(model.components.getSpecificSingleton<carphymodel::SystemScannedMemory>()))[ID]) = tmp1[i];
+    //        }
+    //    }
+    //    //for debug
+    //    //uint64_t de = 4;
+    //    //auto debug_it = model.components.getSpecificSingleton<carphymodel::SystemScannedMemory>().value().find(de);
+    //    //if (getVID() == 0 && debug_it != model.components.getSpecificSingleton<carphymodel::SystemScannedMemory>().value().end())
+    //    //{
+    //    //    size_t size_tmp;
+    //    //    size_tmp = model.components.getSpecificSingleton<carphymodel::SystemScannedMemory>().value().size();
+    //    //    cout << size_tmp << endl;
+    //    //    for (size_t i = 0; i < tmp1.size(); i++)
+    //    //    {
+    //    //        WriteLog(format("wsf{},{},{},tmpsize{};lcccccccc{},{},{},tmpsize{}", getVID(),
+    //    //                        any_cast<uint16_t>(value.find("forceSideID")->second), force_side_id_, tmp_sc.size(),
+    //    //                        tmp1[i].baseInfo.id, tmp1[i].baseInfo.side, tmp1[i].position.x, tmp1.size()));
+    //    //    //WriteLog(format("lcccccccc{},{},{},tmpsize{}", tmp1[i].baseInfo.id, tmp1[i].baseInfo.side, tmp1[i].position.x, tmp1.size()));
+    //    //    }
+    //    //}
+    //}
     if (auto it = value.find("FireData"); it != value.end()) {
         carphymodel::VID ID = any_cast<carphymodel::VID>(value.find("FireID")->second);
         auto& v = it->second;
@@ -199,6 +350,11 @@ std::unordered_map<std::string, std::any>* CarPhyModel::GetOutput() {
     buffer.emplace("InstanceName", GetInstanceName());
     buffer.emplace("ID", GetID());
     buffer.emplace("State", uint16_t(GetState()));
+    /*std::vector<std::any> messages = {"nihao", "nihao1"};
+    buffer.emplace("KeyMessages", messages);*/
+    //success below
+    /*std::vector<std::any> messages = {std::string("nihao"), std::string("nihao1")};
+    buffer["KeyMessages"]=messages;*/
     return &buffer;
 }
 

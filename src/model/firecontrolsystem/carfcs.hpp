@@ -89,10 +89,13 @@ class FireControlSystem : public System {
         auto sid = c.getSpecificSingleton<carphymodel::SID>().value();
 
         auto& scannedMemory = c.getSpecificSingleton<ScannedMemory>();
+        auto& sysscannedMemory = c.getSpecificSingleton<SystemScannedMemory>().value();
         size_t nearstTarget = 0;
         double minDistance = -1;
+        //接下来的判断里需要首先判断有没有对应的id，再调用isTargetAvailable
         for (auto& [id, tar] : scannedMemory.value()) {
-            if (!isTargetAvailable(tar, sid)) {
+            auto it = sysscannedMemory.find(id) == sysscannedMemory.end() ? std::tuple<double, EntityInfo>(100, EntityInfo()) : sysscannedMemory[id];
+            if (!isTargetAvailable(tar, sid) && !isTargetAvailable(it, sid)) {
                 continue;
             }
             auto dis = (std::get<1>(tar).position - selfPosition).norm();
@@ -131,7 +134,8 @@ class FireControlSystem : public System {
             if (fireUnit.state == FIRE_UNIT_STATE::MULTI_SHOOT || fireUnit.state == FIRE_UNIT_STATE::SINGLE_SHOOT ||
                 fireUnit.state == FIRE_UNIT_STATE::LOCK_TARGET) {
                 auto it = scannedMemory.value().find(fireUnit.data);
-                if (it == scannedMemory.value().end() || !isTargetAvailable(it->second, sid)) {
+                auto it1 = sysscannedMemory.find(fireUnit.data) == sysscannedMemory.end() ? std::tuple<double, EntityInfo>(100, EntityInfo()) : sysscannedMemory[fireUnit.data];
+                if ((it == scannedMemory.value().end() || !isTargetAvailable(it->second, sid)) && !isTargetAvailable(it1, sid)) {
                     if (fireUnit.state == FIRE_UNIT_STATE::MULTI_SHOOT) {
                         my_assert(size_t(double(nearstTarget)) == nearstTarget);
                         fireUnit.data = static_cast<double>(nearstTarget);
@@ -159,7 +163,8 @@ class FireControlSystem : public System {
             } else {
                 // fireUnit.state is LOCK_TARGET, SINGLE_SHOOT or MULTI_SHOOT, that means it will lock at target
                 auto it = scannedMemory.value().find(fireUnit.data);
-                my_assert(it != scannedMemory.value().end() && isTargetAvailable(it->second, sid));
+                auto it1 = sysscannedMemory.find(fireUnit.data) == sysscannedMemory.end() ? std::tuple<double, EntityInfo>(100, EntityInfo()) : sysscannedMemory[fireUnit.data];
+                my_assert((it != scannedMemory.value().end() && isTargetAvailable(it->second, sid)) || isTargetAvailable(it1, sid));
                 // TODO: cache?
                 auto& info = std::get<1>(it->second);
                 auto tmp = baseCoordinate.positionWorldToBody(info.position + lagFrameCounter * dt * info.velocity);
@@ -184,12 +189,13 @@ class FireControlSystem : public System {
                 fireUnit.presentDirection.yaw += fireUnit.rotateSpeed.yaw * dt * (signbit(rotateYaw) ? -1 : 1);
                 fireUnit.presentDirection.yaw = angleNormalize(fireUnit.presentDirection.yaw);
             }
+            fireUnit.presentDirection.yaw = angleNormalize1(fireUnit.presentDirection.yaw, fireUnit.rotateZone.yawLeft, fireUnit.rotateZone.yawRight);
             if (fabs(rotatePitch) < fireUnit.rotateSpeed.pitch * dt) {
                 fireUnit.presentDirection.pitch = expectPitch;
             } else {
                 fireUnit.presentDirection.pitch += fireUnit.rotateSpeed.pitch * dt * (signbit(rotatePitch) ? -1 : 1);
             }
-
+            fireUnit.presentDirection.pitch = angleNormalize1(fireUnit.presentDirection.pitch, fireUnit.rotateZone.pitchDown, fireUnit.rotateZone.pitchUp);
             // 4. check if target aimed
             if (fireUnit.fireZone.containsDirection({angleNormalize(expectDirection - fireUnit.presentDirection.yaw),
                                                      angleNormalize(expectPitch - fireUnit.presentDirection.pitch)}) &&
@@ -221,7 +227,7 @@ class FireControlSystem : public System {
     }
 
     // check if target detected and not destroyed
-    bool isTargetAvailable(const std::tuple<double, carphymodel::EntityInfo>& tar, SID selfSide) {
+    bool isTargetAvailable(const std::tuple<double, carphymodel::EntityInfo/*, carphymodel::ProtectionModel*/>& tar, SID selfSide) {
         return std::get<0>(tar) == 0. && std::get<1>(tar).baseInfo.damageLevel != DAMAGE_LEVEL::KK &&
                std::get<1>(tar).baseInfo.side != selfSide;
     }
@@ -235,6 +241,17 @@ class FireControlSystem : public System {
         }
         return angle;
     }
+
+    double angleNormalize1(double angle, double bound1, double bound2) {
+        if (angle > bound1) {
+            return bound1;
+        }
+        if (angle < bound2) {
+            return bound2;
+        }
+        return angle;
+    }
+
     double clamp(double value, double bound) {
         bound = fabs(bound);
         if (value < -bound)
@@ -257,6 +274,9 @@ class FireControlSystem : public System {
             .position = selfPosition,
             .velocity = fireUnit.weapon.speed * (targetPosition - selfPosition).normalize(),
             .range = (targetPosition - selfPosition).norm(),
+            .isFirst = fireUnit.weapon.ammoRemain == fireUnit.weapon.ammototal - 1 ? 1.0 : 0.0,
+            .param1 = fireUnit.weapon.param1,
+            .param2 = fireUnit.weapon.param2,
         };
     }
 };
